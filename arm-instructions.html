@@ -21,6 +21,15 @@
     .card img{ border-radius:10px; width:100%; height:auto; margin-top:10px; }
     video{ border-radius:10px; width:100%; max-width:100%; height:auto; margin-top:10px; }
 
+    /* 👇 new class just for smaller images */
+    .img-small{
+      max-width:380px; 
+      width:100%;
+      height:auto;
+      display:block;
+      margin:10px auto;
+    }
+
     .nav-buttons{
       display:flex; justify-content:space-between; align-items:center; padding:0 15px; margin-top:20px;
     }
@@ -39,10 +48,10 @@
     <h1>01/04</h1>
     <h2>Robotic Arm — What you'll do</h2>
     <p>
-      In this activity you’ll <strong>build an alert button</strong> for your robotic arm,
-      then <strong>upload & test</strong> the program. Use the buttons below to move through each step.
+      In this activity you’ll <strong>build a robotic arm</strong>,
+      then <strong>upload a code & test</strong> it. Use the buttons below to move through each step.
     </p>
-    <img src="https://gtacaus.github.io/legobots/alert.jpg" alt="Robotic arm alert button build">
+    <img src="roboticarm.png" alt="Robotic arm alert button build" class="img-small">
     <div class="nav-buttons">
       <a class="btn" href="index.html">◀ Home</a>
       <button onclick="nextPage()">Start ▶</button>
@@ -53,7 +62,7 @@
   <section class="card" id="c2">
     <h1>02/04</h1>
     <h2>Build Your Alert Button</h2>
-    <img src="https://gtacaus.github.io/legobots/alert.jpg" alt="Alert Button Build">
+    <img src="https://gtacaus.github.io/legobots/alert.jpg" alt="Alert Button Build" class="img-small">
     <p>Follow these instructions to create the alert button for your robotic arm.</p>
     <div class="nav-buttons">
       <button onclick="prevPage()">◀ Prev</button>
@@ -62,7 +71,7 @@
     </div>
   </section>
 
-  <!-- 03/04 UPLOAD & TEST (formerly card 4) -->
+  <!-- 03/04 UPLOAD & TEST -->
   <section class="card" id="c3">
     <h1>03/04</h1>
     <h2>Upload & Test</h2>
