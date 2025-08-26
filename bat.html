@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Bat — Biomimicry Library</title>
+<style>
+  :root{ --ink:#111 }
+  *{ box-sizing:border-box } body{ margin:0; background:#f4f4f4; font-family:Arial,sans-serif; color:var(--ink) }
+  .slide{ max-width:1200px; margin:16px auto; background:#fff; border-radius:8px; box-shadow:0 2px 8px rgba(0,0,0,.12); padding:28px; position:relative }
+  h1{ font-weight:500; font-size:2.4rem; margin:6px 0 28px } em{ font-style:italic }
+  .text{ font-size:1.4rem; line-height:1.5; margin:0 0 20px }
+  .row{ display:grid; grid-template-columns: 1fr 1fr; gap:24px; align-items:end }
+  .img{ width:100%; height:auto; display:block }
+  .home{ position:absolute; right:16px; top:16px; background:#f6c281; border:2px solid #000; border-radius:6px; padding:8px 10px; text-decoration:none; color:#000; font-weight:700 }
+  .nav{ display:flex; justify-content:space-between; margin-top:20px }
+  .btn{ border:none; border-radius:8px; padding:12px 20px; font-size:1rem; cursor:pointer }
+  .prev{ background:#bdbdbd; color:#fff } .next{ background:#16a34a; color:#fff }
+  @media (max-width:900px){ .text{font-size:1.1rem} .row{ grid-template-columns:1fr } }
+</style></head>
+<body>
+  <a class="home" href="biomimicry-library.html">🏠 Home</a>
+  <main class="slide">
+    <h1>Bat - <em>Chiroptera</em></h1>
+
+    <p class="text">
+      A bat’s wing structure is very much like a human arm and hand, except it has a thin layer of
+      skin (called the patagium) between the “hand” and the body, and between each finger bone; this
+      skin allows the animal to fly. All bats have a thumb, it usually has a claw which is used for
+      climbing, food handling, and fighting.
+    </p>
+
+    <div class="row">
+      <img class="img" src="bat1.png" alt="Bat in flight"/>
+      <img class="img" src="bat2.png" alt="Bat wing labelled"/>
+    </div>
+
+    <div class="nav">
+      <button class="btn prev" onclick="location.href='mantis.html'">◀ Previous</button>
+      <button class="btn next" onclick="location.href='venus-flytrap.html'">Next ▶</button>
+    </div>
+  </main>
+</body></html>
