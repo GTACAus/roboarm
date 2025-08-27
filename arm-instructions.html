@@ -23,7 +23,7 @@
 
     /* 👇 new class just for smaller images */
     .img-small{
-      max-width:380px; 
+      max-width:320px; 
       width:100%;
       height:auto;
       display:block;
@@ -61,20 +61,20 @@
   <!-- 02/04 BUILD -->
   <section class="card" id="c2">
     <h1>02/04</h1>
-    <h2>Build Your Alert Button</h2>
-    <img src="https://gtacaus.github.io/legobots/alert.jpg" alt="Alert Button Build" class="img-small">
-    <p>Follow these instructions to create the alert button for your robotic arm.</p>
+    <h2>Build Your Robotic Arm</h2>
+    <img src="lego-arm.png" alt="Lego Arm" class="img-small">
+    <p>Follow these instructions to create the alert button for your robotic arm. Click the build button below to download the instructions for the robot arm.</p>
     <div class="nav-buttons">
       <button onclick="prevPage()">◀ Prev</button>
-      <a class="btn" href="https://gtacaus.github.io/legobots/alert.pdf" target="_blank" rel="noopener">BUILD (PDF)</a>
+      <a class="btn" href="arm-instructions.pdf" target="_blank" rel="noopener">BUILD (PDF)</a>
       <button onclick="nextPage()">Next ▶</button>
     </div>
   </section>
 
-  <!-- 03/04 UPLOAD & TEST -->
+  <!-- 03/04 Connect the motor cables -->
   <section class="card" id="c3">
     <h1>03/04</h1>
-    <h2>Upload & Test</h2>
+    <h2>Connect the motor cables</h2>
 
     <!-- iPad-specific video (hidden by default) -->
     <video id="ipadVideo" controls style="display:none">
@@ -88,15 +88,11 @@
       <source src="AlertUpload_MM_upscaled.mp4" type="video/quicktime">
     </video>
 
-    <p>Watch how to upload the code and test your <strong>Robotic Arm Alert</strong>.</p>
+    <p>To control your motor arms, you need to first connect the motor cables to the Lego Hub. Watch this video to see how to connect the motor tables. You can also look at the PDF instructions by clicking on the "Cable Instructions" button below.</p>
 
     <div class="nav-buttons">
       <button onclick="prevPage()">◀ Prev</button>
-      <button id="uploadButton">UPLOAD & TEST</button>
-      <button id="iPadMessage" style="display:none"
-        onclick="window.open('https://apps.apple.com/us/app/spike-lego-education/id6443545905','_blank')">
-        Install SPIKE (iPad)
-      </button>
+<a class="btn" href="arm-instructions.pdf" target="_blank" rel="noopener">Cable Instructions</a>
       <button onclick="nextPage()">Next ▶</button>
     </div>
   </section>
