@@ -4,9 +4,10 @@
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Robotic Arm — Instructions</title>
+  <link href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;600;700&display=swap" rel="stylesheet">
   <style>
     body{
-      font-family: Arial, sans-serif; background:#f0f0f0; margin:0; padding:0;
+      font-family: 'Figtree', system-ui, Arial, sans-serif; background:#f0f0f0; margin:0; padding:0;
       display:flex; flex-direction:column; align-items:center; justify-content:center; min-height:100vh;
     }
     .card{
@@ -43,9 +44,9 @@
 </head>
 <body>
 
-  <!-- 01/04 INTRO -->
+  <!-- 01/05 INTRO -->
   <section class="card active" id="c1">
-    <h1>01/04</h1>
+    <h1>01/05</h1>
     <h2>Robotic Arm — What you'll do</h2>
     <p>
       In this activity you’ll <strong>build a robotic arm</strong>,
@@ -58,9 +59,9 @@
     </div>
   </section>
 
-  <!-- 02/04 BUILD -->
+  <!-- 02/05 BUILD -->
   <section class="card" id="c2">
-    <h1>02/04</h1>
+    <h1>02/05</h1>
     <h2>Build Your Robotic Arm</h2>
     <img src="lego-arm.png" alt="Lego Arm" class="img-small">
     <p>Follow these instructions to create the alert button for your robotic arm. Click the build button below to download the instructions for the robot arm.</p>
@@ -71,9 +72,9 @@
     </div>
   </section>
 
-  <!-- 03/04 Connect the motor cables -->
+  <!-- 03/05 Connect the motor cables -->
   <section class="card" id="c3">
-    <h1>03/04</h1>
+    <h1>03/05</h1>
     <h2>Connect the motor cables</h2>
 
     <!-- iPad-specific video (hidden by default) -->
@@ -97,9 +98,19 @@
     </div>
   </section>
 
-  <!-- 04/04 DONE -->
+  <!-- 04/05 Upload code -->
   <section class="card" id="c4">
-    <h1>04/04</h1>
+    <h1>04/05</h1>
+    <h2>All set!</h2>
+    <p>You’ve built and tested your robotic arm alert. Explore more or return home.</p>
+    <div class="nav-buttons">
+      <button onclick="prevPage()">◀ Prev</button>
+      <button onclick="nextPage()">Next ▶</button>
+    </div>
+  </section>
+  <!-- 05/05 DONE -->
+  <section class="card" id="c5">
+    <h1>05/05</h1>
     <h2>All set!</h2>
     <p>You’ve built and tested your robotic arm alert. Explore more or return home.</p>
     <div class="nav-buttons">
@@ -107,7 +118,6 @@
       <a class="btn" href="index.html">Home ▶</a>
     </div>
   </section>
-
   <script>
     let current = 0;
     const cards = Array.from(document.querySelectorAll('.card'));
