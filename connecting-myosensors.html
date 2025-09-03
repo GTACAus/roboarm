@@ -25,7 +25,7 @@
 
     /* 👇 new class just for smaller images */
     .img-small{
-      max-width:320px; 
+      max-width:400px; 
       width:100%;
       height:auto;
       display:block;
@@ -60,15 +60,104 @@
     </div>
   </section>
 
-  <!-- 02/05 BUILD -->
+  <!-- 02/05 Equipment List -->
   <section class="card" id="c2">
     <h1>02/05</h1>
+    <h2>The mysosensor - What you'll need</h2>
+
+<!-- iPad-specific video (hidden by default) -->
+    <video id="ipadVideo" controls style="display:none">
+      <source src="myosensor-list.mp4" type="video/mp4">
+      <source src="myosensor-list.mp4" type="video/quicktime">
+    </video>
+
+    <!-- Default video -->
+    <video id="defaultVideo" controls>
+      <source src="myosensor-list.mp4" type="video/mp4">
+      <source src="myosensor-list.mp4" type="video/quicktime">
+    </video>
+
+    <p>In this section, you will get a muscle sensor to connect with your robotic arm.
+      Watch this short video to learn about the components you will get with the muscle sensor.
+      The "The Myosensor" button below takes you to a PDF document that explains the muscle sensor equipment in more detail.
+    </p>
+    <div class="nav-buttons">
+      <button onclick="prevPage()">◀ Prev</button>
+      <a class="btn" href="arm-instructions.pdf" target="_blank" rel="noopener">The Myosensor</a>
+      <button onclick="nextPage()">Next ▶</button>
+    </div>
+  </section>
+
+  <!-- 03/05 Connect the sensor cables -->
+  <section class="card" id="c3">
+    <h1>03/05</h1>
+    <h2>Connecting the sensor cables</h2>
+
+    <img src="connect-sensors.png" alt="Lego Arm">
+
+    <p>In this step, we will be connecting the sensor cables to the board.
+      Each board will have many different pins. We will be connecting the cables to the <b>VCC, GND, IO33</b> pins.
+      Look at the picture above to learn how to connect the cables to the right pin.
+    </p>
+
+    <div class="nav-buttons">
+      <button onclick="prevPage()">◀ Prev</button>
+      <button onclick="nextPage()">Next ▶</button>
+    </div>
+  </section>
+
+    <!-- 04/05 Connect the sensor cables -->
+  <section class="card" id="c3">
+    <h1>04/05</h1>
+    <h2>Connecting the sensor cables</h2>
+
+        <!-- iPad-specific video (hidden by default) -->
+    <video id="ipadVideo" controls style="display:none">
+      <source src="connect-myosensor.mp4" type="video/mp4">
+      <source src="connect-myosensor.mp4" type="video/quicktime">
+    </video>
+
+    <!-- Default video -->
+    <video id="defaultVideo" controls>
+      <source src="connect-myosensor.mp4" type="video/mp4">
+      <source src="connect-myosensor.mp4" type="video/quicktime">
+    </video>
+
+    <p>In this step, we will be connecting the sensor cables to the board.
+      Each board will have many different pins. We will be connecting the cables to the <b>VCC, GND, IO33</b> pins.
+      Look at the picture above to learn how to connect the cables to the right pin.
+    </p>
+
+    <div class="nav-buttons">
+      <button onclick="prevPage()">◀ Prev</button>
+      <button onclick="nextPage()">Next ▶</button>
+    </div>
+  </section>
+
+  <!-- 04/05 BUILD -->
+  <section class="card" id="c2">
+    <h1>04/05</h1>
     <h2>Wire the myosensor up to the GTAC lego controller</h2>
     <img src="controller.jpg" alt="Lego Arm" class="img-small">
     <p>Follow these instructions to connect your myosensor to the GTAC controller.</p>
     <div class="nav-buttons">
       <button onclick="prevPage()">◀ Prev</button>
       <a class="btn" href="arm-instructions.pdf" target="_blank" rel="noopener">BUILD (PDF)</a>
+      <button onclick="nextPage()">Next ▶</button>
+    </div>
+  </section>
+
+  <!-- 03/05 Connect the sensor cables -->
+  <section class="card" id="c3">
+    <h1>03/05</h1>
+    <h2>Connect sensor cables</h2>
+
+<img src="connect-sensors.jpeg" alt="Lego Arm" class="img-small">
+
+    <p>We need to plug wires into <b>VCC, GND, IO33.</b></p>
+
+    <div class="nav-buttons">
+      <button onclick="prevPage()">◀ Prev</button>
       <button onclick="nextPage()">Next ▶</button>
     </div>
   </section>
@@ -98,9 +187,36 @@
     </div>
   </section>
 
-    <!-- 04/05 Connect the sensor cables -->
+    <!-- 04/05 Open the Mindstorms app and project -->
   <section class="card" id="c3">
     <h1>04/05</h1>
+    <h2>Open the Mindstorms app and project</h2>
+
+    <!-- iPad-specific video (hidden by default) -->
+    <video id="ipadVideo" controls style="display:none">
+      <source src="open-app-myosensor.mp4" type="video/mp4">
+      <source src="open-app-myosensor.mp4" type="video/quicktime">
+    </video>
+
+    <!-- Default video -->
+    <video id="defaultVideo" controls>
+      <source src="open-app-myosensor.mp4" type="video/mp4">
+      <source src="open-app-myosensor.mp4" type="video/quicktime">
+    </video>
+
+    <p>We will be using the Lego Mindstorms app to control your robotic arm.
+        We have created the code for you, so all you have to do is select the right code.
+        Watch this video to learn how to open the app, and select the right project.</p>
+
+    <div class="nav-buttons">
+      <button onclick="prevPage()">◀ Prev</button>
+      <button onclick="nextPage()">Next ▶</button>
+    </div>
+  </section>
+
+    <!-- 05/05 Connect the sensor cables -->
+  <section class="card" id="c3">
+    <h1>05/05</h1>
     <h2>Upload your code</h2>
 
     <!-- iPad-specific video (hidden by default) -->
