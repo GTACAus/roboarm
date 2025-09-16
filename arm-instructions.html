@@ -29,7 +29,7 @@
         max-width: 900px;
         padding: 16px;
         text-align: center;
-        height: 800px;
+        height: 1000px;
         display: none;
         flex-direction: column;
         justify-content: space-between;
@@ -99,55 +99,41 @@
       .nav-buttons a.btn:hover {
         background: #0056b3;
       }
+      .center-buttons {
+        flex: 1;
+        display: flex;
+        justify-content: center;
+      }
     </style>
   </head>
   <body>
-    <!-- 01/05 INTRO -->
+    <!-- 01/05 BUILD -->
     <section class="card active" id="c1">
       <h1>01/05</h1>
-      <h2>Robotic Arm — What you'll do</h2>
+      <h2>Build Your Robotic Arm</h2>
+      <img src="lego-arm.png" alt="Lego Arm" class="img-small" />
       <p>
         In this activity you’ll <strong>build a robotic arm</strong>, then
         <strong>upload a code & test</strong> it. Use the buttons below to move
         through each step.
       </p>
-      <img
-        src="roboticarm.png"
-        alt="Robotic arm alert button build"
-        class="img-small"
-      />
       <div class="nav-buttons">
-        <a class="btn" href="index.html">◀ Home</a>
-        <button onclick="nextPage()">Start ▶</button>
-      </div>
-    </section>
-
-    <!-- 02/05 BUILD -->
-    <section class="card" id="c2">
-      <h1>02/05</h1>
-      <h2>Build Your Robotic Arm</h2>
-      <img src="lego-arm.png" alt="Lego Arm" class="img-small" />
-      <p>
-        Follow these instructions to create the alert button for your robotic
-        arm. Click the build button below to download the instructions for the
-        robot arm.
-      </p>
-      <div class="nav-buttons">
-        <button onclick="prevPage()">◀ Prev</button>
-        <a
-          class="btn"
-          href="arm-instructions.pdf"
-          target="_blank"
-          rel="noopener"
-          >BUILD (PDF)</a
-        >
+        <div class="center-buttons">
+          <a
+            class="btn"
+            href="arm-instructions.pdf"
+            target="_blank"
+            rel="noopener"
+            >BUILD (PDF)</a
+          >
+        </div>
         <button onclick="nextPage()">Next ▶</button>
       </div>
     </section>
 
-    <!-- 03/05 Connect the motor cables -->
-    <section class="card" id="c3">
-      <h1>03/05</h1>
+    <!-- 02/05 Connect the motor cables -->
+    <section class="card" id="c2">
+      <h1>02/05</h1>
       <h2>Connect the motor cables</h2>
 
       <!-- iPad-specific video (hidden by default) -->
@@ -163,28 +149,21 @@
       </video>
 
       <p>
-        To control your motor arms, you need to first connect the motor cables
-        to the Lego Hub. Watch this video to learn how to connect the motor
-        tables. You can also look at the PDF instructions by clicking on the
-        "Cable Instructions" button below.
+        Follow these instructions to connect the motor cables.
       </p>
 
       <div class="nav-buttons">
         <button onclick="prevPage()">◀ Prev</button>
-        <a
-          class="btn"
-          href="connect-motors.pdf"
-          target="_blank"
-          rel="noopener"
+        <a class="btn" href="connect-motors.pdf" target="_blank" rel="noopener"
           >Cable Instructions</a
         >
         <button onclick="nextPage()">Next ▶</button>
       </div>
     </section>
 
-    <!-- 04/05 Open the Mindstorms App and Project -->
+    <!-- 03/05 Open the Mindstorms App and Project -->
     <section class="card" id="c3">
-      <h1>04/05</h1>
+      <h1>03/05</h1>
       <h2>Open the Mindstorms app and project</h2>
 
       <!-- iPad-specific video (hidden by default) -->
@@ -200,9 +179,10 @@
       </video>
 
       <p>
-        We will be using the Lego Mindstorms app to control your robotic arm.
-        We have created the code for you, so all you have to do is select the right code.
-        Watch this video to learn how to open the app, and select the right project.
+        We will be using the Lego Mindstorms app to control your robotic arm. We
+        have created the code for you, so all you have to do is select the right
+        code. Watch this video to learn how to open the app, and select the
+        right project.
       </p>
 
       <div class="nav-buttons">
@@ -211,9 +191,9 @@
       </div>
     </section>
 
-    <!-- 05/05 Connecting your robotic arm -->
+    <!-- 04/05 Connecting your robotic arm -->
     <section class="card" id="c4">
-      <h1>05/05</h1>
+      <h1>04/05</h1>
       <h2>Connecting your robotic arm</h2>
       <!-- iPad-specific video (hidden by default) -->
       <video id="ipadVideo" controls style="display: none">
@@ -227,8 +207,10 @@
         <source src="connect-app.mp4" type="video/quicktime" />
       </video>
       <p>
-        We will be connecting the robotic arm to the app so we can control it. We will also need to upload the code.
-        Once you have the Mindstorms app open, watch this video to learn how to upload your code to the robotic arm.
+        We will be connecting the robotic arm to the app so we can control it.
+        We will also need to upload the code. Once you have the Mindstorms app
+        open, watch this video to learn how to upload your code to the robotic
+        arm.
       </p>
       <div class="nav-buttons">
         <button onclick="prevPage()">◀ Prev</button>
@@ -236,9 +218,9 @@
       </div>
     </section>
 
-    <!-- 06/06 DONE -->
+    <!-- 05/05 DONE -->
     <section class="card" id="c5">
-      <h1>06/06</h1>
+      <h1>05/05</h1>
       <h2>Open the controls, and you are all set!</h2>
       <img src="control.png" alt=Controller" class="img-small">
       <!-- iPad-specific video (hidden by default) -->
@@ -254,7 +236,8 @@
       </video>
       <p>
         You’ve built and uploaded code to your robotic arm. Use the controller
-        on your iPad to test it. Click on the joystick icon on the Mindstorms app to open the controls.
+        on your iPad to test it. Click on the joystick icon on the Mindstorms
+        app to open the controls.
       </p>
       <div class="nav-buttons">
         <button onclick="prevPage()">◀ Prev</button>
