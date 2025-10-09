@@ -8,6 +8,7 @@
   .row{ display:grid; grid-template-columns: 1fr 1fr; gap:24px; align-items:start }
   p{ font-size:1.4rem; line-height:1.5; margin:0 0 18px }
   .img{ width:100%; height:auto; display:block }
+  .img2{ width:200%; height:auto; display:block }
   .home{ position:absolute; right:16px; top:16px; background:#f6c281; border:2px solid #000; border-radius:6px; padding:8px 10px; text-decoration:none; color:#000; font-weight:700 }
   .nav{ display:flex; justify-content:space-between; margin-top:20px }
   .btn{ border:none; border-radius:8px; padding:12px 20px; font-size:1rem; cursor:pointer }
@@ -29,16 +30,24 @@
     </div>
 
     <div class="row" style="margin-top:12px">
-      <img class="img" src="spider1.png" alt="Spider"/>
+    <video id="defaultVideo" controls>
+      <source src="necro.mp4" type="video/mp4">
+      <source src="necro.mp4" type="video/quicktime">
+    </video>
       <p>
         Spider legs are covered with hundreds of tiny hairs connected to the nervous system. They use
         these hairs to sense and interact with their environment.
       </p>
     </div>
 
+    <div class="" style="margin-top:12px">
+      <img class="img" src="/comic/26.jpg" alt="Spider"/>
+
+    </div>
+
     <div class="nav">
       <button class="btn prev" onclick="location.href='harpy-eagle.html'">◀ Previous</button>
-      <button class="btn next" onclick="location.href='biomimicry-library.html'">Finish ▶ Library</button>
+      <button class="btn next" onclick="location.href='springtail.html'">▶ Next</button>
     </div>
   </main>
 </body></html>

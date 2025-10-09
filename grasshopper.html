@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html lang="en"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>Bat — Biomimicry Library</title>
+<title>Grasshopper — Biomimicry Library</title>
 <style>
   :root{ --ink:#111 }
   *{ box-sizing:border-box } body{ margin:0; background:#f4f4f4; font-family:Arial,sans-serif; color:var(--ink) }
@@ -8,7 +8,7 @@
   h1{ font-weight:500; font-size:2.4rem; margin:6px 0 28px } em{ font-style:italic }
   .text{ font-size:1.4rem; line-height:1.5; margin:0 0 20px }
   .row{ display:grid; grid-template-columns: 1fr 1fr; gap:24px; align-items:end }
-  .img{ width:30%; height:auto; display:block }
+  .img{ width:100%; height:auto; display:block }
   .home{ position:absolute; right:16px; top:16px; background:#f6c281; border:2px solid #000; border-radius:6px; padding:8px 10px; text-decoration:none; color:#000; font-weight:700 }
   .nav{ display:flex; justify-content:space-between; margin-top:20px }
   .btn{ border:none; border-radius:8px; padding:12px 20px; font-size:1rem; cursor:pointer }
@@ -18,28 +18,32 @@
 <body>
   <a class="home" href="biomimicry-library.html">🏠 Home</a>
   <main class="slide">
-    <h1>Bat - <em>Chiroptera</em></h1>
+    <h1>Grasshopper - <em>Caelifera</em></h1>
 
     <p class="text">
-      A bat’s wing structure is very much like a human arm and hand, except it has a thin layer of
-      skin (called the patagium) between the “hand” and the body, and between each finger bone; this
-      skin allows the animal to fly. All bats have a thumb, it usually has a claw which is used for
-      climbing, food handling, and fighting.
+      The grasshopper's hind legs store energy in a specialized tendon structure like 
+      a spring, allow them to release powerful bursts of force for high jumps.
     </p>
 
     <div class="row">
+      <img class="img" src="https://encrypted-tbn3.gstatic.com/images?q=tbn:ANd9GcQ4RM1nw5xshZEGVgtoeCkG0NkCLs2OgHCiDB4EbXCwBkldobdmUd9g47pKZ_o7VHEnUQU8qca-1wWTqAcBa_jNEJLxqVEOGegj-0xkGlx6IQ" alt="grasshopper1"/>
+    <video id="ipadVideo" controls style="display:none">
+      <source src="grasshopper.mp4" type="video/mp4">
+      <source src="grasshopper.mp4" type="video/quicktime">
+    </video>
+
     <!-- Default video -->
     <video id="defaultVideo" controls>
-      <source src="bat.mp4" type="video/mp4">
-      <source src="bat.mp4" type="video/quicktime">
+      <source src="grasshopper.mp4" type="video/mp4">
+      <source src="grasshopper.mp4" type="video/quicktime">
     </video>
     </div>
-      <img class="img" src="bat2.png" alt="Bat wing labelled"/>
-    </div>
-
+    <p>Source: Grasshopper robot sets hopping record by New Scientist
+        https://www.youtube.com/watch?v=Pl99QQ8MXow
+    </p>
     <div class="nav">
-      <button class="btn prev" onclick="location.href='grasshopper.html'">◀ Previous</button>
-      <button class="btn next" onclick="location.href='venus-flytrap.html'">Next ▶</button>
+      <button class="btn prev" onclick="location.href='shrimp.html'">◀ Previous</button>
+      <button class="btn next" onclick="location.href='bat.html'">Next ▶</button>
     </div>
   </main>
 </body></html>
