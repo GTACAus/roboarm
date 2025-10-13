@@ -5,31 +5,107 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <title>Mantis shrimp — Biomimicry Library</title>
 <style>
-  :root{ --ink:#111; --accent:#17a34a; }
-  *{ box-sizing:border-box }
-  body{ margin:0; background:#f4f4f4; font-family:Arial, sans-serif; color:var(--ink); }
-  .slide{ max-width:1200px; margin:16px auto; background:#fff; border-radius:8px;
-          box-shadow:0 2px 8px rgba(0,0,0,.12); padding:28px; position:relative; }
-  h1{ font-weight:500; font-size:2.4rem; margin:6px 0 28px; }
-  em{ font-style:italic }
-  .grid{ display:grid; grid-template-columns: 1fr 1fr; gap:24px; align-items:start; }
-  p{ font-size:1.4rem; line-height:1.5; margin:0; }
-  .img{ width:100%; height:auto; display:block; }
-  .row{ display:grid; grid-template-columns: 1fr 1fr; gap:24px; margin-top:24px; align-items:end; }
-  .nav{ display:flex; justify-content:space-between; align-items:center; margin-top:20px; }
-  .btn{ border:none; cursor:pointer; border-radius:8px; padding:12px 20px; font-size:1rem; }
-  .prev{ background:#bdbdbd; color:#fff; }
-  .next{ background:#16a34a; color:#fff; }
-  .home{ position:absolute; right:16px; top:16px; background:#f6c281; border:2px solid #000; border-radius:6px; padding:8px 10px; text-decoration:none; color:#000; font-weight:700 }
-  @media (max-width:900px){ .grid,.row{ grid-template-columns: 1fr; } p{ font-size:1.1rem; } }
+  :root {
+    --ink: #111;
+    --accent: #17a34a;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: #f4f4f4;
+    font-family: Arial, sans-serif;
+    color: var(--ink);
+  }
+  .slide {
+    max-width: 1200px;
+    margin: 16px auto;
+    background: #fff;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.12);
+    padding: 28px;
+    position: relative;
+  }
+  h1 {
+    font-weight: 500;
+    font-size: 2.4rem;
+    margin: 6px 0 28px;
+  }
+  em { font-style: italic; }
+  .grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 24px;
+    align-items: start;
+  }
+  p {
+    font-size: 1.4rem;
+    line-height: 1.5;
+    margin: 0;
+  }
+  .img {
+    width: 100%;
+    height: auto;
+    display: block;
+  }
+  .row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 24px;
+    margin-top: 24px;
+    align-items: end;
+  }
+  .nav {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 20px;
+  }
+  .btn {
+    border: none;
+    cursor: pointer;
+    border-radius: 8px;
+    padding: 12px 20px;
+    font-size: 1rem;
+  }
+  .prev { background: #bdbdbd; color: #fff; }
+  .next { background: #16a34a; color: #fff; }
+  .ref {
+    font-size: 0.85rem;
+    color: #555;
+    font-style: italic;
+    margin-top: 12px;
+    line-height: 1.4;
+    overflow-wrap: anywhere;
+    text-align: right;
+  }
+  .ref a {
+    color: inherit;
+    text-decoration: underline;
+  }
+  .home {
+    position: absolute;
+    right: 16px;
+    top: 16px;
+    background: #f6c281;
+    border: 2px solid #000;
+    border-radius: 6px;
+    padding: 8px 10px;
+    text-decoration: none;
+    color: #000;
+    font-weight: 700;
+  }
   video {
-  width: 90%;
-  height: auto;
-  border-radius: 8px;
-  display: block;
-  margin: 0 auto;
-}
-
+    width: 90%;
+    height: auto;
+    border-radius: 8px;
+    display: block;
+    margin: 0 auto;
+  }
+  @media (max-width:900px) {
+    .grid, .row { grid-template-columns: 1fr; }
+    p { font-size: 1.1rem; }
+    .ref { font-size: 0.8rem; }
+  }
 </style>
 </head>
 <body>
@@ -39,32 +115,36 @@
 
     <div class="grid">
       <p>
-        The mantis shrimp can crush things with incredible force due to its specialized club-like appendages, 
-        which accelerate rapidly and strike with the speed and power of a bullet, aided by a spring-loaded mechanism 
+        The mantis shrimp can crush things with incredible force due to its specialized club-like appendages,
+        which accelerate rapidly and strike with the speed and power of a bullet, aided by a spring-loaded mechanism
         in its incredibly strong limbs.
       </p>
-    <!-- Default video -->
-    <video id="defaultVideo" controls>
-      <source src="mantis.mp4" type="video/mp4">
-      <source src="mantis.mp4" type="video/quicktime">
-    </video>
+
+      <video id="defaultVideo" controls>
+        <source src="mantis.mp4" type="video/mp4">
+        <source src="mantis.mp4" type="video/quicktime">
+      </video>
     </div>
-    <p>Source: The Insane Biology of: The Mantis Shrimp by Real Science
-    https://www.youtube.com/watch?v=MQ8JC1d_wgY&ab_channel=RealScience
 
+    <p class="ref">
+      Source: <em>The Insane Biology of: The Mantis Shrimp</em> by Real Science<br>
+      <a href="https://www.youtube.com/watch?v=MQ8JC1d_wgY&ab_channel=RealScience" target="_blank" rel="noopener">
+        https://www.youtube.com/watch?v=MQ8JC1d_wgY
+      </a>
     </p>
+
     <div>
-    <!-- Default video -->
-    <video id="defaultVideo2" controls>
-      <source src="mantis2.mp4" type="video/mp4">
-      <source src="mantis2.mp4" type="video/quicktime">
-    </video>
-    <p>Source: Meet the smasher by the Biomimicry Institute
-    https://www.youtube.com/watch?v=Pl99QQ8MXow
+      <video id="defaultVideo2" controls>
+        <source src="mantis2.mp4" type="video/mp4">
+        <source src="mantis2.mp4" type="video/quicktime">
+      </video>
 
-    </p>
-
-    
+      <p class="ref">
+        Source: <em>Meet the Smasher</em> by the Biomimicry Institute<br>
+        <a href="https://www.youtube.com/watch?v=Pl99QQ8MXow" target="_blank" rel="noopener">
+          https://www.youtube.com/watch?v=Pl99QQ8MXow
+        </a>
+      </p>
     </div>
 
     <div class="nav">

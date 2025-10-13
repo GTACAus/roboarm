@@ -1,52 +1,148 @@
 <!DOCTYPE html>
-<html lang="en"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>Octopus — Biomimicry Library</title>
-<style>
-  *{ box-sizing:border-box } body{ margin:0; background:#f4f4f4; font-family:Arial,sans-serif; color:#111 }
-  .slide{ max-width:1200px; margin:16px auto; background:#fff; border-radius:8px; box-shadow:0 2px 8px rgba(0,0,0,.12); padding:28px; position:relative }
-  h1{ font-weight:500; font-size:2.4rem; margin:6px 0 28px } em{ font-style:italic }
-  p{ font-size:1.4rem; line-height:1.5; margin:0 0 18px }
-  .row{ display:grid; grid-template-columns: 1fr 1fr; gap:24px; align-items:end }
-  .img{ width:100%; height:auto; display:block }
-  .home{ position:absolute; right:16px; top:16px; background:#f6c281; border:2px solid #000; border-radius:6px; padding:8px 10px; text-decoration:none; color:#000; font-weight:700 }
-  .nav{ display:flex; justify-content:space-between; margin-top:20px }
-  .btn{ border:none; border-radius:8px; padding:12px 20px; font-size:1rem; cursor:pointer }
-  .prev{ background:#bdbdbd; color:#fff } .next{ background:#16a34a; color:#fff }
-  @media (max-width:900px){ .row{ grid-template-columns:1fr } p{ font-size:1.1rem } }
-  video {
-  width: 90%;
-  height: auto;
-  border-radius: 8px;
-  display: block;
-  margin: 0 auto;
-}
-</style></head>
-<body>
-  <a class="home" href="biomimicry-library.html">🏠 Home</a>
-  <main class="slide">
-    <h1>Octopus - <em>Octopus vulgaris</em></h1>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Octopus — Biomimicry Library</title>
+    <style>
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        margin: 0;
+        background: #f4f4f4;
+        font-family: Arial, sans-serif;
+        color: #111;
+      }
+      .slide {
+        max-width: 1200px;
+        margin: 16px auto;
+        background: #fff;
+        border-radius: 8px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
+        padding: 28px;
+        position: relative;
+      }
+      h1 {
+        font-weight: 500;
+        font-size: 2.4rem;
+        margin: 6px 0 28px;
+      }
+      em {
+        font-style: italic;
+      }
+      p {
+        font-size: 1.4rem;
+        line-height: 1.5;
+        margin: 0 0 18px;
+      }
+      .row {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 24px;
+        align-items: end;
+      }
+      .img {
+        width: 100%;
+        height: auto;
+        display: block;
+      }
+      .home {
+        position: absolute;
+        right: 16px;
+        top: 16px;
+        background: #f6c281;
+        border: 2px solid #000;
+        border-radius: 6px;
+        padding: 8px 10px;
+        text-decoration: none;
+        color: #000;
+        font-weight: 700;
+      }
+      .nav {
+        display: flex;
+        justify-content: space-between;
+        margin-top: 20px;
+      }
+      .btn {
+        border: none;
+        border-radius: 8px;
+        padding: 12px 20px;
+        font-size: 1rem;
+        cursor: pointer;
+      }
+      .prev {
+        background: #bdbdbd;
+        color: #fff;
+      }
+      .next {
+        background: #16a34a;
+        color: #fff;
+      }
+      .ref {
+        font-size: 0.9rem;
+        color: #555;
+        font-style: italic;
+        margin-top: 12px;
+      }
+      @media (max-width: 900px) {
+        .row {
+          grid-template-columns: 1fr;
+        }
+        p {
+          font-size: 1.1rem;
+        }
+      }
+      video {
+        width: 90%;
+        height: auto;
+        border-radius: 8px;
+        display: block;
+        margin: 0 auto;
+      }
+    </style>
+  </head>
+  <body>
+    <a class="home" href="biomimicry-library.html">🏠 Home</a>
+    <main class="slide">
+      <h1>Octopus - <em>Octopus vulgaris</em></h1>
 
-    <p>
-      The octopus has no skeletal structure which allows it to squeeze into the tightest of openings
-      and reach prey in the most difficult of locations. The octopus’ long tentacles, covered with
-      hundreds of suckers, can grasp, bend and stretch easily.
-    </p>
+      <p>
+        The octopus has no skeletal structure which allows it to squeeze into
+        the tightest of openings and reach prey in the most difficult of
+        locations. The octopus’ long tentacles, covered with hundreds of
+        suckers, can grasp, bend and stretch easily.
+      </p>
 
-    <div class="row">
-    <!-- Default video -->
-    <video id="defaultVideo" controls>
-      <source src="octopus_sum.mp4" type="video/mp4">
-      <source src="octopus_sum.mp4" type="video/quicktime">
-    </video>
-    
-      <img class="img" src="octopus2.png" alt="Octopus suckers close-up"/>
-    </div>
-    <p>Source: Octopus 101 | Suckers! by Candace Reid-Rose at the Monterey Bay Aquarium\
-      https://www.youtube.com/watch?v=SwqeS4H7Jvk
-    </p>
-    <div class="nav">
-      <button class="btn prev" onclick="location.href='venus-flytrap.html'">◀ Previous</button>
-      <button class="btn next" onclick="location.href='harpy-eagle.html'">Next ▶</button>
-    </div>
-  </main>
-</body></html>
+      <div class="row">
+        <!-- Default video -->
+        <video id="defaultVideo" controls>
+          <source src="octopus_sum.mp4" type="video/mp4" />
+          <source src="octopus_sum.mp4" type="video/quicktime" />
+        </video>
+
+        <img class="img" src="octopus2.png" alt="Octopus suckers close-up" />
+      </div>
+      <p class="ref">
+        Source: <em>Octopus 101 | Suckers!</em> by Candace Reid-Rose at the
+        Monterey Bay Aquarium<br />
+        <a
+          href="https://www.youtube.com/watch?v=SwqeS4H7Jvk"
+          target="_blank"
+          rel="noopener"
+        >
+          https://www.youtube.com/watch?v=SwqeS4H7Jvk
+        </a>
+      </p>
+
+      <div class="nav">
+        <button class="btn prev" onclick="location.href='venus-flytrap.html'">
+          ◀ Previous
+        </button>
+        <button class="btn next" onclick="location.href='harpy-eagle.html'">
+          Next ▶
+        </button>
+      </div>
+    </main>
+  </body>
+</html>

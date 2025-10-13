@@ -1,27 +1,119 @@
 <!DOCTYPE html>
-<html lang="en"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <title>Bat — Biomimicry Library</title>
 <style>
-  :root{ --ink:#111 }
-  *{ box-sizing:border-box } body{ margin:0; background:#f4f4f4; font-family:Arial,sans-serif; color:var(--ink) }
-  .slide{ max-width:1200px; margin:16px auto; background:#fff; border-radius:8px; box-shadow:0 2px 8px rgba(0,0,0,.12); padding:28px; position:relative }
-  h1{ font-weight:500; font-size:2.4rem; margin:6px 0 28px } em{ font-style:italic }
-  .text{ font-size:1.4rem; line-height:1.5; margin:0 0 20px }
-  .row{ display:grid; grid-template-columns: 1fr 1fr; gap:24px; align-items:end }
-  .img{ width:70%; height:auto; display:block }
-  .home{ position:absolute; right:16px; top:16px; background:#f6c281; border:2px solid #000; border-radius:6px; padding:8px 10px; text-decoration:none; color:#000; font-weight:700 }
-  .nav{ display:flex; justify-content:space-between; margin-top:20px }
-  .btn{ border:none; border-radius:8px; padding:12px 20px; font-size:1rem; cursor:pointer }
-  .prev{ background:#bdbdbd; color:#fff } .next{ background:#16a34a; color:#fff }
-  @media (max-width:900px){ .text{font-size:1.1rem} .row{ grid-template-columns:1fr } }
+  :root { --ink:#111; --accent:#16a34a; }
+  * { box-sizing:border-box; }
+
+  body {
+    margin:0;
+    background:#f4f4f4;
+    font-family:Arial, sans-serif;
+    color:var(--ink);
+  }
+
+  .slide {
+    max-width:1200px;
+    margin:16px auto;
+    background:#fff;
+    border-radius:8px;
+    box-shadow:0 2px 8px rgba(0,0,0,.12);
+    padding:28px;
+    position:relative;
+  }
+
+  h1 {
+    font-weight:500;
+    font-size:2.4rem;
+    margin:6px 0 28px;
+  }
+
+  em { font-style:italic; }
+
+  .text {
+    font-size:1.4rem;
+    line-height:1.5;
+    margin:0 0 20px;
+  }
+
+  .row {
+    display:grid;
+    grid-template-columns: 1fr 1fr;
+    gap:24px;
+    align-items:end;
+  }
+
+  .img {
+    width:70%;
+    height:auto;
+    display:block;
+    margin: 0 auto;
+  }
+
   video {
-  width: 80%;
-  height: auto;
-  border-radius: 8px;
-  display: block;
-  margin: 0 auto;
-}
-</style></head>
+    width:80%;
+    height:auto;
+    border-radius:8px;
+    display:block;
+    margin:0 auto;
+  }
+
+  .ref {
+    font-size:0.85rem;
+    color:#555;
+    font-style:italic;
+    margin-top:12px;
+    line-height:1.4;
+    overflow-wrap:anywhere;
+    
+  }
+
+  .ref a {
+    color:inherit;
+    text-decoration:underline;
+  }
+
+  .home {
+    position:absolute;
+    right:16px;
+    top:16px;
+    background:#f6c281;
+    border:2px solid #000;
+    border-radius:6px;
+    padding:8px 10px;
+    text-decoration:none;
+    color:#000;
+    font-weight:700;
+  }
+
+  .nav {
+    display:flex;
+    justify-content:space-between;
+    margin-top:20px;
+  }
+
+  .btn {
+    border:none;
+    border-radius:8px;
+    padding:12px 20px;
+    font-size:1rem;
+    cursor:pointer;
+  }
+
+  .prev { background:#bdbdbd; color:#fff; }
+  .next { background:var(--accent); color:#fff; }
+
+  @media (max-width:900px) {
+    .text { font-size:1.1rem; }
+    .row { grid-template-columns:1fr; }
+    .ref { font-size:0.8rem; text-align:left; }
+  }
+</style>
+</head>
+
 <body>
   <a class="home" href="biomimicry-library.html">🏠 Home</a>
   <main class="slide">
@@ -35,20 +127,25 @@
     </p>
 
     <div class="row">
-    <!-- Default video -->
-    <video id="defaultVideo" controls>
-      <source src="bat.mp4" type="video/mp4">
-      <source src="bat.mp4" type="video/quicktime">
-    </video>
-    
-          <img class="img" src="bat2.png" alt="Bat wing labelled"/>
+      <video id="defaultVideo" controls>
+        <source src="bat.mp4" type="video/mp4">
+        <source src="bat.mp4" type="video/quicktime">
+      </video>
+
+      <img class="img" src="bat2.png" alt="Bat wing labelled"/>
     </div>
-    <p>Source: Secrets of the Bat Wing by the Science Take at the New York Times
-      https://www.youtube.com/watch?v=xLsXazDVEUA&ab_channel=TheNewYorkTimes
+
+    <p class="ref">
+      Source: <em>Secrets of the Bat Wing</em> by Science Take at The New York Times<br>
+      <a href="https://www.youtube.com/watch?v=xLsXazDVEUA&ab_channel=TheNewYorkTimes" target="_blank" rel="noopener">
+        https://www.youtube.com/watch?v=xLsXazDVEUA
+      </a>
     </p>
+
     <div class="nav">
       <button class="btn prev" onclick="location.href='grasshopper.html'">◀ Previous</button>
       <button class="btn next" onclick="location.href='venus-flytrap.html'">Next ▶</button>
     </div>
   </main>
-</body></html>
+</body>
+</html>
