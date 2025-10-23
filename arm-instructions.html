@@ -104,41 +104,122 @@
         display: flex;
         justify-content: center;
       }
+
+      .big-btn {
+  width: 250px;
+  height: 250px;
+  background: #007bff;
+  color: #fff;
+  border: none;
+  border-radius: 20px;
+  font-size: 1.6em;
+  font-weight: 600;
+  cursor: pointer;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+  transition: all 0.3s ease;
+}
+
+.big-btn:hover {
+  background: #0056b3;
+  transform: scale(1.05);
+}
+
+/* Center the big button */
+.center-button {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex: 1;
+}
+
+/* Style for the "Next ▶" button below */
+.next-btn {
+  align-self: center;
+  margin-top: 30px;
+  padding: 12px 30px;
+  border: none;
+  border-radius: 25px;
+  background: #007bff;
+  color: #fff;
+  font-size: 1.1em;
+  cursor: pointer;
+}
+.next-btn:hover {
+  background: #0056b3;
+}
+
+/* Fullscreen PDF overlay */
+.pdf-overlay {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: #000;
+  z-index: 999;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+}
+
+.pdf-frame {
+  width: 100%;
+  height: 100%;
+  border: none;
+}
+
+/* Close button (top-right corner) */
+.close-btn {
+  position: absolute;
+  top: 15px;
+  right: 20px;
+  padding: 10px 18px;
+  font-size: 1.1em;
+  border: none;
+  background: #007bff;
+  color: #fff;
+  border-radius: 8px;
+  cursor: pointer;
+  z-index: 1000;
+}
+.close-btn:hover {
+  background: #0056b3;
+}
     </style>
   </head>
   <body>
     <!-- 01/05 BUILD -->
-    <section class="card active" id="c1">
-      <h1>01/05</h1>
-      <h2>Build Your Robotic Arm</h2>
-      <h3>Click the button below to view build instructions:</h3>
-      
-       <p>In this activity you’ll <strong>build a robotic arm</strong>, then
-        <strong>upload a code & test</strong> it. Use the buttons below to move
-        through each step.
-      </p>
+<!-- 01/05 BUILD -->
+<section class="card active" id="c1">
+  <h1>01/05</h1>
+  <h2>Build Your Robotic Arm</h2>
+  <h3>Click the button below to view build instructions:</h3>
 
-      <div class="nav-buttons">
-  <div class="center-buttons">
-    <button class="btn" onclick="togglePDF()">BUILD (PDF)</button>
+  <p>
+    In this activity you’ll <strong>build a robotic arm</strong>, then
+    <strong>upload a code & test</strong> it. Use the buttons below to move
+    through each step.
+  </p>
+
+  <!-- Big Center Button -->
+  <div class="center-button">
+    <button class="big-btn" onclick="openPDF()">BUILD (PDF)</button>
   </div>
-  <button onclick="nextPage()">Next ▶</button>
-</div>
 
-<!-- Embedded PDF viewer (hidden by default) -->
-<div id="pdfViewer" style="display: none; margin-top: 20px;">
-  <iframe
-    src="arm-instructions.pdf"
-    width="100%"
-    height="800px"
-    style="border: none; border-radius: 10px;"
-  ></iframe>
-  <br />
-  <button class="btn" onclick="togglePDF()" style="margin-top: 10px;">Close PDF</button>
-</div>
+  <button class="next-btn" onclick="nextPage()">Next ▶</button>
 
-      
-    </section>
+  <!-- Fullscreen PDF overlay -->
+  <div id="pdfOverlay" class="pdf-overlay">
+    <iframe
+      src="arm-instructions.pdf"
+      class="pdf-frame"
+      allowfullscreen
+    ></iframe>
+    <button class="close-btn" onclick="closePDF()">✕ Close</button>
+  </div>
+</section>
+
 
     <!-- 02/05 Connect the motor cables -->
     <section class="card" id="c2">
@@ -310,6 +391,14 @@
     viewer.style.display = "none";
   }
 }
+      function openPDF() {
+  document.getElementById("pdfOverlay").style.display = "flex";
+}
+
+function closePDF() {
+  document.getElementById("pdfOverlay").style.display = "none";
+}
+
     </script>
   </body>
 </html>
