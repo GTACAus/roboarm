@@ -111,24 +111,33 @@
     <section class="card active" id="c1">
       <h1>01/05</h1>
       <h2>Build Your Robotic Arm</h2>
-      <img src="lego-arm.png" alt="Lego Arm" class="img-small" />
-      <p>
-        In this activity you’ll <strong>build a robotic arm</strong>, then
+      <h3>Click the button below to view build instructions:</h3>
+      
+       <p>In this activity you’ll <strong>build a robotic arm</strong>, then
         <strong>upload a code & test</strong> it. Use the buttons below to move
         through each step.
       </p>
+
       <div class="nav-buttons">
-        <div class="center-buttons">
-          <a
-            class="btn"
-            href="arm-instructions.pdf"
-            target="_blank"
-            rel="noopener"
-            >BUILD (PDF)</a
-          >
-        </div>
-        <button onclick="nextPage()">Next ▶</button>
-      </div>
+  <div class="center-buttons">
+    <button class="btn" onclick="togglePDF()">BUILD (PDF)</button>
+  </div>
+  <button onclick="nextPage()">Next ▶</button>
+</div>
+
+<!-- Embedded PDF viewer (hidden by default) -->
+<div id="pdfViewer" style="display: none; margin-top: 20px;">
+  <iframe
+    src="arm-instructions.pdf"
+    width="100%"
+    height="800px"
+    style="border: none; border-radius: 10px;"
+  ></iframe>
+  <br />
+  <button class="btn" onclick="togglePDF()" style="margin-top: 10px;">Close PDF</button>
+</div>
+
+      
     </section>
 
     <!-- 02/05 Connect the motor cables -->
@@ -292,6 +301,15 @@
         }
       }
       setUploadBehaviour();
+
+      function togglePDF() {
+  const viewer = document.getElementById("pdfViewer");
+  if (viewer.style.display === "none") {
+    viewer.style.display = "block";
+  } else {
+    viewer.style.display = "none";
+  }
+}
     </script>
   </body>
 </html>
