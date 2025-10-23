@@ -4,6 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Grasshopper — Biomimicry Library</title>
+    <link href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;700&display=swap" rel="stylesheet">
     <style>
       :root {
         --ink: #111;
@@ -14,7 +15,7 @@
       body {
         margin: 0;
         background: #f4f4f4;
-        font-family: Arial, sans-serif;
+        font-family: Figtree, sans-serif;
         color: var(--ink);
       }
       .slide {
@@ -74,13 +75,9 @@
         font-size: 1rem;
         cursor: pointer;
       }
-      .prev {
-        background: #bdbdbd;
-        color: #fff;
-      }
-      .next {
-        background: #16a34a;
-        color: #fff;
+      .prev {background: #bdbdbd; color: #fff;   }
+       .back { background: #FF6D3A; color: #fff; }
+      .next {background: #16a34a; color: #fff;
       }
       .ref {
         font-size: 0.9rem;
@@ -133,12 +130,9 @@
         </a>
       </p>
       <div class="nav">
-        <button class="btn prev" onclick="location.href='shrimp.html'">
-          ◀ Previous
-        </button>
-        <button class="btn next" onclick="location.href='bat.html'">
-          Next ▶
-        </button>
+        <button class="btn prev" onclick="location.href='shrimp.html'">◀ Previous </button>
+        <button class="btn back" onclick="location.href='biomimicry-library.html'">Back to Biomimicry Library</button>
+        <button class="btn next" onclick="location.href='bat.html'"> Next ▶ </button>
       </div>
     </main>
   </body>
