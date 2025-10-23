@@ -149,17 +149,29 @@
 }
 
 /* Fullscreen PDF overlay */
+/* Fullscreen PDF overlay (centered popup) */
 .pdf-overlay {
   display: none;
   position: fixed;
-  top: 0;
-  left: 0;
-  width: 100vw;
-  height: 100vh;
-  background: #000;
-  z-index: 999;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  background: rgba(0, 0, 0, 0.75);
+  z-index: 9999;
   justify-content: center;
   align-items: center;
+}
+
+/* PDF container box */
+.pdf-container {
+  position: relative;
+  width: 90%;
+  max-width: 900px;
+  height: 90vh;
+  background: white;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.4);
+  display: flex;
   flex-direction: column;
 }
 
@@ -167,25 +179,29 @@
   width: 100%;
   height: 100%;
   border: none;
+  flex-grow: 1;
 }
 
-/* Close button (top-right corner) */
+/* Close button */
 .close-btn {
   position: absolute;
-  top: 15px;
-  right: 20px;
-  padding: 10px 18px;
-  font-size: 1.1em;
+  top: 10px;
+  right: 15px;
+  background: rgba(0, 0, 0, 0.7);
+  color: white;
   border: none;
-  background: #007bff;
-  color: #fff;
-  border-radius: 8px;
+  font-size: 1.2rem;
+  border-radius: 50%;
+  width: 32px;
+  height: 32px;
   cursor: pointer;
-  z-index: 1000;
+  z-index: 10;
 }
+
 .close-btn:hover {
-  background: #0056b3;
+  background: red;
 }
+
     </style>
   </head>
   <body>
@@ -209,15 +225,15 @@
 
   <button class="next-btn" onclick="nextPage()">Next ▶</button>
 
-  <!-- Fullscreen PDF overlay -->
-  <div id="pdfOverlay" class="pdf-overlay">
-    <iframe
-      src="arm-instructions.pdf"
-      class="pdf-frame"
-      allowfullscreen
-    ></iframe>
-    <button class="close-btn" onclick="closePDF()">✕ Close</button>
+
+<!-- PDF Overlay (Popup) -->
+<div id="pdfOverlay" class="pdf-overlay">
+  <div class="pdf-container">
+    <button class="close-btn" onclick="closePDF()">✕</button>
+    <iframe id="pdfFrame" class="pdf-frame" src=""></iframe>
   </div>
+</div>
+
 </section>
 
 
@@ -391,13 +407,24 @@
     viewer.style.display = "none";
   }
 }
-      function openPDF() {
-  document.getElementById("pdfOverlay").style.display = "flex";
+function openPDF() {
+  const pdfURL = 'arm-instructions.pdf';
+  const googleViewer = `https://docs.google.com/gview?embedded=true&url=${encodeURIComponent(pdfURL)}`;
+  const pdfFrame = document.getElementById('pdfFrame');
+  const overlay = document.getElementById('pdfOverlay');
+
+  // Load via Google Docs for full iPad + Safari compatibility
+  pdfFrame.src = googleViewer;
+  overlay.style.display = 'flex';
 }
 
 function closePDF() {
-  document.getElementById("pdfOverlay").style.display = "none";
+  const overlay = document.getElementById('pdfOverlay');
+  const pdfFrame = document.getElementById('pdfFrame');
+  overlay.style.display = 'none';
+  pdfFrame.src = ''; // reset PDF
 }
+
 
     </script>
   </body>
