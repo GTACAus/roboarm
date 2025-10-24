@@ -106,104 +106,13 @@
         justify-content: center;
       }
 
-      .big-btn {
-  width: 250px;
-  height: 250px;
-  background: #007bff;
-  color: #fff;
-  border: none;
-  border-radius: 20px;
-  font-size: 1.6em;
-  font-family: inherit;
-  font-weight: 600;
-  cursor: pointer;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
-  transition: all 0.3s ease;
-}
-
-.big-btn:hover {
-  background: #ff6d3a;
-  transform: scale(1.05);
-}
-
-/* Center the big button */
-.center-button {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  flex: 1;
-}
-
-/* Style for the "Next ▶" button below */
-.next-btn {
-  align-self: center;
-  margin-top: 30px;
-  padding: 12px 30px;
-  border: none;
-  border-radius: 25px;
-  background: #007bff;
-  color: #fff;
-  font-size: 1.1em;
-  cursor: pointer;
-}
-.next-btn:hover {
-  background: #0056b3;
-}
-
-/* Fullscreen PDF overlay */
-/* Fullscreen PDF overlay (centered popup) */
-.pdf-overlay {
-  display: none;
-  position: fixed;
-  top: 0; left: 0;
-  width: 100%; height: 100%;
-  background: rgba(0, 0, 0, 0.75);
-  z-index: 9999;
-  justify-content: center;
-  align-items: center;
-}
-
-/* PDF container box */
-.pdf-container {
-  position: relative;
-  width: 90%;
-  max-width: 900px;
-  height: 90vh;
-  background: white;
-  border-radius: 12px;
-  overflow: hidden;
-  box-shadow: 0 0 20px rgba(0, 0, 0, 0.4);
-  display: flex;
-  flex-direction: column;
-}
-
-.pdf-frame {
-  width: 100%;
-  height: 100%;
-  border: none;
-  flex-grow: 1;
-}
-
-/* Close button */
-.close-btn {
-  position: absolute;
-  top: 10px;
-  right: 15px;
-  background: rgba(0, 0, 0, 0.7);
-  color: white;
-  border: none;
-  font-size: 1.2rem;
-  border-radius: 50%;
-  width: 32px;
-  height: 32px;
-  cursor: pointer;
-  z-index: 10;
-}
-
-.close-btn:hover {
-  background: red;
-}
-
+    iframe {
+      width: 90%;
+      height: 90vh;
+      border: none;
+      border-radius: 8px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    }
     </style>
   </head>
   <body>
@@ -219,22 +128,8 @@
     through each step.
   </p>
 
-  <!-- Big Center Button -->
-  <div class="center-button">
-    <button class="big-btn" onclick="openPDF()">Click here for Lego instructions</button>
-  </div>
-
-  <button class="next-btn" onclick="nextPage()">Next ▶</button>
-
-
-<!-- PDF Overlay (Popup) -->
-<div id="pdfOverlay" class="pdf-overlay">
-  <div class="pdf-container">
-    <button class="close-btn" onclick="closePDF()">✕</button>
-    <iframe id="pdfFrame" class="pdf-frame" src="arm-instructions.pdf"></iframe>
-  </div>
-</div>
-
+<iframe src="/roboarm/arm-instructions.pdf#view=fitH" title="Robo Arm Instructions"></iframe>
+  
 </section>
 
 
