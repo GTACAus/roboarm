@@ -91,6 +91,7 @@
         background: #007bff;
         color: #fff;
         font-size: 1em;
+        font-family: inherit;
         cursor: pointer;
         text-decoration: none;
         display: inline-block;
@@ -113,6 +114,7 @@
   border: none;
   border-radius: 20px;
   font-size: 1.6em;
+  font-family: inherit;
   font-weight: 600;
   cursor: pointer;
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
@@ -120,7 +122,7 @@
 }
 
 .big-btn:hover {
-  background: #0056b3;
+  background: #ff6d3a;
   transform: scale(1.05);
 }
 
@@ -210,8 +212,6 @@
 <section class="card active" id="c1">
   <h1>01/05</h1>
   <h2>Build Your Robotic Arm</h2>
-  <h3>Click the button below to view build instructions:</h3>
-
   <p>
     In this activity you’ll <strong>build a robotic arm</strong>, then
     <strong>upload a code & test</strong> it. Use the buttons below to move
@@ -220,7 +220,7 @@
 
   <!-- Big Center Button -->
   <div class="center-button">
-    <button class="big-btn" onclick="openPDF()">BUILD (PDF)</button>
+    <button class="big-btn" onclick="openPDF()">Click here for Lego instructions</button>
   </div>
 
   <button class="next-btn" onclick="nextPage()">Next ▶</button>
