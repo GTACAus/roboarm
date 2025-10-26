@@ -176,10 +176,10 @@
 
   <!-- Image Viewer -->
   <div id="imageViewer">
-    <img id="slide" src="roboarm/robo arm instructions/arm-instructions-01.png" alt="Robotic Arm Instructions" />
+    <img id="slide" src="roboarm/robo-arm-instructions/arm-instructions-01.png" alt="Robotic Arm Instructions" />
     <div class="img-controls">
       <button onclick="prevImage()">◀</button>
-      <span id="counter">1 / 40</span>
+      <span id="counter">1 / 39</span>
       <button onclick="nextImage()">▶</button>
     </div>
   </div>
@@ -357,7 +357,7 @@ const counter = document.getElementById("counter");
 
 function showImage() {
   // Updated path + PNG extension
-  imgElement.src = `roboarm/robo arm instructions/arm-instructions-${String(currentImage).padStart(2, '0')}.png`;
+  imgElement.src = `roboarm/robo-arm-instructions/arm-instructions-${String(currentImage).padStart(2, '0')}.png`;
   counter.textContent = `${currentImage} / ${totalImages}`;
 }
 
