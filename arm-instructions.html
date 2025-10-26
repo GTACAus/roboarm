@@ -113,6 +113,51 @@
       border-radius: 8px;
       box-shadow: 0 4px 10px rgba(0,0,0,0.1);
     }
+      #imageViewer {
+  position: relative;
+  width: 100%;
+  height: 90vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+#imageViewer img {
+  width: 100%;
+  height: auto;
+  max-height: 90%;
+  border-radius: 12px;
+  object-fit: contain;
+}
+
+.img-controls {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: 10px;
+  gap: 15px;
+}
+
+.img-controls button {
+  background-color: #007bff;
+  color: white;
+  border: none;
+  border-radius: 20px;
+  padding: 8px 16px;
+  font-size: 1em;
+  cursor: pointer;
+}
+
+.img-controls button:hover {
+  background-color: #0056b3;
+}
+
+#counter {
+  font-weight: 600;
+  color: #333;
+}
+
     </style>
   </head>
   <body>
@@ -128,12 +173,15 @@
     through each step.
   </p>
 
-<iframe 
-  src="https://mozilla.github.io/pdf.js/web/viewer.html?file=https://gtacaus.github.io/roboarm/arm-instructions.pdf"
-  width="100%"
-  height="100%"
-  style="border:none;">
-</iframe>
+<div id="imageViewer">
+  <img id="slide" src="roboarm/arm-instructions-01.jpg" alt="Robotic Arm Instructions" />
+  <div class="img-controls">
+    <button onclick="prevImage()">◀</button>
+    <span id="counter">1 / 40</span>
+    <button onclick="nextImage()">▶</button>
+  </div>
+</div>
+
   
 </section>
 
@@ -300,31 +348,35 @@
       }
       setUploadBehaviour();
 
-      function togglePDF() {
-  const viewer = document.getElementById("pdfViewer");
-  if (viewer.style.display === "none") {
-    viewer.style.display = "block";
-  } else {
-    viewer.style.display = "none";
-  }
-}
-function openPDF() {
-  const pdfURL = 'https://yourusername.github.io/roboarm/arm-instructions.pdf';
-  const googleViewer = `https://docs.google.com/gview?embedded=true&url=${encodeURIComponent(pdfURL)}`;
-  const pdfFrame = document.getElementById('pdfFrame');
-  const overlay = document.getElementById('pdfOverlay');
+// ---- Image Viewer Script ----
+let currentImage = 1;
+const totalImages = 40;
+const imgElement = document.getElementById("slide");
+const counter = document.getElementById("counter");
 
-  // Load via Google Docs for full iPad + Safari compatibility
-  pdfFrame.src = googleViewer;
-  overlay.style.display = 'flex';
+function showImage() {
+  imgElement.src = `roboarm/arm-instructions-${String(currentImage).padStart(2, '0')}.jpg`;
+  counter.textContent = `${currentImage} / ${totalImages}`;
 }
 
-function closePDF() {
-  const overlay = document.getElementById('pdfOverlay');
-  const pdfFrame = document.getElementById('pdfFrame');
-  overlay.style.display = 'none';
-  pdfFrame.src = ''; // reset PDF
+function nextImage() {
+  currentImage = currentImage < totalImages ? currentImage + 1 : 1;
+  showImage();
 }
+
+function prevImage() {
+  currentImage = currentImage > 1 ? currentImage - 1 : totalImages;
+  showImage();
+}
+
+// Swipe gestures for iPad/mobile
+let startX = 0;
+imgElement.addEventListener("touchstart", e => startX = e.touches[0].clientX);
+imgElement.addEventListener("touchend", e => {
+  const diffX = e.changedTouches[0].clientX - startX;
+  if (diffX > 50) prevImage();
+  if (diffX < -50) nextImage();
+});
 
 
     </script>
