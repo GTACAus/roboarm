@@ -183,10 +183,13 @@
       <button onclick="nextImage()">▶</button>
     </div>
   </div>
+  
+  <div class="nav-buttons">
+    <div class="center-buttons">
+      <button onclick="nextPage()">Next ▶</button>
+    </div>
+  </div>
 </section>
-
-</section>
-
 
     <!-- 02/05 Connect the motor cables -->
     <section class="card" id="c2">
@@ -386,6 +389,8 @@
       if (diffX > 50) prevImage();
       if (diffX < -50) nextImage();
     });
+    showImage();
+
   });
 </script>
 
