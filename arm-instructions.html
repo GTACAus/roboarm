@@ -360,7 +360,7 @@
     if (!imgElement || !counter) return; // prevent errors if not found
 
     function showImage() {
-      imgElement.src = `roboarm/lego-instructions/arm-instructions-${String(currentImage).padStart(2, '0')}.png`;
+      imgElement.src = `lego-instructions/arm-instructions-${String(currentImage).padStart(2, '0')}.png`;
       counter.textContent = `${currentImage} / ${totalImages}`;
     }
 
