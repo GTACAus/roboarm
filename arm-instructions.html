@@ -300,87 +300,94 @@
         <a class="btn" href="index.html">Home ▶</a>
       </div>
     </section>
+
     <script>
-      let current = 0;
-      const cards = Array.from(document.querySelectorAll(".card"));
-      function show(i) {
-        cards[current].classList.remove("active");
-        current = i;
-        cards[current].classList.add("active");
-        document.querySelectorAll("video").forEach((v) => {
-          v.pause();
-        });
+  // ---- Page Navigation ----
+  let current = 0;
+  const cards = Array.from(document.querySelectorAll(".card"));
+  function show(i) {
+    cards[current].classList.remove("active");
+    current = i;
+    cards[current].classList.add("active");
+    document.querySelectorAll("video").forEach((v) => v.pause());
+  }
+  function nextPage() {
+    if (current < cards.length - 1) show(current + 1);
+  }
+  function prevPage() {
+    if (current > 0) show(current - 1);
+  }
+
+  // ---- iPad Handling ----
+  function isiPad() {
+    if (navigator.userAgent.includes("iPad")) return true;
+    if (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1) return true;
+    return false;
+  }
+  function setUploadBehaviour() {
+    const uploadBtn = document.getElementById("uploadButton");
+    const ipadMsg = document.getElementById("iPadMessage");
+    const ipadVid = document.getElementById("ipadVideo");
+    const defVid = document.getElementById("defaultVideo");
+
+    if (uploadBtn && ipadMsg && ipadVid && defVid) {
+      if (isiPad()) {
+        ipadMsg.style.display = "inline-block";
+        uploadBtn.style.display = "none";
+        ipadVid.style.display = "block";
+        defVid.style.display = "none";
+      } else {
+        ipadMsg.style.display = "none";
+        uploadBtn.style.display = "inline-block";
+        ipadVid.style.display = "none";
+        defVid.style.display = "block";
+        uploadBtn.onclick = () =>
+          window.open("https://spike.legoeducation.com/prime/lobby/", "_blank");
       }
-      function nextPage() {
-        if (current < cards.length - 1) show(current + 1);
-      }
-      function prevPage() {
-        if (current > 0) show(current - 1);
-      }
+    }
+  }
 
-      // iPad handling + upload button behavior
-      function isiPad() {
-        if (navigator.userAgent.includes("iPad")) return true;
-        if (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1)
-          return true;
-        return false;
-      }
-      function setUploadBehaviour() {
-        const uploadBtn = document.getElementById("uploadButton");
-        const ipadMsg = document.getElementById("iPadMessage");
-        const ipadVid = document.getElementById("ipadVideo");
-        const defVid = document.getElementById("defaultVideo");
+  document.addEventListener("DOMContentLoaded", () => {
+    setUploadBehaviour();
 
-        if (isiPad()) {
-          ipadMsg.style.display = "inline-block";
-          uploadBtn.style.display = "none";
-          ipadVid.style.display = "block";
-          defVid.style.display = "none";
-        } else {
-          ipadMsg.style.display = "none";
-          uploadBtn.style.display = "inline-block";
-          ipadVid.style.display = "none";
-          defVid.style.display = "block";
-          uploadBtn.onclick = () =>
-            window.open(
-              "https://spike.legoeducation.com/prime/lobby/",
-              "_blank"
-            );
-        }
-      }
-      setUploadBehaviour();
-// ---- Image Viewer Script ----
-let currentImage = 1;
-const totalImages = 39;
-const imgElement = document.getElementById("slide");
-const counter = document.getElementById("counter");
+    // ---- Image Viewer Script ----
+    const totalImages = 39;
+    let currentImage = 1;
 
-function showImage() {
-  // Updated path + PNG extension
-  imgElement.src = `roboarm/lego-instructions/arm-instructions-${String(currentImage).padStart(2, '0')}.png`;
-  counter.textContent = `${currentImage} / ${totalImages}`;
-}
+    const imgElement = document.getElementById("slide");
+    const counter = document.getElementById("counter");
 
-function nextImage() {
-  currentImage = currentImage < totalImages ? currentImage + 1 : 1;
-  showImage();
-}
+    if (!imgElement || !counter) return; // prevent errors if not found
 
-function prevImage() {
-  currentImage = currentImage > 1 ? currentImage - 1 : totalImages;
-  showImage();
-}
+    function showImage() {
+      imgElement.src = `roboarm/lego-instructions/arm-instructions-${String(currentImage).padStart(2, '0')}.png`;
+      counter.textContent = `${currentImage} / ${totalImages}`;
+    }
 
-// Swipe gestures for iPad/mobile
-let startX = 0;
-imgElement.addEventListener("touchstart", e => startX = e.touches[0].clientX);
-imgElement.addEventListener("touchend", e => {
-  const diffX = e.changedTouches[0].clientX - startX;
-  if (diffX > 50) prevImage();
-  if (diffX < -50) nextImage();
-});
+    function nextImage() {
+      currentImage = currentImage < totalImages ? currentImage + 1 : 1;
+      showImage();
+    }
 
+    function prevImage() {
+      currentImage = currentImage > 1 ? currentImage - 1 : totalImages;
+      showImage();
+    }
 
-    </script>
+    // Attach to window so buttons can use them
+    window.nextImage = nextImage;
+    window.prevImage = prevImage;
+
+    // Swipe gestures for iPad/mobile
+    let startX = 0;
+    imgElement.addEventListener("touchstart", e => startX = e.touches[0].clientX);
+    imgElement.addEventListener("touchend", e => {
+      const diffX = e.changedTouches[0].clientX - startX;
+      if (diffX > 50) prevImage();
+      if (diffX < -50) nextImage();
+    });
+  });
+</script>
+
   </body>
 </html>
