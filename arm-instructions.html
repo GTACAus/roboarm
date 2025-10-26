@@ -113,7 +113,7 @@
       border-radius: 8px;
       box-shadow: 0 4px 10px rgba(0,0,0,0.1);
     }
-      #imageViewer {
+#imageViewer {
   position: relative;
   width: 100%;
   height: 90vh;
@@ -158,12 +158,13 @@
   color: #333;
 }
 
+
     </style>
   </head>
   <body>
     <!-- 01/05 BUILD -->
-<!-- 01/05 BUILD -->
 <section class="card active" id="c1">
+
   <h1>01/05</h1>
   <h2>Build Your Robotic Arm</h2>
   <br>
@@ -173,16 +174,17 @@
     through each step.
   </p>
 
-<div id="imageViewer">
-  <img id="slide" src="roboarm/arm-instructions-01.jpg" alt="Robotic Arm Instructions" />
-  <div class="img-controls">
-    <button onclick="prevImage()">◀</button>
-    <span id="counter">1 / 40</span>
-    <button onclick="nextImage()">▶</button>
+  <!-- Image Viewer -->
+  <div id="imageViewer">
+    <img id="slide" src="roboarm/robo arm instructions/arm-instructions-01.png" alt="Robotic Arm Instructions" />
+    <div class="img-controls">
+      <button onclick="prevImage()">◀</button>
+      <span id="counter">1 / 40</span>
+      <button onclick="nextImage()">▶</button>
+    </div>
   </div>
-</div>
+</section>
 
-  
 </section>
 
 
@@ -347,15 +349,15 @@
         }
       }
       setUploadBehaviour();
-
 // ---- Image Viewer Script ----
 let currentImage = 1;
-const totalImages = 40;
+const totalImages = 39;
 const imgElement = document.getElementById("slide");
 const counter = document.getElementById("counter");
 
 function showImage() {
-  imgElement.src = `roboarm/arm-instructions-${String(currentImage).padStart(2, '0')}.jpg`;
+  // Updated path + PNG extension
+  imgElement.src = `roboarm/robo arm instructions/arm-instructions-${String(currentImage).padStart(2, '0')}.png`;
   counter.textContent = `${currentImage} / ${totalImages}`;
 }
 
