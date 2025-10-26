@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Image Viewer</title>
+  <style>
+    body {
+      margin: 0;
+      background: #000;
+      color: #fff;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      font-family: sans-serif;
+      overflow: hidden;
+    }
+
+    img {
+      max-width: 100%;
+      max-height: 85vh;
+      border-radius: 8px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+      transition: opacity 0.3s ease;
+    }
+
+    .controls {
+      display: flex;
+      justify-content: center;
+      margin-top: 10px;
+      gap: 20px;
+    }
+
+    button {
+      background: #0078d7;
+      color: #fff;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 5px;
+      font-size: 16px;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background: #005fa3;
+    }
+
+    .counter {
+      margin-top: 5px;
+      opacity: 0.8;
+      font-size: 14px;
+    }
+    #imageViewer {
+  position: relative;
+  width: 100%;
+  height: 90vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+#imageViewer img {
+  width: 100%;
+  height: auto;
+  max-height: 90%;
+  border-radius: 12px;
+  object-fit: contain;
+}
+
+.img-controls {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: 10px;
+  gap: 15px;
+}
+
+.img-controls button {
+  background-color: #007bff;
+  color: white;
+  border: none;
+  border-radius: 20px;
+  padding: 8px 16px;
+  font-size: 1em;
+  cursor: pointer;
+}
+
+.img-controls button:hover {
+  background-color: #0056b3;
+}
+
+#counter {
+  font-weight: 600;
+  color: #333;
+}
+
+  </style>
+</head>
+<body>
+
+  <img id="slide" src="/roboarm/arm-instructions-01.jpg" alt="Instruction Slide">
+  
+  <div class="controls">
+    <button id="prev">⬅ Prev</button>
+    <button id="next">Next ➡</button>
+  </div>
+  <div class="counter" id="counter">1 / 40</div>
+
+  <script>
+    // Set up your image slides here
+    const slides = [];
+    for (let i = 1; i <= 40; i++) {
+      slides.push(`/roboarm/slides/slide${i}.jpg`);
+    }
+
+    let index = 0;
+    const img = document.getElementById("slide");
+    const counter = document.getElementById("counter");
+
+    function updateSlide() {
+      img.style.opacity = 0;
+      setTimeout(() => {
+        img.src = slides[index];
+        img.style.opacity = 1;
+        counter.textContent = `${index + 1} / ${slides.length}`;
+      }, 200);
+    }
+
+    document.getElementById("next").onclick = () => {
+      index = (index + 1) % slides.length;
+      updateSlide();
+    };
+
+    document.getElementById("prev").onclick = () => {
+      index = (index - 1 + slides.length) % slides.length;
+      updateSlide();
+    };
+
+    // Swipe gesture support (for iPad/mobile)
+    let startX = 0;
+    img.addEventListener("touchstart", (e) => startX = e.touches[0].clientX);
+    img.addEventListener("touchend", (e) => {
+      const endX = e.changedTouches[0].clientX;
+      if (endX - startX > 50) document.getElementById("prev").click();
+      else if (startX - endX > 50) document.getElementById("next").click();
+    });
+
+    // ---- Image Viewer Script ----
+let currentImage = 1;
+const totalImages = 40;
+const imgElement = document.getElementById("slide");
+const counter = document.getElementById("counter");
+
+function showImage() {
+  imgElement.src = `roboarm/arm-instructions-${String(currentImage).padStart(2, '0')}.jpg`;
+  counter.textContent = `${currentImage} / ${totalImages}`;
+}
+
+function nextImage() {
+  currentImage = currentImage < totalImages ? currentImage + 1 : 1;
+  showImage();
+}
+
+function prevImage() {
+  currentImage = currentImage > 1 ? currentImage - 1 : totalImages;
+  showImage();
+}
+
+// Swipe gestures for iPad/mobile
+let startX = 0;
+imgElement.addEventListener("touchstart", e => startX = e.touches[0].clientX);
+imgElement.addEventListener("touchend", e => {
+  const diffX = e.changedTouches[0].clientX - startX;
+  if (diffX > 50) prevImage();
+  if (diffX < -50) nextImage();
+});
+
+  </script>
+
+</body>
+</html>
