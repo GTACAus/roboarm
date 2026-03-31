@@ -20,6 +20,7 @@
         justify-content: center;
         min-height: 100vh;
       }
+
       .card {
         background: #fff;
         border-radius: 15px;
@@ -36,28 +37,55 @@
         position: relative;
         padding-bottom: 70px;
       }
+
       .card.active {
         display: flex;
       }
+
+      /* Intro page styling */
+      #introPage.active {
+        min-height: 100vh;
+        height: auto;
+        max-width: 900px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        padding: 24px;
+      }
+
+      .intro-img {
+        width: 100%;
+        max-width: 800px;
+        height: auto;
+        display: block;
+        margin: 0 auto;
+        border-radius: 16px;
+      }
+
       .card h1 {
         font-size: 2.2em;
         margin: 6px 0;
       }
+
       .card h2 {
         font-size: 1.6em;
         margin: 6px 0 10px;
       }
+
       .card p {
         font-size: 1.15em;
         margin: 10px 24px;
         line-height: 1.45;
       }
+
       .card img {
         border-radius: 10px;
         width: 100%;
         height: auto;
         margin-top: 10px;
       }
+
       video {
         border-radius: 10px;
         width: 100%;
@@ -66,7 +94,6 @@
         margin-top: 10px;
       }
 
-      /* 👇 new class just for smaller images */
       .img-small {
         max-width: 320px;
         width: 100%;
@@ -81,7 +108,9 @@
         align-items: center;
         padding: 0 15px;
         margin-top: 20px;
+        width: 100%;
       }
+
       .nav-buttons button,
       .nav-buttons a.btn {
         margin: 5px;
@@ -96,112 +125,133 @@
         text-decoration: none;
         display: inline-block;
       }
+
       .nav-buttons button:hover,
       .nav-buttons a.btn:hover {
         background: #0056b3;
       }
+
       .center-buttons {
         flex: 1;
         display: flex;
         justify-content: center;
       }
 
-    .iframe {
-      width: 95%;
-      height: 90vh;
-      border: none;
-      border-radius: 8px;
-      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-    }
-#imageViewer {
-  position: relative;
-  width: 100%;
-  height: 90vh;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-}
+      .iframe {
+        width: 95%;
+        height: 90vh;
+        border: none;
+        border-radius: 8px;
+        box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+      }
 
-#imageViewer img {
-  width: 100%;
-  height: auto;
-  max-height: 90%;
-  border-radius: 12px;
-  object-fit: contain;
-}
+      #imageViewer {
+        position: relative;
+        width: 100%;
+        height: 90vh;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+      }
 
-.img-controls {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  margin-top: 10px;
-  gap: 15px;
-}
+      #imageViewer img {
+        width: 100%;
+        height: auto;
+        max-height: 90%;
+        border-radius: 12px;
+        object-fit: contain;
+      }
 
-.img-controls button {
-  background-color: #007bff;
-  color: white;
-  border: none;
-  border-radius: 20px;
-  padding: 8px 16px;
-  font-size: 1em;
-  cursor: pointer;
-}
+      .img-controls {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        margin-top: 10px;
+        gap: 15px;
+      }
 
-.img-controls button:hover {
-  background-color: #0056b3;
-}
+      .img-controls button {
+        background-color: #007bff;
+        color: white;
+        border: none;
+        border-radius: 20px;
+        padding: 8px 16px;
+        font-size: 1em;
+        cursor: pointer;
+      }
 
-#counter {
-  font-weight: 600;
-  color: #333;
-}
+      .img-controls button:hover {
+        background-color: #0056b3;
+      }
 
+      #counter {
+        font-weight: 600;
+        color: #333;
+      }
 
+      @media (max-width: 600px) {
+        #introPage.active {
+          min-height: 100vh;
+          padding-top: 16px;
+          padding-bottom: 16px;
+        }
+
+        .nav-buttons {
+          flex-wrap: wrap;
+        }
+      }
     </style>
   </head>
   <body>
-    <!-- 01/05 BUILD -->
-<section class="card active" id="c1">
 
-  <h1>01/05</h1>
-  <h2>Build Your Robotic Arm</h2>
-  <br>
-  <p>
-    In this activity you’ll <strong>build a robotic arm</strong>, then
-    <strong>upload a code & test</strong> it. <br>Use the buttons below to move
-    through each step.
-  </p>
+    <!-- INTRO PAGE -->
+    <section class="card active" id="introPage">
+      <img src="LO roboarm.png" alt="Learning Intentions" class="intro-img" />
 
-  <!-- Image Viewer -->
-  <div id="imageViewer">
-    <img id="slide" src="lego-instructions/arm-instructions-01.png" alt="Robotic Arm Instructions" />
-    <div class="img-controls">
-      <button onclick="prevImage()">◀</button>
-      <span id="counter">1 / 39</span>
-      <button onclick="nextImage()">▶</button>
-    </div>
-  </div>
-  
-  <div class="nav-buttons">
-    <div class="center-buttons">
-      <button onclick="nextPage()">Next ▶</button>
-    </div>
-  </div>
-</section>
+      <div class="nav-buttons">
+        <a class="btn" href="index.html">◀ Back to Home</a>
+        <button onclick="nextPage()">Next ▶</button>
+      </div>
+    </section>
 
-    <!-- 02/05 Connect the motor cables -->
+    <!-- 01/06 BUILD -->
+    <section class="card" id="c1">
+      <h1>01/06</h1>
+      <h2>Build Your Robotic Arm</h2>
+      <br>
+      <p>
+        In this activity you’ll <strong>build a robotic arm</strong>, then
+        <strong>upload a code & test</strong> it. <br>Use the buttons below to move
+        through each step.
+      </p>
+
+      <!-- Image Viewer -->
+      <div id="imageViewer">
+        <img id="slide" src="lego-instructions/arm-instructions-01.png" alt="Robotic Arm Instructions" />
+        <div class="img-controls">
+          <button onclick="prevImage()">◀</button>
+          <span id="counter">1 / 39</span>
+          <button onclick="nextImage()">▶</button>
+        </div>
+      </div>
+
+      <div class="nav-buttons">
+        <button onclick="prevPage()">◀ Learning Intentions</button>
+        <button onclick="nextPage()">Next ▶</button>
+      </div>
+    </section>
+
+    <!-- 02/06 Connect the motor cables -->
     <section class="card" id="c2">
-      <h1>02/05</h1>
+      <h1>02/06</h1>
       <h2>Connect the motor cables</h2>
-      
+
       <video id="ipadVideo" controls style="display: none">
         <source src="connect-motors.mp4" type="video/mp4" />
         <source src="connect-motors.mp4" type="video/quicktime" />
       </video>
 
-      
       <video id="defaultVideo" controls>
         <source src="connect-motors.mp4" type="video/mp4" />
         <source src="connect-motors.mp4" type="video/quicktime" />
@@ -213,36 +263,53 @@
 
       <div class="nav-buttons">
         <button onclick="prevPage()">◀ Prev</button>
-        <a class="btn" href="connect-motors.pdf" target="_blank" rel="noopener"
-          >Cable Instructions</a
-        >
+        <a class="btn" href="connect-motors.pdf" target="_blank" rel="noopener">Cable Instructions</a>
         <button onclick="nextPage()">Next ▶</button>
       </div>
     </section>
 
-    <!-- 03/05 Open the Mindstorms App and Project -->
+    <!-- 03/06 Download the Mindstorms app and the code -->
     <section class="card" id="c3">
-      <h1>03/05</h1>
-      <h2>Open the Mindstorms app and project</h2>
-
-      <!-- iPad-specific video (hidden by default) -->
-      <video id="ipadVideo" controls style="display: none">
-        <source src="open-app.mp4" type="video/mp4" />
-        <source src="open-app.mp4" type="video/quicktime" />
-      </video>
-
-      <!-- Default video -->
-      <video id="defaultVideo" controls>
-        <source src="open-app.mp4" type="video/mp4" />
-        <source src="open-app.mp4" type="video/quicktime" />
-      </video>
+      <h1>03/06</h1>
+      <h2>Download the Mindstorms App and Code</h2>
 
       <p>
-        We will be using the Lego Mindstorms app to control your robotic arm. We
-        have created the code for you, so all you have to do is select the right
-        code. Watch this video to learn how to open the app, and select the
+        We will be using the <b>Lego Mindstorms app</b> to control your robotic arm. Make sure you have
+        the Lego Mindstorms app downloaded using the "<b>Download app</b>" button below. You will also need to download the right code.
+        Click on the "<b>Download code</b>" button to download the code you'll need for this exercise.
+      </p>
+
+      <div class="nav-buttons">
+        <button onclick="prevPage()">◀ Prev</button>
+        <div class="center-buttons">
+          <a class="btn" href="downloads.html">Download app</a>
+        </div>
+        <div class="center-buttons">
+          <a class="btn" href="RobotArmController.lms" download>Download code</a>
+        </div>
+        <button onclick="nextPage()">Next ▶</button>
+      </div>
+    </section>
+
+    <!-- 04/06 Open the Mindstorms App and Project -->
+    <section class="card" id="c4">
+      <h1>04/06</h1>
+      <h2>Open the Mindstorms app and project</h2>
+
+      <p>
+        Once you have downloaded the app and code, watch this video to learn how to select the
         right project.
       </p>
+
+      <video id="ipadVideo" controls style="display: none">
+        <source src="openroboarmcontroller_outreach.mp4" type="video/mp4" />
+        <source src="openroboarmcontroller_outreach.mp4" type="video/quicktime" />
+      </video>
+
+      <video id="defaultVideo" controls>
+        <source src="openroboarmcontroller_outreach.mp4" type="video/mp4" />
+        <source src="openroboarmcontroller_outreach.mp4" type="video/quicktime" />
+      </video>
 
       <div class="nav-buttons">
         <button onclick="prevPage()">◀ Prev</button>
@@ -250,54 +317,56 @@
       </div>
     </section>
 
-    <!-- 04/05 Connecting your robotic arm -->
-    <section class="card" id="c4">
-      <h1>04/05</h1>
+    <!-- 05/06 Connecting your robotic arm -->
+    <section class="card" id="c5">
+      <h1>05/06</h1>
       <h2>Connecting your robotic arm</h2>
-      <!-- iPad-specific video (hidden by default) -->
+
       <video id="ipadVideo" controls style="display: none">
-        <source src="connect-app.mp4" type="video/mp4" />
-        <source src="connect-app.mp4" type="video/quicktime" />
+        <source src="connect-app-outreach-2.mp4" type="video/mp4" />
+        <source src="connect-app-outreach-2.mp4" type="video/quicktime" />
       </video>
 
-      <!-- Default video -->
       <video id="defaultVideo" controls>
-        <source src="connect-app.mp4" type="video/mp4" />
-        <source src="connect-app.mp4" type="video/quicktime" />
+        <source src="connect-app-outreach-2.mp4" type="video/mp4" />
+        <source src="connect-app-outreach-2.mp4" type="video/quicktime" />
       </video>
+
       <p>
         We will be connecting the robotic arm to the app so we can control it.
         We will also need to upload the code. Once you have the Mindstorms app
         open, watch this video to learn how to upload your code to the robotic
         arm.
       </p>
+
       <div class="nav-buttons">
         <button onclick="prevPage()">◀ Prev</button>
         <button onclick="nextPage()">Next ▶</button>
       </div>
     </section>
 
-    <!-- 05/05 DONE -->
-    <section class="card" id="c5">
-      <h1>05/05</h1>
+    <!-- 06/06 DONE -->
+    <section class="card" id="c6">
+      <h1>06/06</h1>
       <h2>Open the controls, and you are all set!</h2>
-      <img src="control.png" alt=Controller" class="img-small">
-      <!-- iPad-specific video (hidden by default) -->
+      <img src="control.png" alt="Controller" class="img-small">
+
       <video id="ipadVideo" controls style="display: none">
         <source src="open-controls.mp4" type="video/mp4" />
         <source src="open-controls.mp4" type="video/quicktime" />
       </video>
 
-      <!-- Default video -->
       <video id="defaultVideo" controls>
         <source src="open-controls.mp4" type="video/mp4" />
         <source src="open-controls.mp4" type="video/quicktime" />
       </video>
+
       <p>
         You’ve built and uploaded code to your robotic arm. Use the controller
         on your iPad to test it. Click on the joystick icon on the Mindstorms
         app to open the controls.
       </p>
+
       <div class="nav-buttons">
         <button onclick="prevPage()">◀ Prev</button>
         <a class="btn" href="index.html">Home ▶</a>
@@ -305,94 +374,97 @@
     </section>
 
     <script>
-  // ---- Page Navigation ----
-  let current = 0;
-  const cards = Array.from(document.querySelectorAll(".card"));
-  function show(i) {
-    cards[current].classList.remove("active");
-    current = i;
-    cards[current].classList.add("active");
-    document.querySelectorAll("video").forEach((v) => v.pause());
-  }
-  function nextPage() {
-    if (current < cards.length - 1) show(current + 1);
-  }
-  function prevPage() {
-    if (current > 0) show(current - 1);
-  }
+      // ---- Page Navigation ----
+      let current = 0;
+      const cards = Array.from(document.querySelectorAll(".card"));
 
-  // ---- iPad Handling ----
-  function isiPad() {
-    if (navigator.userAgent.includes("iPad")) return true;
-    if (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1) return true;
-    return false;
-  }
-  function setUploadBehaviour() {
-    const uploadBtn = document.getElementById("uploadButton");
-    const ipadMsg = document.getElementById("iPadMessage");
-    const ipadVid = document.getElementById("ipadVideo");
-    const defVid = document.getElementById("defaultVideo");
-
-    if (uploadBtn && ipadMsg && ipadVid && defVid) {
-      if (isiPad()) {
-        ipadMsg.style.display = "inline-block";
-        uploadBtn.style.display = "none";
-        ipadVid.style.display = "block";
-        defVid.style.display = "none";
-      } else {
-        ipadMsg.style.display = "none";
-        uploadBtn.style.display = "inline-block";
-        ipadVid.style.display = "none";
-        defVid.style.display = "block";
-        uploadBtn.onclick = () =>
-          window.open("https://spike.legoeducation.com/prime/lobby/", "_blank");
+      function show(i) {
+        cards[current].classList.remove("active");
+        current = i;
+        cards[current].classList.add("active");
+        document.querySelectorAll("video").forEach((v) => v.pause());
+        window.scrollTo(0, 0);
       }
-    }
-  }
 
-  document.addEventListener("DOMContentLoaded", () => {
-    setUploadBehaviour();
+      function nextPage() {
+        if (current < cards.length - 1) show(current + 1);
+      }
 
-    // ---- Image Viewer Script ----
-    const totalImages = 39;
-    let currentImage = 1;
+      function prevPage() {
+        if (current > 0) show(current - 1);
+      }
 
-    const imgElement = document.getElementById("slide");
-    const counter = document.getElementById("counter");
+      // ---- iPad Handling ----
+      function isiPad() {
+        if (navigator.userAgent.includes("iPad")) return true;
+        if (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1) return true;
+        return false;
+      }
 
-    if (!imgElement || !counter) return; // prevent errors if not found
+      function setUploadBehaviour() {
+        const uploadBtn = document.getElementById("uploadButton");
+        const ipadMsg = document.getElementById("iPadMessage");
+        const ipadVid = document.getElementById("ipadVideo");
+        const defVid = document.getElementById("defaultVideo");
 
-    function showImage() {
-      imgElement.src = `lego-instructions/arm-instructions-${String(currentImage).padStart(2, '0')}.png`;
-      counter.textContent = `${currentImage} / ${totalImages}`;
-    }
+        if (uploadBtn && ipadMsg && ipadVid && defVid) {
+          if (isiPad()) {
+            ipadMsg.style.display = "inline-block";
+            uploadBtn.style.display = "none";
+            ipadVid.style.display = "block";
+            defVid.style.display = "none";
+          } else {
+            ipadMsg.style.display = "none";
+            uploadBtn.style.display = "inline-block";
+            ipadVid.style.display = "none";
+            defVid.style.display = "block";
+            uploadBtn.onclick = () =>
+              window.open("https://spike.legoeducation.com/prime/lobby/", "_blank");
+          }
+        }
+      }
 
-    function nextImage() {
-      currentImage = currentImage < totalImages ? currentImage + 1 : 1;
-      showImage();
-    }
+      document.addEventListener("DOMContentLoaded", () => {
+        setUploadBehaviour();
 
-    function prevImage() {
-      currentImage = currentImage > 1 ? currentImage - 1 : totalImages;
-      showImage();
-    }
+        // ---- Image Viewer Script ----
+        const totalImages = 39;
+        let currentImage = 1;
 
-    // Attach to window so buttons can use them
-    window.nextImage = nextImage;
-    window.prevImage = prevImage;
+        const imgElement = document.getElementById("slide");
+        const counter = document.getElementById("counter");
 
-    // Swipe gestures for iPad/mobile
-    let startX = 0;
-    imgElement.addEventListener("touchstart", e => startX = e.touches[0].clientX);
-    imgElement.addEventListener("touchend", e => {
-      const diffX = e.changedTouches[0].clientX - startX;
-      if (diffX > 50) prevImage();
-      if (diffX < -50) nextImage();
-    });
-    showImage();
+        if (!imgElement || !counter) return;
 
-  });
-</script>
+        function showImage() {
+          imgElement.src = `lego-instructions/arm-instructions-${String(currentImage).padStart(2, '0')}.png`;
+          counter.textContent = `${currentImage} / ${totalImages}`;
+        }
+
+        function nextImage() {
+          currentImage = currentImage < totalImages ? currentImage + 1 : 1;
+          showImage();
+        }
+
+        function prevImage() {
+          currentImage = currentImage > 1 ? currentImage - 1 : totalImages;
+          showImage();
+        }
+
+        window.nextImage = nextImage;
+        window.prevImage = prevImage;
+
+        let startX = 0;
+        imgElement.addEventListener("touchstart", e => startX = e.touches[0].clientX);
+        imgElement.addEventListener("touchend", e => {
+          const diffX = e.changedTouches[0].clientX - startX;
+          if (diffX > 50) prevImage();
+          if (diffX < -50) nextImage();
+        });
+
+        showImage();
+      });
+    </script>
 
   </body>
 </html>

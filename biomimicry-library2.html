@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Biomimicry Library — Bionic Arm</title>
+
+  <style>
+    :root{ --card:#dbf2ff; --ink:#0b1726; }
+    *{ box-sizing:border-box; }
+
+    body{
+      margin:0;
+      font-family:system-ui, Arial, sans-serif;
+      color:var(--ink);
+      background:#fff;
+      padding:32px 16px;
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+    }
+
+    /* Hide pages by default */
+    .page{
+      display:none;
+      width:100%;
+      max-width:1100px;
+    }
+
+    .page.active{
+      display:block;
+    }
+
+    /* Center the intro page like the SCAMPER one */
+    #page1.active{
+      min-height:100vh;
+      max-width:900px;
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+      justify-content:center;
+    }
+
+    h1{
+      margin:0 0 8px;
+      font-size:clamp(1.4rem,2.6vw,2rem);
+      text-align:center;
+    }
+
+    p.lede{
+      margin:0 0 28px;
+      text-align:center;
+      opacity:.8;
+    }
+
+    /* Buttons */
+    .nav-buttons{
+      margin-top:24px;
+      display:flex;
+      justify-content:space-between;
+      gap:16px;
+      width:100%;
+    }
+
+    .btn{
+      text-decoration:none;
+      padding:10px 16px;
+      border-radius:10px;
+      background:#0a66ff;
+      color:white;
+      font-weight:600;
+    }
+
+    .btn.secondary{
+      background:#e5e7eb;
+      color:#111;
+    }
+
+    /* Image page */
+    .intro-img{
+      width:100%;
+      max-width:800px;
+      display:block;
+      margin:0 auto;
+      border-radius:16px;
+    }
+
+    /* Grid */
+    .grid{
+      display:grid;
+      gap:28px;
+      grid-template-columns: repeat(3, minmax(220px, 1fr));
+      width:100%;
+      justify-items:center;
+    }
+
+    .card{
+      position:relative;
+      width:300px;
+      height:300px;
+      border-radius:28px;
+      background:var(--card);
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+      justify-content:center;
+      box-shadow:0 2px 10px rgba(0,0,0,.06);
+      transition:.15s transform, .15s box-shadow;
+      text-align:center;
+      overflow:hidden;
+      padding:16px;
+    }
+
+    .card:hover{
+      transform:translateY(-3px);
+      box-shadow:0 8px 22px rgba(0,0,0,.12);
+    }
+
+    .thumb{
+      width:72%;
+      aspect-ratio:1/1;
+      background:#edf8ff;
+      border-radius:18px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      overflow:hidden;
+      margin-bottom:16px;
+    }
+
+    .thumb img{
+      max-width:100%;
+      max-height:100%;
+      object-fit:contain;
+    }
+
+    .label{
+      font-weight:700;
+      font-size:1.05rem;
+    }
+
+    .card a{
+      position:absolute;
+      inset:0;
+      text-indent:-9999px;
+    }
+
+    @media (max-width:900px){
+      .grid{ grid-template-columns: 1fr 1fr; }
+    }
+
+    @media (max-width:600px){
+      .grid{ grid-template-columns: 1fr; }
+      .card{ width:88vw; max-width:420px; }
+
+      #page1.active{
+        min-height:100vh;
+        padding-top:16px;
+        padding-bottom:16px;
+      }
+
+      .nav-buttons{
+        flex-direction:row;
+        flex-wrap:wrap;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- PAGE 1: LEARNING INTENTIONS -->
+  <div id="page1" class="page active">
+    <img src="LO Biomimicry.png" alt="Learning Intentions" class="intro-img">
+
+    <div class="nav-buttons">
+      <a href="index.html" class="btn secondary">← Back to Home</a>
+      <a href="#" class="btn" onclick="showPage(2)">Next →</a>
+    </div>
+  </div>
+
+  <!-- PAGE 2: MAIN CONTENT -->
+  <div id="page2" class="page">
+
+    <h1>Biomimicry Library</h1>
+    <p class="lede">Explore organisms whose adaptations inspire robotic arms & prosthetic design.</p>
+
+    <div class="grid">
+
+      <div class="card">
+        <div class="thumb"><img src="mantis1.png" alt="Praying Mantis"></div>
+        <div class="label">Praying Mantis</div>
+        <a href="mantis.html">Praying Mantis</a>
+      </div>
+
+      <div class="card">
+        <div class="thumb"><img src="https://encrypted-tbn3.gstatic.com/images?q=tbn:ANd9GcSHOIJ9AJbgZS-3fpS-1l0w0vlLqxV2kKpZlrVqqtg9QeyqDCAMchyhCB_rUzCVak7ZwKWXZrCPGx8AmiKfQfQgjdXzaJDPAoYgze8iRx2OjA" alt="Mantis shrimp"></div>
+        <div class="label">Mantis shrimp</div>
+        <a href="shrimp.html">Mantis shrimp</a>
+      </div>
+
+      <div class="card">
+        <div class="thumb"><img src="https://encrypted-tbn3.gstatic.com/images?q=tbn:ANd9GcRltaQ1atswf66uL6Sl1d4RJw9sU9UKt5vT284_16aMo_OPPn6KKDLXkg1OVortpE_yVZEdqh2X8pasobi969zTCn2f1lBhnN5H9eMuDxiCYw" alt="Grasshopper"></div>
+        <div class="label">Grasshopper</div>
+        <a href="grasshopper.html">Grasshopper</a>
+      </div>
+
+      <div class="card">
+        <div class="thumb"><img src="bat1.png" alt="Bat"></div>
+        <div class="label">Bat</div>
+        <a href="bat.html">Bat</a>
+      </div>
+
+      <div class="card">
+        <div class="thumb"><img src="venus-flytrap2.png" alt="Venus Flytrap"></div>
+        <div class="label">Venus Flytrap</div>
+        <a href="venus-flytrap.html">Venus Flytrap</a>
+      </div>
+
+      <div class="card">
+        <div class="thumb"><img src="octopus1.png" alt="Octopus"></div>
+        <div class="label">Octopus</div>
+        <a href="octopus.html">Octopus</a>
+      </div>
+
+      <div class="card">
+        <div class="thumb"><img src="harpy-eagle1.png" alt="Harpy Eagle"></div>
+        <div class="label">Harpy Eagle</div>
+        <a href="harpy-eagle.html">Harpy Eagle</a>
+      </div>
+
+      <div class="card">
+        <div class="thumb"><img src="spider1.png" alt="Spider"></div>
+        <div class="label">Spider</div>
+        <a href="spider.html">Spider</a>
+      </div>
+
+      <div class="card">
+        <div class="thumb"><img src="https://encrypted-tbn1.gstatic.com/images?q=tbn:ANd9GcT9rGegSZaFkjuNllWY_Tt2JquWsYXEXE_Qcf3nAmvqxwHWHgcK0Gjq6rFPspNVPiN049FR5-vGIr7tb1PZorWFf0AMZmMd7rFJwt1SViUhWQ" alt="Springtail"></div>
+        <div class="label">Springtail</div>
+        <a href="springtail.html">Springtail</a>
+      </div>
+
+    </div>
+
+    <div class="nav-buttons">
+      <a href="#" class="btn secondary" onclick="showPage(1)">← Back to Learning Intentions</a>
+    </div>
+
+  </div>
+
+  <script>
+    function showPage(pageNumber){
+      document.getElementById('page1').classList.remove('active');
+      document.getElementById('page2').classList.remove('active');
+      document.getElementById('page' + pageNumber).classList.add('active');
+      window.scrollTo(0, 0);
+    }
+  </script>
+
+</body>
+</html>
