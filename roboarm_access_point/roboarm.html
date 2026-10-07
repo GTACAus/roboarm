@@ -14,6 +14,13 @@
     </div>
 
     <div class="hdr">
+      <button id="btn-help" aria-label="Trouble connecting">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="10"></circle>
+          <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path>
+          <line x1="12" y1="17" x2="12.01" y2="17"></line>
+        </svg>
+      </button>
       <button id="edit" aria-label="Change the remote">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
           <path d="M4 20h4L19 9l-4-4L4 16z"/>
@@ -26,8 +33,26 @@
 
     <div id="musclebox">
       <div class="big" id="pct">0%</div>
-      <canvas id="graph"></canvas>
-      <div>Muscle signal over the last 30 seconds. The muscle sensor is moving the arm.</div>
+      
+      <div id="muscle-motors">
+        <p>Select a motor port</p>
+        <button class="sel">B</button>
+        <button>C</button>
+        <button>D</button>
+        <button>E</button>
+        <button>F</button>
+      </div>
+
+      <div id="graph-row">
+        <canvas id="graph"></canvas>
+        <input type="range" id="amp-slider" orient="vertical" min="1" max="3" step="0.1" value="1" title="Signal Amplifier">
+      </div>
+      
+      <div class="desc">
+        <p>When the LEGO hub is running program 0, the muscle sensor will control the arm.</p>
+        <p>If your signal doesn't go up to 100%: </p>
+        <p>  - slide the slider to amplify your signal.</p>
+      </div>
     </div>
 
     <div id="editbar">
@@ -38,11 +63,34 @@
       <button class="warn" id="reset">Start again</button>
     </div>
 
-    <div id="status">Hold the controls to move the arm</div>
+    <div id="status"></div>
   </div>
 
+  <!-- Settings Dialog -->
   <div id="dlg">
     <div id="dlgbox"></div>
+  </div>
+
+  <!-- Help Dialog -->
+  <div id="help-dlg">
+    <div id="help-dlgbox">
+      <h2>How to make your robot listen to your remote/sensor:</h2>
+      <pre>
+1. Press the circle button in the centre of the three buttons
+
+     BUTTONS 
+       ___
+ __   /   \  __
+(__( |     | )__)
+      \___/
+Left  Circle Right
+   
+2.  Click on the left or right arrow button to 
+    select the "0" program
+3. Start the "0" program by pressing the circle button again
+4. Test your controller</pre>
+      <button class="done" id="close-help">Got it</button>
+    </div>
   </div>
 
   <script src="script.js"></script>

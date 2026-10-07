@@ -260,7 +260,7 @@ body {
   position: absolute;
   top: 8px;
   left: 10px;
-  display: flex; /* Changed from display: none */
+  display: flex;
   background: #1b1b1b;
   border-radius: 999px;
   padding: 4px;
@@ -303,17 +303,85 @@ body {
   display: none !important;
 }
 
-#graph {
+#musclebox .big {
+  font-size: max(28px, 6vmin);
+  color: #e8fffc;
+  font-weight: 700;
+}
+
+#muscle-motors {
+  display: flex;
+  gap: 12px;
+  margin: 5px 0 15px;
+}
+
+#muscle-motors button {
+  width: 46px;
+  height: 46px;
+  border-radius: 50%;
+  border: 2px solid #2b2b2b;
+  background: #1b1b1b;
+  color: #bbb;
+  font-weight: bold;
+  font-size: 18px;
+  touch-action: manipulation;
+}
+
+#muscle-motors button.sel {
+  background: var(--teal);
+  color: #06211e;
+  border-color: var(--lit);
+}
+
+#graph-row {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 16px;
   width: min(88vw, 820px);
+  justify-content: center;
+}
+
+#graph {
+  flex: 1;
   height: min(46vh, 340px);
   display: block;
   touch-action: none;
 }
 
-#musclebox .big {
-  font-size: max(28px, 6vmin);
-  color: #e8fffc;
-  font-weight: 700;
+#amp-slider {
+  -webkit-appearance: slider-vertical;
+  appearance: slider-vertical;
+  width: 24px;
+  height: min(46vh, 340px);
+  background: #111;
+  border: 1px solid #333;
+  border-radius: 12px;
+  outline: none;
+  cursor: pointer;
+}
+
+#amp-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: var(--teal);
+  cursor: pointer;
+}
+
+#musclebox .desc {
+  text-align: center;
+  max-width: 760px;
+  font-size: max(14px, 2vmin);
+  line-height: 1.5;
+  margin-top: 15px;
+  color: #9a9a9a;
+}
+
+#musclebox .desc p {
+  margin: 6px 0;
 }
 
 #editbar {
@@ -351,7 +419,7 @@ body {
   min-height: 1.2em;
 }
 
-#dlg {
+#dlg, #help-dlg {
   position: fixed;
   inset: 0;
   background: rgba(0, 0, 0, 0.65);
@@ -362,11 +430,11 @@ body {
   touch-action: auto;
 }
 
-#dlg.open {
+#dlg.open, #help-dlg.open {
   display: flex;
 }
 
-#dlgbox {
+#dlgbox, #help-dlgbox {
   width: min(92vw, 460px);
   max-height: 90vh;
   overflow: auto;
@@ -377,9 +445,25 @@ body {
   color: #ddd;
 }
 
-#dlgbox h2 {
-  margin: 0 0 12px;
+#help-dlgbox {
+  width: min(92vw, 560px);
+}
+
+#dlgbox h2, #help-dlgbox h2 {
+  margin: 0 0 16px;
   font-size: 1.1em;
+}
+
+#help-dlgbox pre {
+  background: #111;
+  padding: 16px;
+  border-radius: 12px;
+  overflow-x: auto;
+  font-family: monospace;
+  font-size: 14px;
+  line-height: 1.3;
+  color: #bfeee9;
+  border: 1px solid #2b2b2b;
 }
 
 .ax {
@@ -410,8 +494,8 @@ select, input[type="text"] {
   font-size: 16px;
 }
 
-#dlgbox .done {
-  margin-top: 12px;
+.done {
+  margin-top: 16px;
   width: 100%;
   padding: 12px;
   border: none;

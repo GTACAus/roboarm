@@ -13,6 +13,8 @@ let layout = load();
 let editing = false;
 let nextId = 100;
 let remoteMode = loadMode();
+let ampMultiplier = 1.0;
+let musclePort = 'B';
 
 function loadMode() {
   try {
@@ -37,6 +39,11 @@ function setMode(remote) {
 
   if (document.readyState !== 'loading') {
     $('status').textContent = remote ? 'Hold the controls to move the arm' : 'Muscle sensor mode (Simulated / Live)';
+  }
+  
+  // Resize graph on mode switch since it might have been display:none
+  if (!remote) {
+    setTimeout(drawGraph, 50);
   }
 }
 
@@ -70,6 +77,8 @@ function save() {
 let busy = false;
 let dirty = false;
 let lastLiveSignalTime = 0;
+let lastPctUpdateTime = 0; // Timer to slow down the % text updates
+const PCT_UPDATE_INTERVAL = 200; // Update text every 200ms
 
 function digits() {
   const lv = [0, 0, 0, 0, 0];
@@ -118,15 +127,25 @@ function connectWS() {
 function handleReply(t) {
   const parts = t.split(' '); // "ok" or "ok <muscle %>"
   if (parts.length > 1) {
-    const p = Math.max(0, Math.min(100, parseInt(parts[1]) || 0));
-    $('pct').textContent = p + '%';
+    let rawSignal = parseInt(parts[1]) || 0;
+    let p = Math.max(0, Math.min(100, rawSignal * ampMultiplier)); 
     addSample(p);
     lastLiveSignalTime = performance.now();
+    
+    // Throttle the text update so it's readable
+    if (performance.now() - lastPctUpdateTime > PCT_UPDATE_INTERVAL) {
+      $('pct').textContent = Math.round(p) + '%';
+      lastPctUpdateTime = performance.now();
+    }
   }
 }
 
 function send() {
-  const msg = 'm=' + digits() + '&x=' + (remoteMode ? 1 : 0);
+  let msg = 'm=' + digits() + '&x=' + (remoteMode ? 1 : 0);
+  if (!remoteMode) {
+    msg += '&port=' + musclePort;
+  }
+
   if (wsOpen) {
     try {
       ws.send(msg);
@@ -501,6 +520,14 @@ $('edit').addEventListener('click', () => {
   $('status').textContent = editing ? 'Change the remote: add, move, resize or set up the controls' : 'Hold the controls to move the arm';
 });
 
+$('btn-help').addEventListener('click', () => {
+  $('help-dlg').classList.add('open');
+});
+
+$('close-help').addEventListener('click', () => {
+  $('help-dlg').classList.remove('open');
+});
+
 document.querySelectorAll('[data-add]').forEach((b) => b.addEventListener('click', () => addWidget(b.dataset.add)));
 
 $('reset').addEventListener('click', () => {
@@ -534,9 +561,14 @@ function generateMockSample() {
     mockVal += (mockTarget - mockVal) * 0.15 + (Math.random() - 0.5) * 4;
     mockVal = Math.max(0, Math.min(100, mockVal));
 
-    const displayVal = Math.round(mockVal);
-    $('pct').textContent = displayVal + '%';
+    let displayVal = Math.round(Math.max(0, Math.min(100, mockVal * ampMultiplier)));
     addSample(displayVal);
+    
+    // Throttle the text update so it's readable
+    if (performance.now() - lastPctUpdateTime > PCT_UPDATE_INTERVAL) {
+      $('pct').textContent = displayVal + '%';
+      lastPctUpdateTime = performance.now();
+    }
   }
 }
 
@@ -646,6 +678,26 @@ setInterval(() => {
 
 $('mRemote').addEventListener('click', () => setMode(true));
 $('mMuscle').addEventListener('click', () => setMode(false));
+
+const ampSlider = $('amp-slider');
+if (ampSlider) {
+  ampSlider.addEventListener('input', (e) => {
+    ampMultiplier = parseFloat(e.target.value);
+  });
+}
+
+const motorBtns = document.querySelectorAll('#muscle-motors button');
+motorBtns.forEach(btn => {
+  btn.addEventListener('click', (e) => {
+    // Ignore if it's the paragraph text
+    if(e.target.tagName !== 'BUTTON') return;
+    
+    motorBtns.forEach(b => b.classList.remove('sel'));
+    e.target.classList.add('sel');
+    musclePort = e.target.textContent;
+    send(); 
+  });
+});
 
 /* Prevent touch zoom on mobile/tablets */
 let lastTouch = 0;
