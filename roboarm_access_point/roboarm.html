@@ -1,89 +1,90 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Robot Control Panel</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no, viewport-fit=cover">
+  <title>Robot Arm Remote</title>
   <link rel="stylesheet" href="style.css">
-  <!-- Load Blockly -->
-  <script src="https://unpkg.com/blockly/blockly.min.js"></script>
 </head>
 <body>
-
   <div class="panel" id="panel">
     <div id="modes">
       <button id="mRemote" class="sel">Remote</button>
-      <button id="mMuscle">Muscle</button>
-    </div>
-    
-    <div class="hdr">
-      <button id="edit" aria-label="edit">✎</button>
-      <button id="code-btn">&lt; / &gt;</button>
+      <button id="mMuscle">Muscle sensor</button>
     </div>
 
-    <!-- Remote Mode Board -->
+    <div class="hdr">
+      <button id="edit" aria-label="Change the remote" title="Edit remote">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M4 20h4L19 9l-4-4L4 16z"/>
+          <path d="M13.5 6.5l4 4"/>
+        </svg>
+      </button>
+      <button id="code" aria-label="Code the remote" title="Code the remote">
+        <span class="code-glyph" aria-hidden="true">&lt;/&gt;</span>
+      </button>
+    </div>
+
+    <button id="help" class="corner-help" aria-label="LEGO connection help" title="LEGO connection help">?</button>
+
     <div id="board"></div>
 
-    <!-- Edit Tools (Visible only when editing) -->
-    <div id="editbar">
-      <button data-add="dpad">+ D-pad</button>
-      <button data-add="joy">+ Joystick</button>
-      <button data-add="slider">+ Slider</button>
-      <button data-add="button">+ Button</button>
-      <button id="reset" class="warn">Reset all</button>
-    </div>
+    <section id="codeview" aria-hidden="true">
+      <div class="code-view-header">
+        <div>
+          <div class="code-kicker">REMOTE PROGRAM</div>
+          <h2>Code your controls</h2>
+          <p>Change what each control does. Your blocks update the same remote you use on the main screen.</p>
+        </div>
+        <button id="codeBack" type="button">Back to remote</button>
+      </div>
+      <div id="codeblocks"></div>
+      <div class="code-footnote">
+        These blocks currently control motor choice, speed and direction. Movement runs while the control is being used.
+      </div>
+    </section>
 
-    <!-- Muscle Sensor Mode Board -->
     <div id="musclebox">
       <div class="big" id="pct">0%</div>
-      <div id="muscle-motors">
-        <p>Motor:</p>
-        <button class="sel">B</button>
-        <button>C</button>
-        <button>D</button>
-        <button>E</button>
-        <button>F</button>
-      </div>
-      <div id="graph-row">
+
+      <div class="signal-row">
         <canvas id="graph"></canvas>
-        <input type="range" id="amp-slider" min="0.1" max="5.0" step="0.1" value="1.0" orient="vertical">
+
+        <div class="sensitivity-control">
+          <div class="sensitivity-title">Sensitivity</div>
+          <div class="sensitivity-scale">
+            <span>High</span>
+            <input
+              id="sensitivity"
+              type="range"
+              min="1"
+              max="2"
+              step="0.1"
+              value="1"
+              aria-label="Muscle signal sensitivity"
+            >
+            <span>Low</span>
+          </div>
+          <div id="gainValue" class="gain-value">1.0</div>
+        </div>
       </div>
-      <div class="desc">
-        <p>Adjust the slider to amplify the signal.</p>
-      </div>
+
+      <div>Muscle signal over the last 30 seconds. Adjust sensitivity if the signal is too small or too large.</div>
+    </div>
+
+    <div id="editbar">
+      <button data-add="dpad">+ D-pad</button>
+      <button data-add="slider">+ Slider</button>
+      <button data-add="joy">+ Joystick</button>
+      <button data-add="button">+ Button</button>
+      <button class="warn" id="reset">Start again</button>
     </div>
 
     <div id="status">Hold the controls to move the arm</div>
   </div>
 
-  <!-- Giant Floating Help Button -->
-  <button id="btn-help">
-    <svg viewBox="0 0 24 24" fill="currentColor">
-      <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 17h-2v-2h2v2zm2.07-7.75l-.9.92C13.45 12.9 13 13.5 13 15h-2v-.5c0-1.1.45-2.1 1.17-2.83l1.24-1.26c.37-.36.59-.86.59-1.41 0-1.1-.9-2-2-2s-2 .9-2 2H8c0-2.21 1.79-4 4-4s4 1.79 4 4c0 .88-.36 1.68-.93 2.25z"/>
-    </svg>
-  </button>
-
-  <!-- Configuration Dialog -->
   <div id="dlg">
     <div id="dlgbox"></div>
-  </div>
-
-  <!-- Help Dialog -->
-  <div id="help-dlg">
-    <div id="help-dlgbox">
-      <h2>Help & Info</h2>
-      <p>Connection details and setup go here.</p>
-      <button id="close-help" class="done">Close</button>
-    </div>
-  </div>
-
-  <!-- Blockly Coding Canvas Dialog -->
-  <div id="code-dlg">
-    <div class="code-hdr">
-      <h2>Code Canvas</h2>
-      <button id="close-code" class="done-btn">Done</button>
-    </div>
-    <div id="blocklyDiv"></div>
   </div>
 
   <script src="script.js"></script>

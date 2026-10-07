@@ -13,8 +13,7 @@ let layout = load();
 let editing = false;
 let nextId = 100;
 let remoteMode = loadMode();
-let ampMultiplier = 1.0;
-let musclePort = 'B';
+let coding = false;
 
 function loadMode() {
   try {
@@ -31,21 +30,19 @@ function setMode(remote) {
   } catch (_) {}
 
   if (!remote && editing) $('edit').click();
+  if (!remote && coding) setCoding(false);
 
   $('mRemote').classList.toggle('sel', remote);
-  $('mMuscle').classList.toggle('sel', !remote);$('panel').classList.toggle('muscle', !remote);
+  $('mMuscle').classList.toggle('sel', !remote);
+  $('panel').classList.toggle('muscle', !remote);
   releaseAll();
 
   if (document.readyState !== 'loading') {
     $('status').textContent = remote ? 'Hold the controls to move the arm' : 'Muscle sensor mode (Simulated / Live)';
   }
-  
-  if (!remote) {
-    setTimeout(drawGraph, 50);
-  }
 }
 
-const outs = {}; 
+const outs = {}; // widget id -> signed speed level (-3..3) for each axis
 
 function defaults() {
   return [
@@ -75,8 +72,6 @@ function save() {
 let busy = false;
 let dirty = false;
 let lastLiveSignalTime = 0;
-let lastPctUpdateTime = 0;
-const PCT_UPDATE_INTERVAL = 200; 
 
 function digits() {
   const lv = [0, 0, 0, 0, 0];
@@ -123,26 +118,17 @@ function connectWS() {
 }
 
 function handleReply(t) {
-  const parts = t.split(' '); 
+  const parts = t.split(' '); // "ok" or "ok <muscle %>"
   if (parts.length > 1) {
-    let rawSignal = parseInt(parts[1]) || 0;
-    let p = Math.max(0, Math.min(100, rawSignal * ampMultiplier)); 
+    const p = Math.max(0, Math.min(100, parseInt(parts[1]) || 0));
     addSample(p);
+    showMuscleValue(p);
     lastLiveSignalTime = performance.now();
-    
-    if (performance.now() - lastPctUpdateTime > PCT_UPDATE_INTERVAL) {
-      $('pct').textContent = Math.round(p) + '%';
-      lastPctUpdateTime = performance.now();
-    }
   }
 }
 
 function send() {
-  let msg = 'm=' + digits() + '&x=' + (remoteMode ? 1 : 0);
-  if (!remoteMode) {
-    msg += '&port=' + musclePort;
-  }
-
+  const msg = 'm=' + digits() + '&x=' + (remoteMode ? 1 : 0);
   if (wsOpen) {
     try {
       ws.send(msg);
@@ -436,6 +422,7 @@ function addWidget(t) {
 /* ---------- Configuration Dialog ---------- */
 function openDialog(w) {
   const box = $('dlgbox');
+  box.classList.remove('help-dialog');
   box.innerHTML = '';
   const title = { dpad: 'D-pad', slider: 'Slider', joy: 'Joystick', button: 'Button' }[w.t];
   box.appendChild(el('h2', null, title + ': choose the motors'));
@@ -508,18 +495,194 @@ function openDialog(w) {
   $('dlg').classList.add('open');
 }
 
+
+/* ---------- Student Code View ---------- */
+function widgetTypeName(t) {
+  return { dpad: 'D-pad', slider: 'Slider', joy: 'Joystick', button: 'Button' }[t] || 'Control';
+}
+
+function axisTrigger(w, axisIndex, widgetNumber) {
+  const name = widgetTypeName(w.t) + ' ' + widgetNumber;
+  if (w.t === 'dpad') return 'when ' + name + ' ' + (axisIndex === 0 ? 'UP / DOWN' : 'LEFT / RIGHT') + ' is pressed';
+  if (w.t === 'joy') return 'when ' + name + ' moves ' + (axisIndex === 0 ? 'UP / DOWN' : 'LEFT / RIGHT');
+  if (w.t === 'slider') return 'when ' + name + ' is moved';
+  return 'when ' + (w.name || name) + ' is pressed';
+}
+
+function behaviourText(w) {
+  if (w.t === 'slider' || w.t === 'joy') return 'follows the control';
+  return 'while held';
+}
+
+function codeSelect(options, value, onChange, label) {
+  const s = el('select');
+  if (label) s.setAttribute('aria-label', label);
+  options.forEach(([text, val]) => {
+    const o = document.createElement('option');
+    o.value = String(val);
+    o.textContent = text;
+    if (String(value) === String(val)) o.selected = true;
+    s.appendChild(o);
+  });
+  s.addEventListener('change', () => onChange(s.value));
+  return s;
+}
+
+function codeField(label, control) {
+  const row = el('div', 'code-field');
+  row.appendChild(el('label', null, label));
+  row.appendChild(control);
+  return row;
+}
+
+function renderCode() {
+  const host = $('codeblocks');
+  if (!host) return;
+  host.innerHTML = '';
+
+  if (!layout.length) {
+    host.appendChild(el('div', 'code-empty', 'There are no controls yet. Go back to the remote and use the pencil to add one.'));
+    return;
+  }
+
+  const counts = {};
+  layout.forEach((w) => {
+    counts[w.t] = (counts[w.t] || 0) + 1;
+    const widgetNumber = counts[w.t];
+
+    w.ax.forEach((a, axisIndex) => {
+      const program = el('div', 'code-program');
+      program.appendChild(el('div', 'code-program-title', widgetTypeName(w.t) + ' ' + widgetNumber));
+      program.appendChild(el('div', 'code-event-block', axisTrigger(w, axisIndex, widgetNumber)));
+
+      const action = el('div', 'code-action-block');
+      action.appendChild(el('div', 'code-action-title', 'move LEGO motor'));
+
+      const motorOptions = [['No motor', '']].concat(MOTORS.map((m) => ['Motor ' + m, m]));
+      const motor = codeSelect(motorOptions, a.m, (value) => {
+        a.m = value;
+        save();
+      }, 'Choose motor');
+      action.appendChild(codeField('Motor', motor));
+
+      const speed = codeSelect(
+        [['Slow (1)', 1], ['Medium (2)', 2], ['Fast (3)', 3]],
+        a.sp,
+        (value) => {
+          a.sp = +value;
+          save();
+        },
+        'Choose speed'
+      );
+      action.appendChild(codeField(w.t === 'slider' || w.t === 'joy' ? 'Top speed' : 'Speed', speed));
+
+      const direction = codeSelect(
+        [['Normal', 'normal'], ['Reversed', 'reverse']],
+        a.rev ? 'reverse' : 'normal',
+        (value) => {
+          a.rev = value === 'reverse';
+          save();
+        },
+        'Choose direction'
+      );
+      action.appendChild(codeField('Direction', direction));
+
+      action.appendChild(codeField('Run', el('div', 'code-fixed', behaviourText(w))));
+      program.appendChild(action);
+      host.appendChild(program);
+    });
+  });
+}
+
+function setCoding(on) {
+  coding = !!on && remoteMode;
+
+  if (coding && editing) {
+    editing = false;
+    $('panel').classList.remove('editing');
+    $('edit').classList.remove('sel');
+  }
+
+  releaseAll();
+  $('panel').classList.toggle('coding', coding);
+  $('code').classList.toggle('sel', coding);
+  $('codeview').setAttribute('aria-hidden', coding ? 'false' : 'true');
+
+  if (coding) {
+    renderCode();
+    $('status').textContent = 'Change the blocks, then go back to the remote to try them';
+  } else if (remoteMode) {
+    render();
+    $('status').textContent = 'Hold the controls to move the arm';
+  }
+}
+
+/* ---------- LEGO Connection Help ---------- */
+function openConnectionHelp() {
+  const box = $('dlgbox');
+  box.classList.add('help-dialog');
+  box.innerHTML = '';
+
+  box.appendChild(el('h2', null, 'LEGO not responding?'));
+  box.appendChild(el('p', null, 'Use this quick connection check before changing the remote.'));
+
+  const img = document.createElement('img');
+  img.className = 'connect-image';
+  img.src = 'lego-connect.png';
+  img.alt = 'LEGO connection instructions';
+
+  const fallback = el('div', 'connect-fallback');
+  fallback.style.display = 'none';
+  fallback.innerHTML =
+    '<div class="connect-node"><strong>1</strong>This device</div>' +
+    '<div class="connect-arrow">→</div>' +
+    '<div class="connect-node"><strong>2</strong>Robot connection</div>' +
+    '<div class="connect-arrow">→</div>' +
+    '<div class="connect-node"><strong>3</strong>LEGO / controller</div>';
+
+  img.addEventListener('error', () => {
+    img.style.display = 'none';
+    fallback.style.display = 'grid';
+  });
+
+  box.appendChild(img);
+  box.appendChild(fallback);
+
+  const steps = el('ol', 'help-steps');
+  [
+    'Check that the LEGO hub / robot controller is switched on.',
+    'Check that this device is connected to the robot connection your class is using.',
+    'Look at the status message at the bottom of this page. If it still says “Not connected”, reconnect and try again.',
+    'If the robot is still not responding, ask your teacher before changing any wiring or hardware.'
+  ].forEach((text) => {
+    const li = document.createElement('li');
+    li.textContent = text;
+    steps.appendChild(li);
+  });
+  box.appendChild(steps);
+  box.appendChild(el('div', 'help-status-tip', 'Tip: place a file called lego-connect.png beside this HTML file and it will automatically appear here instead of the simple diagram.'));
+
+  const done = el('button', 'done', 'Back to remote');
+  done.addEventListener('click', () => {
+    $('dlg').classList.remove('open');
+    box.classList.remove('help-dialog');
+  });
+  box.appendChild(done);
+  $('dlg').classList.add('open');
+}
+
 /* ---------- Event Listeners ---------- */
+$('code').addEventListener('click', () => setCoding(!coding));
+$('codeBack').addEventListener('click', () => setCoding(false));
+$('help').addEventListener('click', openConnectionHelp);
+
 $('edit').addEventListener('click', () => {
+  if (coding) setCoding(false);
   editing = !editing;
   releaseAll();
   $('panel').classList.toggle('editing', editing);
-  $('edit').classList.toggle('sel', editing);$('status').textContent = editing ? 'Change the remote: add, move, resize or set up the controls' : 'Hold the controls to move the arm';
-});
-
-$('btn-help').addEventListener('click', () => {$('help-dlg').classList.add('open');
-});
-
-$('close-help').addEventListener('click', () => {$('help-dlg').classList.remove('open');
+  $('edit').classList.toggle('sel', editing);
+  $('status').textContent = editing ? 'Change the remote: add, move, resize or set up the controls' : 'Hold the controls to move the arm';
 });
 
 document.querySelectorAll('[data-add]').forEach((b) => b.addEventListener('click', () => addWidget(b.dataset.add)));
@@ -536,7 +699,37 @@ document.addEventListener('contextmenu', (e) => e.preventDefault());
 
 /* ---------- Muscle Signal Real-Time Graph ---------- */
 const WINDOW_MS = 30000;
-const samples = [];
+const samples = []; // Keep RAW sensor values so sensitivity can rescale the visible history.
+let lastRawMuscleValue = 0;
+let muscleGain = loadMuscleGain();
+
+function loadMuscleGain() {
+  try {
+    const saved = parseFloat(localStorage.getItem('gtac-muscle-gain'));
+    if (Number.isFinite(saved)) return Math.max(1, Math.min(2, saved));
+  } catch (_) {}
+  return 1;
+}
+
+function amplifiedMuscleValue(raw) {
+  const x = Math.max(0, Math.min(100, raw)) / 100;
+
+  // Soft sensitivity curve.
+  // 1.0 = original signal.
+  // 2.0 = maximum boost.
+  // Weak signals are lifted more than already-strong signals,
+  // so the graph keeps its shape instead of flattening at 100%.
+  const sensitivity = Math.max(1, Math.min(2, muscleGain));
+  const boosted = 1 - Math.pow(1 - x, sensitivity);
+
+  return boosted * 100;
+}
+
+function showMuscleValue(raw) {
+  lastRawMuscleValue = raw;
+  const amplified = amplifiedMuscleValue(raw);
+  $('pct').textContent = Math.round(amplified) + '%';
+}
 
 function addSample(v) {
   const t = performance.now();
@@ -544,23 +737,39 @@ function addSample(v) {
   while (samples.length && samples[0][0] < t - WINDOW_MS - 1000) samples.shift();
 }
 
-let mockVal = 30;
-let mockTarget = 30;
+function setupSensitivityControl() {
+  const slider = $('sensitivity');
+  slider.value = muscleGain;
+
+  function update() {
+    muscleGain = Math.max(1, Math.min(2, parseFloat(slider.value) || 1));
+    $('gainValue').textContent = muscleGain.toFixed(1);
+    showMuscleValue(lastRawMuscleValue);
+    try {
+      localStorage.setItem('gtac-muscle-gain', String(muscleGain));
+    } catch (_) {}
+  }
+
+  slider.addEventListener('input', update);
+  update();
+}
+
+/* Dummy Data Generator */
+let mockVal = 20;
+let mockTarget = 20;
 function generateMockSample() {
   if (performance.now() - lastLiveSignalTime > 1000) {
     if (Math.random() < 0.08) {
-      mockTarget = Math.floor(Math.random() * 85) + 10;
+      // Simulate mostly small-to-medium muscle signals so students can
+      // clearly see what changing sensitivity does.
+      mockTarget = Math.floor(Math.random() * 51) + 10; // 10% to 60%
     }
-    mockVal += (mockTarget - mockVal) * 0.15 + (Math.random() - 0.5) * 4;
+    mockVal += (mockTarget - mockVal) * 0.15 + (Math.random() - 0.5) * 3;
     mockVal = Math.max(0, Math.min(100, mockVal));
 
-    let displayVal = Math.round(Math.max(0, Math.min(100, mockVal * ampMultiplier)));
-    addSample(displayVal);
-    
-    if (performance.now() - lastPctUpdateTime > PCT_UPDATE_INTERVAL) {
-      $('pct').textContent = displayVal + '%';
-      lastPctUpdateTime = performance.now();
-    }
+    const rawVal = Math.round(mockVal);
+    addSample(rawVal);
+    showMuscleValue(rawVal);
   }
 }
 
@@ -594,6 +803,7 @@ function drawGraph() {
   g.font = '12px system-ui,-apple-system,Arial,sans-serif';
   g.textBaseline = 'middle';
 
+  // Y Axis (0 - 100 %)
   for (const v of [0, 25, 50, 75, 100]) {
     g.strokeStyle = v === 0 ? '#3a3a3a' : '#262626';
     g.lineWidth = 1;
@@ -606,6 +816,7 @@ function drawGraph() {
     g.fillText(v + '%', L - 8, Y(v));
   }
 
+  // X Axis (Time Scale)
   g.textAlign = 'center';
   g.textBaseline = 'top';
   for (const s of [30, 20, 10, 0]) {
@@ -619,7 +830,9 @@ function drawGraph() {
     g.fillText(s === 0 ? 'now' : '-' + s + ' s', x, T + ph + 8);
   }
 
-  const pts = samples.filter((p) => p[0] >= now - WINDOW_MS - 1000);
+  const pts = samples
+    .filter((p) => p[0] >= now - WINDOW_MS - 1000)
+    .map((p) => [p[0], amplifiedMuscleValue(p[1])]);
   if (pts.length < 2) return;
 
   g.save();
@@ -666,26 +879,10 @@ setInterval(() => {
   if (!remoteMode && !wsOpen) send();
 }, 150);
 
-$('mRemote').addEventListener('click', () => setMode(true));$('mMuscle').addEventListener('click', () => setMode(false));
+$('mRemote').addEventListener('click', () => setMode(true));
+$('mMuscle').addEventListener('click', () => setMode(false));
 
-const ampSlider = $('amp-slider');
-if (ampSlider) {
-  ampSlider.addEventListener('input', (e) => {
-    ampMultiplier = parseFloat(e.target.value);
-  });
-}
-
-const motorBtns = document.querySelectorAll('#muscle-motors button');
-motorBtns.forEach(btn => {
-  btn.addEventListener('click', (e) => {
-    if(e.target.tagName !== 'BUTTON') return;
-    motorBtns.forEach(b => b.classList.remove('sel'));
-    e.target.classList.add('sel');
-    musclePort = e.target.textContent;
-    send(); 
-  });
-});
-
+/* Prevent touch zoom on mobile/tablets */
 let lastTouch = 0;
 document.addEventListener(
   'touchend',
@@ -701,7 +898,7 @@ document.addEventListener('dblclick', (e) => e.preventDefault(), { passive: fals
   document.addEventListener(n, (e) => e.preventDefault(), { passive: false })
 );
 
-setInterval(send, 500); 
+setInterval(send, 500); // Heartbeat
 window.addEventListener('blur', () => {
   releaseAll();
   render();
@@ -713,112 +910,7 @@ document.addEventListener('visibilitychange', () => {
   }
 });
 
-/* ---------- Blockly Coding Canvas ---------- */
-let workspace = null;
-
-// Define custom SPIKE-like blocks
-Blockly.defineBlocksWithJsonArray([
-  {
-    "type": "event_remote_button",
-    "message0": "When %1 %2 %3 button is pressed",
-    "args0": [
-      {
-        "type": "field_dropdown",
-        "name": "WIDGET",
-        "options": [["D-pad", "dpad"], ["Joystick", "joy"]]
-      },
-      {
-        "type": "field_dropdown",
-        "name": "ID",
-        "options": [["1", "1"], ["2", "2"], ["3", "3"]]
-      },
-      {
-        "type": "field_dropdown",
-        "name": "DIR",
-        "options": [["Up", "up"], ["Down", "down"], ["Left", "left"], ["Right", "right"]]
-      }
-    ],
-    "colour": 65, 
-    "nextStatement": null,
-    "tooltip": "Triggers when a remote button is pressed"
-  },
-  {
-    "type": "motor_set_speed",
-    "message0": "Motor %1 set speed to %2 %",
-    "args0": [
-      {
-        "type": "field_dropdown",
-        "name": "PORT",
-        "options": [["B", "B"], ["C", "C"], ["D", "D"], ["E", "E"], ["F", "F"]]
-      },
-      {
-        "type": "field_dropdown",
-        "name": "SPEED",
-        "options": [["5", "5"], ["25", "25"], ["50", "50"], ["75", "75"], ["100", "100"]]
-      }
-    ],
-    "colour": 230, 
-    "previousStatement": null,
-    "nextStatement": null
-  },
-  {
-    "type": "motor_turn_rotations",
-    "message0": "Motor %1 turn %2 for %3 rotations",
-    "args0": [
-      {
-        "type": "field_dropdown",
-        "name": "PORT",
-        "options": [["B", "B"], ["C", "C"], ["D", "D"], ["E", "E"], ["F", "F"]]
-      },
-      {
-        "type": "field_dropdown",
-        "name": "DIR",
-        "options": [["Right", "right"], ["Left", "left"]]
-      },
-      {
-        "type": "field_number",
-        "name": "ROTATIONS",
-        "value": 1,
-        "min": 0,
-        "precision": 0.1
-      }
-    ],
-    "colour": 230, 
-    "previousStatement": null,
-    "nextStatement": null
-  }
-]);
-
-// Setup the Toolbox Sidebar
-const toolboxXML = `
-<xml id="toolbox" style="display: none">
-  <category name="Remote" colour="65">
-    <block type="event_remote_button"></block>
-  </category>
-  <category name="Motors" colour="230">
-    <block type="motor_set_speed"></block>
-    <block type="motor_turn_rotations"></block>
-  </category>
-</xml>
-`;
-
-$('code-btn').addEventListener('click', () => {$('code-dlg').classList.add('open');
-  
-  if (!workspace) {
-    workspace = Blockly.inject('blocklyDiv', {
-      toolbox: toolboxXML,
-      trashcan: true,
-      theme: Blockly.Themes.Dark
-    });
-  }
-  
-  Blockly.svgResize(workspace);
-});
-
-$('close-code').addEventListener('click', () => {$('code-dlg').classList.remove('open');
-});
-
-// Initialization
+setupSensitivityControl();
 render();
 setMode(remoteMode);
 connectWS();
