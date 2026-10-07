@@ -600,3 +600,7 @@ select, input[type="text"] {
   background-color: #222 !important;
   color: #fff;
 }
+.panel.muscle #code-btn,
+.panel.muscle-mode #code-btn {
+  display: none !important;
+}

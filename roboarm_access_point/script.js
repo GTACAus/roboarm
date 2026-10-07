@@ -32,8 +32,8 @@ function setMode(remote) {
 
   if (!remote && editing) $('edit').click();
 
-  $('mRemote').classList.toggle('sel', remote);
-  $('mMuscle').classList.toggle('sel', !remote);$('panel').classList.toggle('muscle', !remote);
+  $('mRemote').classList.toggle('sel', remote);$('mMuscle').classList.toggle('sel', !remote);
+  $('panel').classList.toggle('muscle', !remote);$('panel').classList.toggle('muscle-mode', !remote);
   releaseAll();
 
   if (document.readyState !== 'loading') {
