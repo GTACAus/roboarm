@@ -262,6 +262,11 @@ body {
   font-weight: bold;
   font-size: 16px;
   letter-spacing: -1px;
+  box-sizing: border-box;
+  max-width: 100%;
+  width: auto; /* Or specific sizing if needed */
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 /* Giant Help Button Bottom Right */
