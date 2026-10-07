@@ -1,72 +1,69 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no, viewport-fit=cover">
-  <title>Robot Arm Remote</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Robot Control Panel</title>
   <link rel="stylesheet" href="style.css">
+  <!-- Load Blockly -->
+  <script src="https://unpkg.com/blockly/blockly.min.js"></script>
 </head>
 <body>
+
   <div class="panel" id="panel">
     <div id="modes">
       <button id="mRemote" class="sel">Remote</button>
-      <button id="mMuscle">Muscle sensor</button>
+      <button id="mMuscle">Muscle</button>
     </div>
-
+    
     <div class="hdr">
-      <button id="btn-help" aria-label="Trouble connecting">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <circle cx="12" cy="12" r="10"></circle>
-          <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path>
-          <line x1="12" y1="17" x2="12.01" y2="17"></line>
-        </svg>
-      </button>
-      <button id="edit" aria-label="Change the remote">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M4 20h4L19 9l-4-4L4 16z"/>
-          <path d="M13.5 6.5l4 4"/>
-        </svg>
-      </button>
+      <button id="edit" aria-label="edit">✎</button>
+      <button id="code-btn">&lt; / &gt;</button>
     </div>
 
+    <!-- Remote Mode Board -->
     <div id="board"></div>
 
+    <!-- Edit Tools (Visible only when editing) -->
+    <div id="editbar">
+      <button data-add="dpad">+ D-pad</button>
+      <button data-add="joy">+ Joystick</button>
+      <button data-add="slider">+ Slider</button>
+      <button data-add="button">+ Button</button>
+      <button id="reset" class="warn">Reset all</button>
+    </div>
+
+    <!-- Muscle Sensor Mode Board -->
     <div id="musclebox">
       <div class="big" id="pct">0%</div>
-      
       <div id="muscle-motors">
-        <p>Select a motor port</p>
+        <p>Motor:</p>
         <button class="sel">B</button>
         <button>C</button>
         <button>D</button>
         <button>E</button>
         <button>F</button>
       </div>
-
       <div id="graph-row">
         <canvas id="graph"></canvas>
-        <input type="range" id="amp-slider" orient="vertical" min="1" max="3" step="0.1" value="1" title="Signal Amplifier">
+        <input type="range" id="amp-slider" min="0.1" max="5.0" step="0.1" value="1.0" orient="vertical">
       </div>
-      
       <div class="desc">
-        <p>When the LEGO hub is running program 0, the muscle sensor will control the arm.</p>
-        <p>If your signal doesn't go up to 100%: </p>
-        <p>  - slide the slider to amplify your signal.</p>
+        <p>Adjust the slider to amplify the signal.</p>
       </div>
     </div>
 
-    <div id="editbar">
-      <button data-add="dpad">+ D-pad</button>
-      <button data-add="slider">+ Slider</button>
-      <button data-add="joy">+ Joystick</button>
-      <button data-add="button">+ Button</button>
-      <button class="warn" id="reset">Start again</button>
-    </div>
-
-    <div id="status"></div>
+    <div id="status">Hold the controls to move the arm</div>
   </div>
 
-  <!-- Settings Dialog -->
+  <!-- Giant Floating Help Button -->
+  <button id="btn-help">
+    <svg viewBox="0 0 24 24" fill="currentColor">
+      <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 17h-2v-2h2v2zm2.07-7.75l-.9.92C13.45 12.9 13 13.5 13 15h-2v-.5c0-1.1.45-2.1 1.17-2.83l1.24-1.26c.37-.36.59-.86.59-1.41 0-1.1-.9-2-2-2s-2 .9-2 2H8c0-2.21 1.79-4 4-4s4 1.79 4 4c0 .88-.36 1.68-.93 2.25z"/>
+    </svg>
+  </button>
+
+  <!-- Configuration Dialog -->
   <div id="dlg">
     <div id="dlgbox"></div>
   </div>
@@ -74,23 +71,19 @@
   <!-- Help Dialog -->
   <div id="help-dlg">
     <div id="help-dlgbox">
-      <h2>How to make your robot listen to your remote/sensor:</h2>
-      <pre>
-1. Press the circle button in the centre of the three buttons
-
-     BUTTONS 
-       ___
- __   /   \  __
-(__( |     | )__)
-      \___/
-Left  Circle Right
-   
-2.  Click on the left or right arrow button to 
-    select the "0" program
-3. Start the "0" program by pressing the circle button again
-4. Test your controller</pre>
-      <button class="done" id="close-help">Got it</button>
+      <h2>Help & Info</h2>
+      <p>Connection details and setup go here.</p>
+      <button id="close-help" class="done">Close</button>
     </div>
+  </div>
+
+  <!-- Blockly Coding Canvas Dialog -->
+  <div id="code-dlg">
+    <div class="code-hdr">
+      <h2>Code Canvas</h2>
+      <button id="close-code" class="done-btn">Done</button>
+    </div>
+    <div id="blocklyDiv"></div>
   </div>
 
   <script src="script.js"></script>

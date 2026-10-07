@@ -33,21 +33,19 @@ function setMode(remote) {
   if (!remote && editing) $('edit').click();
 
   $('mRemote').classList.toggle('sel', remote);
-  $('mMuscle').classList.toggle('sel', !remote);
-  $('panel').classList.toggle('muscle', !remote);
+  $('mMuscle').classList.toggle('sel', !remote);$('panel').classList.toggle('muscle', !remote);
   releaseAll();
 
   if (document.readyState !== 'loading') {
     $('status').textContent = remote ? 'Hold the controls to move the arm' : 'Muscle sensor mode (Simulated / Live)';
   }
   
-  // Resize graph on mode switch since it might have been display:none
   if (!remote) {
     setTimeout(drawGraph, 50);
   }
 }
 
-const outs = {}; // widget id -> signed speed level (-3..3) for each axis
+const outs = {}; 
 
 function defaults() {
   return [
@@ -77,8 +75,8 @@ function save() {
 let busy = false;
 let dirty = false;
 let lastLiveSignalTime = 0;
-let lastPctUpdateTime = 0; // Timer to slow down the % text updates
-const PCT_UPDATE_INTERVAL = 200; // Update text every 200ms
+let lastPctUpdateTime = 0;
+const PCT_UPDATE_INTERVAL = 200; 
 
 function digits() {
   const lv = [0, 0, 0, 0, 0];
@@ -125,14 +123,13 @@ function connectWS() {
 }
 
 function handleReply(t) {
-  const parts = t.split(' '); // "ok" or "ok <muscle %>"
+  const parts = t.split(' '); 
   if (parts.length > 1) {
     let rawSignal = parseInt(parts[1]) || 0;
     let p = Math.max(0, Math.min(100, rawSignal * ampMultiplier)); 
     addSample(p);
     lastLiveSignalTime = performance.now();
     
-    // Throttle the text update so it's readable
     if (performance.now() - lastPctUpdateTime > PCT_UPDATE_INTERVAL) {
       $('pct').textContent = Math.round(p) + '%';
       lastPctUpdateTime = performance.now();
@@ -516,16 +513,13 @@ $('edit').addEventListener('click', () => {
   editing = !editing;
   releaseAll();
   $('panel').classList.toggle('editing', editing);
-  $('edit').classList.toggle('sel', editing);
-  $('status').textContent = editing ? 'Change the remote: add, move, resize or set up the controls' : 'Hold the controls to move the arm';
+  $('edit').classList.toggle('sel', editing);$('status').textContent = editing ? 'Change the remote: add, move, resize or set up the controls' : 'Hold the controls to move the arm';
 });
 
-$('btn-help').addEventListener('click', () => {
-  $('help-dlg').classList.add('open');
+$('btn-help').addEventListener('click', () => {$('help-dlg').classList.add('open');
 });
 
-$('close-help').addEventListener('click', () => {
-  $('help-dlg').classList.remove('open');
+$('close-help').addEventListener('click', () => {$('help-dlg').classList.remove('open');
 });
 
 document.querySelectorAll('[data-add]').forEach((b) => b.addEventListener('click', () => addWidget(b.dataset.add)));
@@ -550,7 +544,6 @@ function addSample(v) {
   while (samples.length && samples[0][0] < t - WINDOW_MS - 1000) samples.shift();
 }
 
-/* Dummy Data Generator */
 let mockVal = 30;
 let mockTarget = 30;
 function generateMockSample() {
@@ -564,7 +557,6 @@ function generateMockSample() {
     let displayVal = Math.round(Math.max(0, Math.min(100, mockVal * ampMultiplier)));
     addSample(displayVal);
     
-    // Throttle the text update so it's readable
     if (performance.now() - lastPctUpdateTime > PCT_UPDATE_INTERVAL) {
       $('pct').textContent = displayVal + '%';
       lastPctUpdateTime = performance.now();
@@ -602,7 +594,6 @@ function drawGraph() {
   g.font = '12px system-ui,-apple-system,Arial,sans-serif';
   g.textBaseline = 'middle';
 
-  // Y Axis (0 - 100 %)
   for (const v of [0, 25, 50, 75, 100]) {
     g.strokeStyle = v === 0 ? '#3a3a3a' : '#262626';
     g.lineWidth = 1;
@@ -615,7 +606,6 @@ function drawGraph() {
     g.fillText(v + '%', L - 8, Y(v));
   }
 
-  // X Axis (Time Scale)
   g.textAlign = 'center';
   g.textBaseline = 'top';
   for (const s of [30, 20, 10, 0]) {
@@ -676,8 +666,7 @@ setInterval(() => {
   if (!remoteMode && !wsOpen) send();
 }, 150);
 
-$('mRemote').addEventListener('click', () => setMode(true));
-$('mMuscle').addEventListener('click', () => setMode(false));
+$('mRemote').addEventListener('click', () => setMode(true));$('mMuscle').addEventListener('click', () => setMode(false));
 
 const ampSlider = $('amp-slider');
 if (ampSlider) {
@@ -689,9 +678,7 @@ if (ampSlider) {
 const motorBtns = document.querySelectorAll('#muscle-motors button');
 motorBtns.forEach(btn => {
   btn.addEventListener('click', (e) => {
-    // Ignore if it's the paragraph text
     if(e.target.tagName !== 'BUTTON') return;
-    
     motorBtns.forEach(b => b.classList.remove('sel'));
     e.target.classList.add('sel');
     musclePort = e.target.textContent;
@@ -699,7 +686,6 @@ motorBtns.forEach(btn => {
   });
 });
 
-/* Prevent touch zoom on mobile/tablets */
 let lastTouch = 0;
 document.addEventListener(
   'touchend',
@@ -715,7 +701,7 @@ document.addEventListener('dblclick', (e) => e.preventDefault(), { passive: fals
   document.addEventListener(n, (e) => e.preventDefault(), { passive: false })
 );
 
-setInterval(send, 500); // Heartbeat
+setInterval(send, 500); 
 window.addEventListener('blur', () => {
   releaseAll();
   render();
@@ -727,6 +713,112 @@ document.addEventListener('visibilitychange', () => {
   }
 });
 
+/* ---------- Blockly Coding Canvas ---------- */
+let workspace = null;
+
+// Define custom SPIKE-like blocks
+Blockly.defineBlocksWithJsonArray([
+  {
+    "type": "event_remote_button",
+    "message0": "When %1 %2 %3 button is pressed",
+    "args0": [
+      {
+        "type": "field_dropdown",
+        "name": "WIDGET",
+        "options": [["D-pad", "dpad"], ["Joystick", "joy"]]
+      },
+      {
+        "type": "field_dropdown",
+        "name": "ID",
+        "options": [["1", "1"], ["2", "2"], ["3", "3"]]
+      },
+      {
+        "type": "field_dropdown",
+        "name": "DIR",
+        "options": [["Up", "up"], ["Down", "down"], ["Left", "left"], ["Right", "right"]]
+      }
+    ],
+    "colour": 65, 
+    "nextStatement": null,
+    "tooltip": "Triggers when a remote button is pressed"
+  },
+  {
+    "type": "motor_set_speed",
+    "message0": "Motor %1 set speed to %2 %",
+    "args0": [
+      {
+        "type": "field_dropdown",
+        "name": "PORT",
+        "options": [["B", "B"], ["C", "C"], ["D", "D"], ["E", "E"], ["F", "F"]]
+      },
+      {
+        "type": "field_dropdown",
+        "name": "SPEED",
+        "options": [["5", "5"], ["25", "25"], ["50", "50"], ["75", "75"], ["100", "100"]]
+      }
+    ],
+    "colour": 230, 
+    "previousStatement": null,
+    "nextStatement": null
+  },
+  {
+    "type": "motor_turn_rotations",
+    "message0": "Motor %1 turn %2 for %3 rotations",
+    "args0": [
+      {
+        "type": "field_dropdown",
+        "name": "PORT",
+        "options": [["B", "B"], ["C", "C"], ["D", "D"], ["E", "E"], ["F", "F"]]
+      },
+      {
+        "type": "field_dropdown",
+        "name": "DIR",
+        "options": [["Right", "right"], ["Left", "left"]]
+      },
+      {
+        "type": "field_number",
+        "name": "ROTATIONS",
+        "value": 1,
+        "min": 0,
+        "precision": 0.1
+      }
+    ],
+    "colour": 230, 
+    "previousStatement": null,
+    "nextStatement": null
+  }
+]);
+
+// Setup the Toolbox Sidebar
+const toolboxXML = `
+<xml id="toolbox" style="display: none">
+  <category name="Remote" colour="65">
+    <block type="event_remote_button"></block>
+  </category>
+  <category name="Motors" colour="230">
+    <block type="motor_set_speed"></block>
+    <block type="motor_turn_rotations"></block>
+  </category>
+</xml>
+`;
+
+$('code-btn').addEventListener('click', () => {$('code-dlg').classList.add('open');
+  
+  if (!workspace) {
+    workspace = Blockly.inject('blocklyDiv', {
+      toolbox: toolboxXML,
+      trashcan: true,
+      theme: Blockly.Themes.Dark
+    });
+  }
+  
+  Blockly.svgResize(workspace);
+});
+
+$('close-code').addEventListener('click', () => {$('code-dlg').classList.remove('open');
+});
+
+// Initialization
 render();
 setMode(remoteMode);
 connectWS();
