@@ -251,6 +251,31 @@ body {
   height: 22px;
 }
 
+/* 10x Larger Help Button Overrides */
+#btn-help {
+  width: 110px;
+  height: 110px;
+}
+
+#btn-help svg {
+  width: 220px;
+  height: 220px;
+}
+
+#btn-help::after {
+  content: "It's not moving!";
+  position: absolute;
+  top: 100%; /* Pushes text below the bottom edge */
+  left: 50%;
+  transform: translateX(-50%); /* Centers the text horizontally */
+  margin-top: 12px;
+  font-size: 16px;
+  font-family: system-ui, -apple-system, Arial, sans-serif;
+  color: #9a9a9a;
+  white-space: nowrap;
+  pointer-events: none; /* Prevents the text from interfering with clicks */
+}
+
 .hdr button.sel {
   background: var(--teal);
   color: #06211e;
@@ -311,8 +336,15 @@ body {
 
 #muscle-motors {
   display: flex;
+  align-items: center;
   gap: 12px;
   margin: 5px 0 15px;
+}
+
+#muscle-motors p {
+  margin: 0;
+  color: #9a9a9a;
+  font-size: 14px;
 }
 
 #muscle-motors button {
