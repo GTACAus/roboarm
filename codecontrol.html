@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Connecting Myosensors — Instructions</title>
+  <title>Change How Your Arm Moves — Instructions</title>
   <link href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;600;700&display=swap" rel="stylesheet">
 
   <style>
@@ -22,15 +22,10 @@
     .card p{ font-size:1.15em; margin:10px 24px; line-height:1.45; }
     .card img{ border-radius:10px; width:100%; height:auto; margin-top:10px; }
     video{ border-radius:10px; width:100%; max-width:100%; height:auto; margin-top:10px; }
-
-    /* 👇 new class just for smaller images */
-    .img-small{
-      max-width:400px; 
-      width:100%;
-      height:auto;
-      display:block;
-      margin:10px auto;
-    }
+    .img-medium{ max-width:560px; display:block; margin:10px auto; border:2px solid #e4dfc8; }
+    .steps{ text-align:left; font-size:1.1em; line-height:1.5; margin:10px 30px; padding-left:28px; }
+    .steps li{ margin-bottom:8px; }
+    .tip{ background:#fff8db; border-radius:10px; padding:10px 14px; font-size:1.05em !important; }
 
     .nav-buttons{
       display:flex; justify-content:space-between; align-items:center; padding:0 15px; margin-top:20px;
@@ -38,46 +33,68 @@
     .nav-buttons button, .nav-buttons a.btn{
       margin:5px; padding:10px 18px; border:none; border-radius:25px;
       background:#007bff; color:#fff; font-size:1em; cursor:pointer;
-      text-decoration:none; display:inline-block;
+      text-decoration:none; display:inline-block; font-family:inherit;
     }
     .nav-buttons button:hover, .nav-buttons a.btn:hover{ background:#0056b3; }
   </style>
 </head>
 <body>
 
-  <!-- 01/02 INTRO -->
+  <!-- 01/03 INTRO -->
   <section class="card active" id="c1">
-    <h1>01/02</h1>
-    <h2>Want to change the way your prosthetic moves?</h2>
+    <h1>01/03</h1>
+    <h2>Change how your prosthetic moves</h2>
     <p>
-      The code for your controller can be modified to change the way <br> your motors move.
+      You can program your arm with blocks on the iPad. Each control on the remote has a number,
+      and your code decides what happens when you use it: how far a motor turns, how fast, and in which direction.
     </p>
-    <img src="codeblocks.jpg" alt="Robotic arm alert button build" class="img-small">
+    <img src="code-canvas.jpg" alt="The code canvas: blocks on the left, the live remote and motor positions on the right" class="img-medium">
     <div class="nav-buttons">
       <a class="btn" href="index.html">◀ Home</a>
       <button onclick="nextPage()">Start ▶</button>
     </div>
   </section>
 
-  <!-- 02/02 video -->
+  <!-- 02/03 Open the code canvas -->
   <section class="card" id="c2">
-    <h1>02/02</h1>
-    <h2>Change your robotics controller</h2>
+    <h1>02/03</h1>
+    <h2>Open the code canvas</h2>
 
-<!-- iPad-specific video (hidden by default) -->
-    <video id="ipadVideo" controls style="display:none">
-      <source src="coding.mp4" type="video/mp4">
-      <source src="coding.mp4" type="video/quicktime">
+    <video controls playsinline preload="metadata">
+      <source src="code-canvas.mp4" type="video/mp4">
     </video>
 
-    <!-- Default video -->
-    <video id="defaultVideo" controls>
-      <source src="coding.mp4" type="video/mp4">
-      <source src="coding.mp4" type="video/quicktime">
+    <ol class="steps">
+      <li>Connect your iPad to the arm's Wi-Fi (see <a href="arm-instructions.html">the robotic arm steps</a>).</li>
+      <li>On the <b>Remote</b> tab, choose <b>Advanced (code)</b>, then tap <b>&lt;/&gt; Code</b>.</li>
+      <li>The starting program is already there: each control turns its motor <b>5 degrees</b>.
+        The live remote on the right shows the same numbers as the blocks.</li>
+      <li>Tap <b>▶ Run</b>, then use the remote on the right to test it.</li>
+    </ol>
+
+    <div class="nav-buttons">
+      <button onclick="prevPage()">◀ Prev</button>
+      <button onclick="nextPage()">Next ▶</button>
+    </div>
+  </section>
+
+  <!-- 03/03 Change the code -->
+  <section class="card" id="c3">
+    <h1>03/03</h1>
+    <h2>Change your code</h2>
+
+    <video controls playsinline preload="metadata">
+      <source src="code-change.mp4" type="video/mp4">
     </video>
 
-    <p>Watch this video to understand how to change how fast and far your motors move.
-    </p>
+    <ol class="steps">
+      <li>Tap a number in a <b>turn</b> block and change it: <b>5</b> is a small step, <b>90</b> is a quarter turn.</li>
+      <li>Drag <b>set Motor speed to slow / medium / fast</b> from <b>Motors</b> to change how fast it moves.</li>
+      <li>Try <b>go to position</b> to send a motor to an exact angle, or <b>move all motors home</b>.</li>
+      <li>Tap <b>■ Stop</b>, then <b>▶ Run</b> again to try your changes. Your code is saved on the iPad.</li>
+    </ol>
+    <p class="tip">Stuck? Tap the yellow <b>?</b> in the app for help.</p>
+
     <div class="nav-buttons">
       <button onclick="prevPage()">◀ Prev</button>
       <a class="btn" href="index.html">Home ▶</a>
@@ -96,32 +113,11 @@
     function nextPage(){ if(current < cards.length - 1) show(current + 1); }
     function prevPage(){ if(current > 0) show(current - 1); }
 
-    // iPad handling + upload button behavior
-    function isiPad(){
-      if (navigator.userAgent.includes("iPad")) return true;
-      if (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1) return true;
-      return false;
-    }
-    function setUploadBehaviour(){
-      const uploadBtn = document.getElementById('uploadButton');
-      const ipadMsg  = document.getElementById('iPadMessage');
-      const ipadVid  = document.getElementById('ipadVideo');
-      const defVid   = document.getElementById('defaultVideo');
-
-      if (isiPad()){
-        ipadMsg.style.display = 'inline-block';
-        uploadBtn.style.display = 'none';
-        ipadVid.style.display = 'block';
-        defVid.style.display = 'none';
-      } else {
-        ipadMsg.style.display = 'none';
-        uploadBtn.style.display = 'inline-block';
-        ipadVid.style.display = 'none';
-        defVid.style.display = 'block';
-        uploadBtn.onclick = () => window.open('https://spike.legoeducation.com/prime/lobby/','_blank');
-      }
-    }
-    setUploadBehaviour();
+    // A video that has not been recorded yet stays hidden; it appears once the file is uploaded
+    document.querySelectorAll('video').forEach(v => {
+      const last = v.querySelector('source:last-of-type');
+      if (last) last.addEventListener('error', () => { v.style.display = 'none'; });
+    });
   </script>
 </body>
 </html>

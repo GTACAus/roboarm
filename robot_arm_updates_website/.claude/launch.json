@@ -1,0 +1,6 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    { "name": "lms-esp32-viewer", "runtimeExecutable": "sh", "runtimeArgs": ["lms-esp32/serve.sh", "8765"], "port": 8765 }
+  ]
+}

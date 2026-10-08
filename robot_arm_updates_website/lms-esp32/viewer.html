@@ -1,0 +1,579 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>LMS-ESP32 EMG Rig</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;600;700;800&display=swap">
+<style>
+/* Layout: GTAC workshop page styling (vibe.gtac.edu.au): eggshell ground, cobalt headings with a
+   sodium-flame rule, chlorophyll section markers, aquamarine-edged panels, Figtree throughout.
+   Title, then the rotatable assembly with its controls beside the wiring, then what each model is
+   made from. Light only, like the site. */
+:root {
+  /* GTAC hero colours */
+  --eggshell: #F9F6E7; --sodium-flame: #FF6D3A; --cadmium-yellow: #FFCD1F; --chlorophyll-green: #00BC74;
+  --aquamarine: #6BE7BE; --lavender: #C0ADFF; --cobalt-blue: #4C34E5; --onyx: #272A24;
+  --muted: #5C6057; --hairline: #DDD8C2;
+  /* 3D scene colours the script reads */
+  --case: #ECE8DA; --lid: #DCD7C6; --table: #E2DCC4;
+  --w-sig: #3E6FD1; --w-vcc: #C93A2E; --w-gnd: #1E1F21;
+  --font: "Figtree", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --mono: ui-monospace, "SF Mono", Menlo, monospace;
+  color-scheme: light;
+}
+* { box-sizing: border-box }
+body { margin: 0; background: var(--eggshell); color: var(--onyx); font: 15px/1.6 var(--font); padding-inline: 20px; padding-block: 20px 64px }
+.wrap { max-width: 1240px; margin: 0 auto; display: grid; gap: 24px }
+h1, h2, h3 { margin: 0; text-wrap: balance }
+h1 { font-weight: 800; font-size: clamp(32px, 5vw, 48px); line-height: 1.1; color: var(--cobalt-blue);
+  border-bottom: 4px solid var(--sodium-flame); padding-bottom: 10px }
+h2 { font-weight: 800; font-size: 21px; line-height: 1.2; color: var(--onyx); border-left: 5px solid var(--chlorophyll-green); padding-left: 10px }
+p { margin: 0; max-width: 70ch }
+.eyebrow { font-weight: 700; font-size: 13px; letter-spacing: .12em; text-transform: uppercase; color: var(--cobalt-blue) }
+header { display: grid; gap: 12px }
+
+.panel { border: 1px solid var(--aquamarine); border-radius: 10px; background: var(--eggshell); box-shadow: 0 4px 12px rgba(0,0,0,0.05) }
+.hero { display: grid; grid-template-columns: minmax(0, 1.8fr) minmax(260px, 1fr); overflow: hidden }
+.viewer { border-right: 1px solid var(--aquamarine); min-width: 0; display: grid }
+#asm { width: 100%; cursor: grab; touch-action: none; position: relative; overflow: hidden }
+#asm:active { cursor: grabbing }
+#asm canvas { display: block }
+#asm .status { position: absolute; inset: auto 0 0 0; padding: 10px 14px; font-weight: 600; font-size: 13px; color: var(--muted) }
+.tag { position: absolute; left: 0; top: 0; pointer-events: none; font: 700 12px/1 var(--font); padding: 5px 7px; border-radius: 6px;
+  background: var(--eggshell); border: 1.5px solid var(--cobalt-blue); color: var(--onyx); white-space: nowrap; transform: translate(-50%, -130%) }
+.tag i { display: inline-block; width: 9px; height: 9px; border-radius: 50%; margin-right: 5px; vertical-align: -1px }
+.controls { display: flex; flex-wrap: wrap; gap: 10px 18px; align-items: center; padding: 14px 16px; border-top: 1px solid var(--aquamarine) }
+.controls label { display: flex; gap: 7px; align-items: center; font-size: 14px; font-weight: 600 }
+.controls input[type=range] { width: 150px; accent-color: var(--cobalt-blue) }
+.controls input[type=checkbox], .controls input[type=radio] { accent-color: var(--cobalt-blue); width: 16px; height: 16px }
+.seg { display: inline-flex; gap: 12px; padding: 5px 10px; border: 2px solid var(--aquamarine); border-radius: 8px }
+.views { display: flex; gap: 6px; flex-wrap: wrap }
+.views button { font: 700 14px/1 var(--font); padding: 9px 12px; border: 2px solid var(--aquamarine); background: var(--eggshell); color: var(--onyx);
+  border-radius: 8px; cursor: pointer; transition: border-color .2s, background-color .2s, color .2s }
+.views button:hover { border-color: var(--sodium-flame) }
+.views button:active { background: var(--cobalt-blue); border-color: var(--cobalt-blue); color: var(--eggshell) }
+.views button:focus-visible, .controls input:focus-visible { outline: 3px solid var(--cobalt-blue); outline-offset: 2px }
+
+.side { padding: 18px 20px; display: grid; gap: 16px; align-content: start; min-width: 0 }
+table { border-collapse: collapse; width: 100%; font-size: 14px }
+th { text-align: left; font-weight: 700; font-size: 11px; letter-spacing: .1em; text-transform: uppercase; color: var(--muted); padding: 6px 8px 6px 0; border-bottom: 2px solid var(--aquamarine) }
+td { padding: 7px 8px 7px 0; border-bottom: 1px solid var(--hairline); vertical-align: top }
+td.mono, .mono { font-family: var(--mono); font-size: 13px }
+.sw { display: inline-block; width: 22px; height: 4px; border-radius: 2px; vertical-align: middle; margin-right: 6px }
+.note { font-size: 14px; color: var(--muted) }
+@media (max-width: 860px) { .hero { grid-template-columns: 1fr } .viewer { border-right: 0; border-bottom: 1px solid var(--aquamarine) } }
+
+.parts { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 16px }
+.part { padding: 16px 18px; display: grid; gap: 8px; align-content: start }
+.part h3 { font-weight: 800; font-size: 18px; line-height: 1.2; color: var(--cobalt-blue); border-bottom: 2px dashed var(--aquamarine); padding-bottom: 5px }
+.part p { font-size: 14px }
+footer { font-size: 13px; color: var(--muted); border-top: 1px solid var(--sodium-flame); padding-top: 14px }
+footer a, .part a { color: var(--cobalt-blue); font-weight: 700 }
+.fallback { padding: 40px 20px; color: var(--muted) }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="eyebrow">robot arm · sensing · models</div>
+    <h1>LMS-ESP32 EMG Rig</h1>
+    <p class="lede">A LEGO SPIKE Prime hub driving Anton's Mindstorms LMS-ESP32 v2.0 in its printed case, which is wired to DFRobot's Gravity EMG sensor board, with the snap electrodes in its 3.5 mm jack. The boards carry their silkscreen as printed, so every header pin is labelled where it really is. Drag to turn, scroll to zoom, and slide Explode to take it apart.</p>
+  </header>
+
+  <section class="hero panel" aria-label="Assembly">
+    <div class="viewer">
+      <div id="asm" role="img" aria-label="Rotatable 3D model: a SPIKE Prime hub cabled from port A to the LMS-ESP32 board in its case, a three-wire Gravity cable from header pins GND, 3V3 and IO32 to the EMG sensor board, and three snap electrodes plugged into the sensor's 3.5 mm jack."><div class="status" id="status">Loading models…</div></div>
+      <div class="controls">
+        <label for="explode">Explode <input id="explode" type="range" min="0" max="1" step="0.01" value="0"></label>
+        <label for="tCase"><input id="tCase" type="checkbox" checked> Case</label>
+        <label for="tLid"><input id="tLid" type="checkbox" checked> Lid</label>
+        <label for="tCable"><input id="tCable" type="checkbox" checked> Gravity cable</label>
+        <span class="seg" role="radiogroup" aria-label="EMG sensor">
+          <label for="sGravity"><input id="sGravity" type="radio" name="sensor" value="gravity" checked> Gravity EMG</label>
+          <label for="sMyo"><input id="sMyo" type="radio" name="sensor" value="myo"> MyoWare</label>
+        </span>
+        <label for="tEmg"><input id="tEmg" type="checkbox" checked> Sensor board</label>
+        <label for="tLeads"><input id="tLeads" type="checkbox" checked> Electrodes</label>
+        <label for="tHub"><input id="tHub" type="checkbox" checked> SPIKE hub</label>
+        <label for="tSpike"><input id="tSpike" type="checkbox" checked> SPIKE cable</label>
+        <label for="tBox"><input id="tBox" type="checkbox"> SPIKE box</label>
+        <label for="tTags"><input id="tTags" type="checkbox" checked> Pin tags</label>
+        <div class="views" role="group" aria-label="Views">
+          <button type="button" data-view="all">Whole rig</button>
+          <button type="button" data-view="board">Board labels</button>
+          <button type="button" data-view="header">Header pins</button>
+          <button type="button" data-view="emg">Sensor</button>
+          <button type="button" data-view="hub">SPIKE hub</button>
+          <button type="button" data-view="box">SPIKE box</button>
+        </div>
+      </div>
+    </div>
+    <aside class="side">
+      <h2>Wiring</h2>
+      <table>
+        <thead><tr><th>Wire</th><th>LMS-ESP32 pin</th><th>Gravity</th><th>MyoWare</th></tr></thead>
+        <tbody>
+          <tr><td><span class="sw" style="background:var(--w-sig)"></span>blue</td><td class="mono">IO32 · inner, 5th</td><td class="mono">A</td><td class="mono">SIG</td></tr>
+          <tr><td><span class="sw" style="background:var(--w-vcc)"></span>red</td><td class="mono">3V3 · outer, 1st</td><td class="mono">+</td><td class="mono">+</td></tr>
+          <tr><td><span class="sw" style="background:var(--w-gnd)"></span>black</td><td class="mono">GND · inner, 1st</td><td class="mono">−</td><td class="mono">−</td></tr>
+        </tbody>
+      </table>
+      <p class="note">Rows count from the USB-C end. GND and 3V3 are the first pair of pins; IO32 is four rows further down the inner column, straight across from IO33. IO32 is on ADC1, which still reads while Wi-Fi is on.</p>
+      <p class="note">The MyoWare runs on 2.9–5.7 V and its SIG output swings 0 V to its supply, so on 3V3 it stays inside the ESP32's ADC range. Its electrode pads snap straight onto the two studs underneath, and the third goes on the reference lead.</p>
+      <p class="note">The sensor's output centres on 1.5 V and swings 0–3.0 V, inside the ESP32's 3.3 V ADC range. DFRobot rates the board for 3.3–5.5 V at 20 mA or more.</p>
+      <h2>SPIKE hub</h2>
+      <p class="note">Anton's SPIKE cable runs from the LMS-ESP32's 2 × 3 HUB header to hub port A. Through it the hub powers the board and the two talk over serial: IO8 and IO7 on the board to the port's ID1 and ID2 lines. M+ and M− carry the port's motor lines; 3V3 and GND are shared. The lid's cutout over the HUB header lets the plug through with the lid on.</p>
+      <h2>Electrodes</h2>
+      <p class="note">Three snap leads, red, blue and black, on one 3.5 mm TRS plug. They're shown short and laid straight here; the real leads are about a metre long.</p>
+    </aside>
+  </section>
+
+  <section class="parts" aria-label="The models">
+    <div class="part panel"><h3>LMS-ESP32 v2.0</h3><p>39.8 × 55.8 mm, the size of a LEGO Technic 5 × 7 frame. ESP32-PICO-MINI-02, CH340C USB-serial, USB-C, the 14 × 2 header with both rows labelled, the HUB box header for SPIKE, Grove, Qwiic and the 10-pin display socket. Parts placed from Anton's top-view photo.</p></div>
+    <div class="part panel"><h3>Printed case</h3><p>GTAC-Science's case (Thingiverse 7032044, CC BY-SA): base, lid and RST button cap. Its floor holes take LEGO pins through the board's own holes, and the lid leaves the header open for the Dupont plugs.</p></div>
+    <div class="part panel"><h3>MyoWare muscle sensor</h3><p>Advancer Technologies AT-04-001 (Pololu 2732), 53.3 × 20.8 mm, red: electrode snaps underneath, a 3 in reference lead, and a 1 × 3 male header in its <span class="mono">+&nbsp;−&nbsp;SIG</span> holes for the Dupont leads. Labelled as printed, upside down as on the real board.</p></div>
+    <div class="part panel"><h3>Gravity EMG sensor</h3><p>DFRobot SEN0240 signal board, 35 × 22 mm: 3.5 mm electrode jack on one end, the Gravity PH2.0 socket on the other, labelled <span class="mono">−&nbsp;+&nbsp;A</span>.</p></div>
+    <div class="part panel"><h3>SPIKE Prime hub</h3><p>LEGO 45601, 7 × 11 × 4 studs (56 × 88 × 32 mm): white top, yellow base, six LPF2 ports, A/C/E down one side and B/D/F down the other. Geometry from Philippe Hurbain's LDraw part (CC BY 4.0); the port letters and the 5 × 5 light matrix are drawn on.</p></div>
+    <div class="part panel"><h3>SPIKE Prime box</h3><p>The storage box from set 45678, 41.3 × 30.3 × 15.5 cm, without the sorting trays or stickers: a yellow tapered tub with a rolled rim and grab handles on the short ends, and a white lid that drops inside the rim, with a raised panel on top. Wall thickness and taper are estimated from photos. Three 2 × 2 inch stickers sit side by side on the front: QR codes that join Wi-Fi networks GTAC 1, GTAC 2 and GTAC 3 (password robotarm), each with its name under it.</p></div>
+    <div class="part panel"><h3>Cables</h3><p>The SPIKE cable: 2 × 3 Dupont housing to an LPF2 plug (13.9 × 7.5 × 13.7 mm, 5.85 mm of it inside the port). The Gravity cable: white PH2.0 plug to three single Dupont plugs. The snap electrodes follow the Plastics One 222 drawing: 14.1 mm head, 5.1 mm thick, 4 mm stud socket.</p></div>
+  </section>
+
+  <footer>Built by <span class="mono">lms-esp32/build.sh</span>: <span class="mono">gen_models.py</span> and <span class="mono">gen_pcb.py</span> make KiCad boards, kicad-cli exports them with silkscreen to glTF, and <span class="mono">case.py</span> places the case parts. The cables are drawn here in the page.</footer>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/STLLoader.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcode-generator/1.4.4/qrcode.min.js"></script>
+<script>
+// World frame, in mm: X = the LMS-ESP32's board x, Y = up from its underside, Z = its board y.
+// The table is the case's underside, Y = -1.45.
+const TABLE = -1.45;
+
+// LMS-ESP32 header (from gen_pcb.py): inner column x 34.86, outer 37.40; rows from y 11.5, 2.54 apart.
+const pin = (col, row) => [col === 'inner' ? 34.86 : 37.40, 11.5 + row * 2.54];
+const HEADER_TOP = 1.6 + 2.54;            // top of the header's plastic: the Dupont plugs sit on it
+const BOARD_RISE = 22;                     // how far Explode lifts the board out of the case
+
+// The EMG board lies on the table beside the case, turned round so its Gravity socket faces the
+// LMS-ESP32: its board (x, y) lands at world (EX0 - x, EZ0 - y).
+const EX0 = 96.65, EZ0 = 36, EY0 = TABLE + 1.81;
+const emgToWorld = (x, up, y) => new THREE.Vector3(EX0 - x, EY0 + up, EZ0 - y);
+const EMG_SLIDE = 28;                      // how far Explode slides the board to the right
+const PH_FACE = 34.65, PH_AXIS = 4.0;     // socket mouth (EMG x) and plug centre height above the board's underside
+const JACK = { x: -2.4, y: 9.4, up: 1.6 + 2.6 };
+
+// The MyoWare (53.3 x 20.8 mm) lies on its electrode snaps right of the case, its + - SIG end
+// (board x = 1.25) toward the LMS-ESP32. Its glTF needs no turn: board (x, y) -> world (MX0 + x, MZ0 + y).
+const MX0 = 58, MZ0 = 14, MY0 = TABLE + 3.6;
+const MYO_SNAPS = [[10.7, 10.5], [41.6, 10.5]];
+
+// The SPIKE Prime hub (LDraw 45601, 56 x 88 x 32 mm) stands on the table left of the case, turned
+// half round so its A/C/E side faces the case. Hub frame: x across, y up, z along; its ports are on
+// the long sides at x = +-27.6, z = -16, 0, +16, opening centred 27.2 mm up. Before the turn A, C, E
+// are on -x from the micro-USB end (z -16), B, D, F on +x.
+const HX = -57.6, HZ = 26, HY = TABLE;
+// The SPIKE Prime storage box (413 x 303 x 155 mm, tub and lid) sits on the table behind the rig.
+// Its front (+z) wall carries three 2 x 2 inch QR stickers side by side, centred: GTAC 1, 2 and 3,
+// each joining that Wi-Fi network.
+const BOX = { x: 60, z: -190 }, STICKERS = [1, 2, 3], STICKER_GAP = 15;
+const WIFI_PASSWORD = 'robotarm';
+// tub front wall (spike_box.py): z 129 mm at the foot (y 8) out to 140.5 at y 130
+const WALL = { y0: 8, z0: 129, y1: 130, z1: 140.5 };
+const hubToWorld = (x, up, z) => new THREE.Vector3(HX - x, HY + up, HZ - z);
+const PORT_A = hubToWorld(-27.6, 27.2, -16);          // = (-30, 25.75, 42): faces +X, toward the case
+// LPF2 plug (13.9 wide, 7.5 tall, 13.7 long, 5.85 mm of it inside the port)
+const LPF2 = { w: 13.9, h: 7.5, len: 13.7, depth: 5.85 };
+// The LMS-ESP32's HUB box header: 2 x 3 pins at x 3.7/6.24, y 37.7..42.78. Anton's SPIKE cable
+// puts a 2 x 3 Dupont housing on it; the lid has a cutout right over it.
+const HUB_HDR = { x: 4.97, z: 40.24, seat: 1.6 + 2.0, h: 14 };
+
+// Gravity pin -> wire colour -> LMS pin. EMG socket pins sit at board y 12.2 (A), 10.2 (+), 8.2 (-).
+// GND and 3V3 are the first pair of pins at the USB end, IO32 four rows along the inner column.
+// myo: the matching MyoWare pin (its 1 x 3 header, board y).
+const WIRES = [
+  { name: 'A', myo: 'SIG', my: 8.0,   y: 12.2, color: '--w-sig', to: pin('inner', 4), lms: 'IO32' },
+  { name: '+', myo: '+',   my: 13.08, y: 10.2, color: '--w-vcc', to: pin('outer', 0), lms: '3V3' },
+  { name: '−', myo: '−',   my: 10.54, y: 8.2,  color: '--w-gnd', to: pin('inner', 0), lms: 'GND' },
+];
+
+function boot() {
+  const host = document.getElementById('asm'), status = document.getElementById('status');
+  if (!window.THREE || !THREE.OrbitControls || !THREE.GLTFLoader) { status.textContent = 'The 3D viewer could not load its libraries.'; return; }
+  let renderer;
+  try { renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true }); }
+  catch (e) { host.innerHTML = '<p class="fallback">The 3D model needs WebGL, which this browser has turned off.</p>'; return; }
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+  host.prepend(renderer.domElement);
+
+  const scene = new THREE.Scene();
+  const cam = new THREE.PerspectiveCamera(35, 1, 1, 5000);
+  const controls = new THREE.OrbitControls(cam, renderer.domElement);
+  controls.enableDamping = true; controls.screenSpacePanning = true;
+  scene.add(new THREE.HemisphereLight(0xffffff, 0x8a918d, 0.8));
+  const sun = new THREE.DirectionalLight(0xffffff, 0.6); sun.position.set(60, 200, 120); scene.add(sun);
+  const fill = new THREE.DirectionalLight(0xffffff, 0.25); fill.position.set(-120, 80, -60); scene.add(fill);
+
+  const css = n => getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+  const lam = (c, extra) => new THREE.MeshLambertMaterial(Object.assign({ color: c, side: THREE.DoubleSide }, extra || {}));
+  const M = {
+    case: lam(0xe9e6dc), lid: lam(0xd8d4c6), table: lam(0xe3e6de),
+    dupont: lam(0x141516), crimp: lam(0xc9cbd0), phPlug: lam(0xf1ede2),
+    plug: lam(0x1b1c1e), shaft: lam(0xd3d5d9), ring: lam(0x2a2b2d),
+    snapSteel: lam(0xcfd2d6), hole: lam(0x101010),
+    sig: lam(0x3e6fd1), vcc: lam(0xc93a2e), gnd: lam(0x1e1f21),
+    leadR: lam(0xd23b33), leadB: lam(0x8a9be8), leadK: lam(0x1d1e20),
+    snapR: lam(0xd8473c), snapB: lam(0x3858c8), snapK: lam(0x202124),
+    lpf2: lam(0xa0a5a9), lpf2Dark: lam(0x3a3d40), lpf2Cable: lam(0x2b2d30),
+  };
+  function applyColors() {
+    M.case.color.set(css('--case') || '#e9e6dc'); M.lid.color.set(css('--lid') || '#d8d4c6'); M.table.color.set(css('--table') || '#e3e6de');
+    M.sig.color.set(css('--w-sig')); M.vcc.color.set(css('--w-vcc')); M.gnd.color.set(css('--w-gnd'));
+  }
+  applyColors();
+  const edgeMat = new THREE.LineBasicMaterial({ color: 0x1d2627, transparent: true, opacity: 0.35 });
+
+  const G = {}; ['lms', 'base', 'lid', 'button', 'emg', 'cable', 'duponts', 'phplug', 'leads', 'hub', 'spike', 'myo', 'myoLead', 'box', 'boxLid'].forEach(k => { G[k] = new THREE.Group(); scene.add(G[k]); });
+
+  // the table
+  const table = new THREE.Mesh(new THREE.PlaneGeometry(560, 520), M.table);
+  table.rotation.x = -Math.PI / 2; table.position.set(60, TABLE - 0.05, -110); scene.add(table);
+
+  // ---- boards (KiCad glTF: metres, y up) and case parts (STL, already in world mm) ----
+  let pending = 10;
+  const done = () => { if (--pending === 0) { status.remove(); update(); } };
+  const fail = what => () => { status.textContent = `Couldn't load ${what}. Serve this folder over http (./serve.sh).`; };
+  function kicad(url, parent, keepClear, edges) {
+    new THREE.GLTFLoader().load(url, gltf => {
+      gltf.scene.traverse(o => {
+        if (!o.isMesh) return;
+        const c = o.material.color.clone().convertLinearToSRGB(), a = o.material.opacity;
+        // flat colours, opaque soldermask, like the build book; LDraw's clear parts stay clear
+        o.material = keepClear && a < 1 ? lam(c, { transparent: true, opacity: Math.max(a, 0.45), depthWrite: false }) : lam(c);
+      });
+      gltf.scene.scale.setScalar(1000);
+      if (edges) gltf.scene.traverse(o => { if (o.isMesh) o.add(new THREE.LineSegments(new THREE.EdgesGeometry(o.geometry, 20), edgeMat)); });
+      parent.add(gltf.scene); done();
+    }, undefined, fail(url));
+  }
+  function stl(url, parent, mat) {
+    new THREE.STLLoader().load(url, g => {
+      g.computeVertexNormals();
+      parent.add(new THREE.Mesh(g, mat), new THREE.LineSegments(new THREE.EdgesGeometry(g, 30), edgeMat)); done();
+    }, undefined, fail(url));
+  }
+  kicad('out/lms-esp32.glb', G.lms);
+  kicad('out/emg.glb', G.emg);
+  stl('out/case-base.stl', G.base, M.case);
+  stl('out/case-lid.stl', G.lid, M.lid);
+  stl('out/case-button.stl', G.button, M.lid);
+  G.emg.rotation.y = Math.PI; G.emg.position.set(EX0, EY0, EZ0);
+  kicad('out/myoware.glb', G.myo);
+  G.myo.position.set(MX0, MY0, MZ0);
+  kicad('out/spike-hub.glb', G.hub, true);
+  kicad('out/spike-box-tub.glb', G.box, false, true);
+  kicad('out/spike-box-lid.glb', G.boxLid, false, true);
+  G.box.position.set(BOX.x, TABLE, BOX.z); G.boxLid.position.set(BOX.x, TABLE, BOX.z);
+  STICKERS.forEach((n, i) => G.box.add(qrSticker(n, (i - (STICKERS.length - 1) / 2) * (50.8 + STICKER_GAP))));
+  G.hub.rotation.y = Math.PI; G.hub.position.set(HX, HY, HZ);
+  G.hub.add(hubTop());
+  done();   // the cables below need no loading
+
+  // ---- Gravity cable: PH2.0 plug at the EMG board, three single Dupont plugs on the header ----
+  const box = (w, h, d, mat) => new THREE.Mesh(new THREE.BoxGeometry(w, h, d), mat);
+  // plug, in the EMG board's frame (parented to a group that follows the board's placement)
+  const phLocal = new THREE.Group(); G.phplug.add(phLocal);
+  phLocal.rotation.y = Math.PI; phLocal.position.set(EX0, EY0, EZ0);
+  const ph = box(5.4, 3.6, 7.2, M.phPlug); ph.position.set(PH_FACE + 1.9, PH_AXIS, 10.2); phLocal.add(ph);
+  const latch = box(2.6, 0.8, 3.0, M.phPlug); latch.position.set(PH_FACE + 1.4, PH_AXIS + 2.2, 10.2); phLocal.add(latch);
+  const PH_BACK = PH_FACE + 4.6;          // wires leave the plug's back here
+
+  const DUP_H = 14;
+  WIRES.forEach(w => {
+    const d = new THREE.Group();
+    const body = box(2.5, DUP_H, 2.5, M.dupont); body.position.y = DUP_H / 2; d.add(body);
+    const win = box(0.9, 3, 0.05, M.crimp); win.position.set(0, DUP_H - 4, 1.27); d.add(win);
+    d.position.set(w.to[0], HEADER_TOP, w.to[1]);
+    d.userData.wire = w; G.duponts.add(d); w.dupont = d;
+  });
+
+  let wireMeshes = [];
+  function buildCable(k) {
+    wireMeshes.forEach(m => { G.cable.remove(m); m.geometry.dispose(); }); wireMeshes = [];
+    const lift = (BOARD_RISE + 18) * k, myo = sensor() === 'myo';
+    WIRES.forEach((w, i) => {
+      const top = new THREE.Vector3(w.to[0], HEADER_TOP + DUP_H + lift, w.to[1]);
+      let pts;
+      if (myo) {          // down into the Dupont plug on the MyoWare's header
+        const end = new THREE.Vector3(MX0 + 1.25, MY0 + HEADER_TOP + DUP_H + 18 * k, MZ0 + w.my);
+        const peak = Math.max(top.y, end.y) + 10 - i * 1.2;
+        pts = [top, new THREE.Vector3(top.x, top.y + 6, top.z),
+          new THREE.Vector3((top.x + end.x) / 2, peak, (top.z + end.z) / 2),
+          new THREE.Vector3(end.x, end.y + 6, end.z), end];
+      } else {            // into the back of the Gravity plug
+        const end = emgToWorld(PH_BACK, PH_AXIS, w.y);         // the plug stays put; the board slides away
+        const mid = (top.z + end.z) / 2;
+        pts = [top,
+          new THREE.Vector3(top.x, top.y + 6, top.z),
+          new THREE.Vector3(top.x + 9, top.y + 9 - i * 0.6, mid + (top.z - mid) * 0.5),
+          new THREE.Vector3(end.x - 8, end.y + 7, end.z),
+          new THREE.Vector3(end.x - 2.5, end.y, end.z),
+          end];
+      }
+      const curve = new THREE.CatmullRomCurve3(pts, false, 'centripetal');
+      const m = new THREE.Mesh(new THREE.TubeGeometry(curve, 80, 0.55, 8), M[['sig', 'vcc', 'gnd'][i]]);
+      G.cable.add(m); wireMeshes.push(m);
+    });
+  }
+
+  // ---- electrodes: 3.5 mm TRS plug in the EMG jack, three short snap leads laid out straight ----
+  const leadsLocal = new THREE.Group(); G.leads.add(leadsLocal);
+  leadsLocal.rotation.y = Math.PI; leadsLocal.position.set(EX0, EY0, EZ0);
+  const trs = new THREE.Group(); leadsLocal.add(trs);       // in EMG board coordinates: plug along -x
+  const cylX = (r, len, mat, seg) => { const m = new THREE.Mesh(new THREE.CylinderGeometry(r, r, len, seg || 28), mat); m.rotation.z = Math.PI / 2; return m; };
+  const at = (m, x) => { m.position.set(x, JACK.up, JACK.y); trs.add(m); return m; };
+  at(cylX(1.75, 14, M.shaft), JACK.x + 7);                // shaft, inside the jack
+  [JACK.x + 4.2, JACK.x + 8.6].forEach(x => at(cylX(1.8, 0.6, M.ring), x));   // TRS insulating rings
+  at(cylX(3.0, 6, M.plug), JACK.x - 3);                    // collar
+  at(cylX(3.6, 12, M.plug), JACK.x - 12);                  // grip
+  for (let k = 0; k < 4; k++) at(cylX(2.6, 1.0, M.plug), JACK.x - 19.5 - k * 2);   // ribbed strain relief
+  at(cylX(2.0, 9, M.plug), JACK.x - 22);
+  const TRS_END = JACK.x - 26.5;
+
+  // Snap (Plastics One 222): 14.1 mm head, 5.08 mm thick, socket face 10.41 mm with a 4.06 mm stud
+  // hole, a ribbed boot reaching 17.4 mm from the head's centre, 1.27 mm wire. Laid socket up.
+  function snap(mat) {
+    const g = new THREE.Group(), R = 7.05, T = 5.08;
+    const prof = [[0, 0], [R - 0.9, 0], [R - 0.1, 0.5], [R, 1.4], [R, T - 1.4], [R - 0.1, T - 0.5], [R - 0.9, T], [0, T]].map(p => new THREE.Vector2(p[0], p[1]));
+    g.add(new THREE.Mesh(new THREE.LatheGeometry(prof, 40), mat));
+    const face = new THREE.Mesh(new THREE.CylinderGeometry(5.2, 5.2, 0.25, 40), M.snapSteel); face.position.y = T + 0.05; g.add(face);
+    const hole = new THREE.Mesh(new THREE.CylinderGeometry(2.03, 2.03, 0.3, 28), M.hole); hole.position.y = T + 0.08; g.add(hole);
+    const neck = new THREE.Mesh(new THREE.BoxGeometry(4.2, 4.06, 5.2), mat); neck.position.set(R + 0.4, T / 2, 0); g.add(neck);
+    for (let k = 0; k < 5; k++) {      // ribs along the boot
+      const r = new THREE.Mesh(new THREE.BoxGeometry(1.0, k % 2 ? 3.2 : 4.06, k % 2 ? 3.2 : 4.06), mat);
+      r.position.set(R + 2.6 + k * 1.6, T / 2, 0); g.add(r);
+    }
+    const tail = new THREE.Mesh(new THREE.CylinderGeometry(1.0, 1.4, 2.2, 16), mat); tail.rotation.z = Math.PI / 2; tail.position.set(R + 11.2, T / 2, 0); g.add(tail);
+    g.userData.boot = new THREE.Vector3(R + 12.3, T / 2, 0);
+    return g;
+  }
+  const SNAPS = [{ dz: -22, mat: M.snapR, lead: M.leadR }, { dz: 0, mat: M.snapB, lead: M.leadB }, { dz: 22, mat: M.snapK, lead: M.leadK }];
+  const SNAP_X = TRS_END - 72, snapUp = (TABLE - EY0);       // EMG-frame height of the table
+  SNAPS.forEach(s => {
+    const sn = snap(s.mat); sn.position.set(SNAP_X, snapUp, JACK.y + s.dz); trs.add(sn);
+    const boot = sn.userData.boot.clone().add(sn.position);
+    const start = new THREE.Vector3(TRS_END, JACK.up, JACK.y + s.dz * 0.04);
+    const curve = new THREE.CatmullRomCurve3([start,
+      new THREE.Vector3(TRS_END - 8, JACK.up - 0.6, JACK.y + s.dz * 0.15),
+      new THREE.Vector3(TRS_END - 26, snapUp + 2.6, JACK.y + s.dz * 0.75),
+      new THREE.Vector3(boot.x + 8, snapUp + 2.54, boot.z), boot], false, 'centripetal');
+    trs.add(new THREE.Mesh(new THREE.TubeGeometry(curve, 64, 0.64, 8), s.lead));
+  });
+
+  // ---- a 2 x 2 inch (50.8 mm) Wi-Fi QR sticker for network GTAC n, with its name under it,
+  // at x along the tub's front wall ----
+  function qrSticker(n, x) {
+    const S = 50.8, CAP = 9, px = 12;                         // px per mm
+    const c = document.createElement('canvas'); c.width = S * px; c.height = (S + CAP) * px;
+    const g = c.getContext('2d');
+    g.fillStyle = '#ffffff'; g.fillRect(0, 0, c.width, c.height);
+    const ssid = `GTAC ${n}`, esc = t => t.replace(/([\\;,:"])/g, '\\$1');
+    if (window.qrcode) {
+      const q = qrcode(0, 'M'); q.addData(`WIFI:T:WPA;S:${esc(ssid)};P:${esc(WIFI_PASSWORD)};;`); q.make();
+      const m = q.getModuleCount(), cell = Math.floor((S * px) / (m + 8)), off = Math.round((S * px - cell * m) / 2);
+      g.fillStyle = '#000000';
+      for (let r = 0; r < m; r++) for (let k = 0; k < m; k++) if (q.isDark(r, k)) g.fillRect(off + k * cell, off + r * cell, cell, cell);
+    }
+    g.fillStyle = '#272a24'; g.font = `700 ${Math.round(6.2 * px)}px "Figtree", Arial, sans-serif`;
+    g.textAlign = 'center'; g.textBaseline = 'middle'; g.fillText(ssid, c.width / 2, (S + CAP / 2 - 1) * px);
+    const tex = new THREE.CanvasTexture(c); tex.anisotropy = 8; tex.magFilter = THREE.NearestFilter;
+    const mesh = new THREE.Mesh(new THREE.PlaneGeometry(S, S + CAP), new THREE.MeshBasicMaterial({ map: tex }));
+    // centred on the front wall, tilted to its taper and standing 0.3 mm proud of it
+    const tilt = Math.atan2(WALL.z1 - WALL.z0, WALL.y1 - WALL.y0), y = 72;
+    mesh.position.set(x, y, WALL.z0 + (WALL.z1 - WALL.z0) * (y - WALL.y0) / (WALL.y1 - WALL.y0) + 0.3);
+    mesh.rotation.x = tilt;
+    return mesh;
+  }
+
+  // ---- the hub's top prints (LDraw's model has none): port letters, arrows and the 5 x 5 matrix ----
+  function hubTop() {
+    const c = document.createElement('canvas'); c.width = 560; c.height = 880;    // 10 px per mm, hub frame
+    const g = c.getContext('2d'), mm = v => v * 10, X = x => mm(x + 28), Z = z => mm(z + 44);
+    g.fillStyle = '#5b6064'; g.font = '600 34px "Figtree", Arial, sans-serif'; g.textAlign = 'center'; g.textBaseline = 'middle';
+    [['A', -1, -16], ['C', -1, 0], ['E', -1, 16], ['B', 1, -16], ['D', 1, 0], ['F', 1, 16]].forEach(([l, sx, z]) => g.fillText(l, X(sx * 21.5), Z(z)));
+    // matrix: 5 x 5 square pixels, 4.6 mm pitch, centred between the Bluetooth button and the centre button
+    const lit = ['00000', '01010', '00000', '10001', '01110'];
+    for (let r = 0; r < 5; r++) for (let q = 0; q < 5; q++) {
+      g.fillStyle = lit[r][q] === '1' ? '#fff6d6' : '#2c3033';
+      g.fillRect(X(-11.5 + q * 4.6 - 1.7), Z(-14.5 + r * 4.6 - 1.7), mm(3.4), mm(3.4));
+    }
+    g.strokeStyle = '#c9ccce'; g.lineWidth = 4; g.strokeRect(X(-12.6), Z(-15.6), mm(25.2), mm(25.2));
+    // left and right buttons either side of the centre button
+    g.fillStyle = '#5b6064';
+    [[-1, -14.5], [1, 14.5]].forEach(([d, x]) => { g.beginPath(); g.moveTo(X(x - d * 1.6), Z(32)); g.lineTo(X(x + d * 1.4), Z(30.3)); g.lineTo(X(x + d * 1.4), Z(33.7)); g.fill(); });
+    const tex = new THREE.CanvasTexture(c); tex.anisotropy = 4;
+    const plane = new THREE.Mesh(new THREE.PlaneGeometry(56, 88), new THREE.MeshBasicMaterial({ map: tex, transparent: true, depthWrite: false }));
+    plane.rotation.x = -Math.PI / 2; plane.position.y = 31.66; plane.renderOrder = 2;
+    return plane;
+  }
+
+  // ---- SPIKE cable: 2 x 3 Dupont housing on the HUB header -> round cable -> LPF2 plug in port A ----
+  const hubPlug = new THREE.Group(); G.spike.add(hubPlug);       // the housing, which rides with the board
+  const housing = box(5.1, HUB_HDR.h, 7.6, M.dupont); housing.position.y = HUB_HDR.h / 2; hubPlug.add(housing);
+  for (let k = 0; k < 3; k++) { const w = box(0.06, 3, 1.0, M.crimp); w.position.set(-2.58, HUB_HDR.h - 4, (k - 1) * 2.54); hubPlug.add(w); }
+  const lpf2 = new THREE.Group(); G.spike.add(lpf2);             // the plug, in world space, pointing -X into the port
+  const lpBody = box(LPF2.len - 2, LPF2.h, LPF2.w, M.lpf2); lpBody.position.x = (LPF2.len - 2) / 2 - LPF2.depth; lpf2.add(lpBody);
+  const lpTip = box(2, LPF2.h - 1.6, LPF2.w - 2.4, M.lpf2); lpTip.position.x = -LPF2.depth - 1; lpf2.add(lpTip);
+  const lpLatch = box(5.5, 0.9, 6, M.lpf2Dark); lpLatch.position.set(2.2, LPF2.h / 2 + 0.45, 0); lpf2.add(lpLatch);
+  const lpBoot = new THREE.Mesh(new THREE.CylinderGeometry(2.2, 2.8, 4, 20), M.lpf2Dark);
+  lpBoot.rotation.z = Math.PI / 2; lpBoot.position.x = LPF2.len - LPF2.depth; lpf2.add(lpBoot);
+  let spikeCable = null;
+  function buildSpike(k) {
+    if (spikeCable) { G.spike.remove(spikeCable); spikeCable.geometry.dispose(); }
+    const rise = (BOARD_RISE + 18) * k, pull = 16 * k;
+    hubPlug.position.set(HUB_HDR.x, HUB_HDR.seat + rise, HUB_HDR.z);
+    lpf2.position.set(PORT_A.x + pull, PORT_A.y, PORT_A.z);
+    const top = new THREE.Vector3(HUB_HDR.x, HUB_HDR.seat + HUB_HDR.h + rise, HUB_HDR.z);
+    const tail = new THREE.Vector3(PORT_A.x + pull + LPF2.len - LPF2.depth + 2, PORT_A.y, PORT_A.z);
+    const curve = new THREE.CatmullRomCurve3([top,
+      new THREE.Vector3(top.x, top.y + 5, top.z),
+      new THREE.Vector3(top.x - 6, top.y + 9, (top.z + tail.z) / 2),
+      new THREE.Vector3(tail.x + 6, Math.max(tail.y, top.y) + 4, tail.z),
+      new THREE.Vector3(tail.x + 1.5, tail.y, tail.z), tail], false, 'centripetal');
+    spikeCable = new THREE.Mesh(new THREE.TubeGeometry(curve, 80, 1.6, 12), M.lpf2Cable);
+    G.spike.add(spikeCable);
+  }
+
+  // ---- MyoWare: electrode snaps, the reference lead, Dupont plugs on its + - SIG header ----
+  const cylY = (r, h, mat, seg) => new THREE.Mesh(new THREE.CylinderGeometry(r, r, h, seg || 32), mat);
+  MYO_SNAPS.forEach(([x, y]) => {
+    const g = new THREE.Group(); g.position.set(x, 0, y); G.myo.add(g);
+    const ring = cylY(4.7, 0.5, M.snapSteel); ring.position.y = 1.85; g.add(ring);        // rivet head on top
+    const dome = new THREE.Mesh(new THREE.SphereGeometry(3.3, 28, 12, 0, Math.PI * 2, 0, Math.PI / 2), M.snapSteel);
+    dome.scale.y = 0.45; dome.position.y = 2.1; g.add(dome);
+    const base = cylY(4.8, 0.5, M.snapSteel); base.position.y = -0.25; g.add(base);        // stud underneath
+    const stud = cylY(1.95, 2.6, M.snapSteel); stud.position.y = -1.8; g.add(stud);
+    const ball = new THREE.Mesh(new THREE.SphereGeometry(2.1, 20, 12), M.snapSteel); ball.scale.y = 0.6; ball.position.y = -3.0; g.add(ball);
+  });
+  // the reference lead: soldered on top at the R pad end, about 3 in long, ending in a snap
+  G.myoLead.position.copy(G.myo.position);
+  const shrink = cylX(0.95, 9.5, M.leadK); shrink.position.set(31.3, 2.5, 1.5); G.myoLead.add(shrink);
+  const refSnap = snap(M.snapK), refAt = new THREE.Vector3(70, -3.6, -16);
+  const toBoard = new THREE.Vector3(36, 0, 1.5).sub(refAt);
+  refSnap.rotation.y = Math.atan2(-toBoard.z, toBoard.x); refSnap.position.copy(refAt); G.myoLead.add(refSnap);
+  refSnap.updateMatrix();
+  const refBoot = refSnap.userData.boot.clone().applyMatrix4(refSnap.matrix);
+  G.myoLead.add(new THREE.Mesh(new THREE.TubeGeometry(new THREE.CatmullRomCurve3([
+    new THREE.Vector3(36, 2.5, 1.5), new THREE.Vector3(44, 3.2, -1.5), new THREE.Vector3(54, 0.5, -8),
+    new THREE.Vector3(refBoot.x + (36 - refBoot.x) * 0.15, refBoot.y + 0.4, refBoot.z + (1.5 - refBoot.z) * 0.15), refBoot],
+    false, 'centripetal'), 64, 0.6, 8), M.leadK));
+  const myoDuponts = WIRES.map(w => {
+    const d = new THREE.Group();
+    const body = box(2.5, DUP_H, 2.5, M.dupont); body.position.y = DUP_H / 2; d.add(body);
+    const win = box(0.05, 3, 0.9, M.crimp); win.position.set(1.27, DUP_H - 4, 0); d.add(win);
+    G.myo.add(d); d.position.set(1.25, HEADER_TOP, w.my); return d;
+  });
+  const sensor = () => (document.querySelector('input[name=sensor]:checked') || {}).value || 'gravity';
+
+  // ---- pin tags: HTML labels that follow the Dupont plugs ----
+  const tags = WIRES.map(w => {
+    const el = document.createElement('div'); el.className = 'tag';
+    host.appendChild(el); return el;
+  });
+  const spikeTags = ['HUB header', 'Port A'].map(t => {
+    const el = document.createElement('div'); el.className = 'tag'; el.textContent = t; host.appendChild(el); return el;
+  });
+
+  // ---- controls ----
+  const $ = id => document.getElementById(id);
+  const ui = { explode: $('explode'), case: $('tCase'), lid: $('tLid'), cable: $('tCable'), emg: $('tEmg'), leads: $('tLeads'), box: $('tBox'), sGravity: $('sGravity'), sMyo: $('sMyo'), hub: $('tHub'), spike: $('tSpike'), tags: $('tTags') };
+  function update() {
+    const k = +ui.explode.value;
+    // the base stays on the table: the board lifts out of it, the lid above that, and the Dupont
+    // plugs lift off the header on top of the board's rise
+    G.lms.position.y = BOARD_RISE * k;
+    G.lid.position.y = 46 * k;
+    G.duponts.children.forEach(d => d.position.y = HEADER_TOP + (BOARD_RISE + 18) * k);
+    // the DFRobot board (with its jack, electrode plug and leads) slides right, off the Gravity plug
+    G.emg.position.x = EX0 + EMG_SLIDE * k; G.leads.position.x = EMG_SLIDE * k;
+    myoDuponts.forEach(d => d.position.y = HEADER_TOP + 18 * k);
+    const myo = sensor() === 'myo';
+    WIRES.forEach((w, i) => { tags[i].innerHTML = `<i style="background:var(${w.color})"></i>${w.lms} ← ${myo ? w.myo : w.name}`; });
+    trs.position.x = -20 * k;                    // EMG frame: out of the jack
+    buildCable(k);
+    buildSpike(k);
+    G.base.visible = G.button.visible = ui.case.checked; G.lid.visible = ui.case.checked && ui.lid.checked;
+    G.cable.visible = G.duponts.visible = G.phplug.visible = ui.cable.checked;
+    G.emg.visible = !myo && ui.emg.checked; G.leads.visible = !myo && ui.leads.checked;
+    G.phplug.visible = !myo && ui.cable.checked;
+    G.myo.visible = myo && ui.emg.checked; G.myoLead.visible = myo && ui.leads.checked;
+    G.hub.visible = ui.hub.checked; G.spike.visible = ui.spike.checked;
+    G.box.visible = G.boxLid.visible = ui.box.checked;
+    G.boxLid.position.y = TABLE + 120 * k;
+  }
+  Object.values(ui).forEach(e => e.addEventListener('input', update));
+
+  const VIEWS = {
+    all:    { t: [60, 10, 28], p: [60, 280, 390] },
+    board:  { t: [20, 2, 28], p: [20, 95, 30] },
+    header: { t: [36, 8, 24], p: [78, 70, 62] },
+    emg:    { t: [92, 2, 26], p: [96, 82, 96] },
+    hub:    { t: [-34, 14, 30], p: [-6, 105, 150] },
+    box:    { t: [60, 70, -150], p: [60, 330, 420] },
+  };
+  let flight = null;
+  function go(name, instant) {
+    const v = VIEWS[name], to = { t: new THREE.Vector3(...v.t), p: new THREE.Vector3(...v.p) };
+    if (instant) { controls.target.copy(to.t); cam.position.copy(to.p); controls.update(); return; }
+    flight = { from: { t: controls.target.clone(), p: cam.position.clone() }, to, s: performance.now() };
+  }
+  document.querySelectorAll('[data-view]').forEach(b => b.addEventListener('click', () => {
+    if (b.dataset.view === 'box' && !ui.box.checked) { ui.box.checked = true; update(); }
+    go(b.dataset.view);
+  }));
+  go('all', true);
+
+  function resize() {
+    const w = host.clientWidth, h = Math.round(Math.min(640, Math.max(360, w * 0.66)));
+    if (!w) return;
+    renderer.setSize(w, h); cam.aspect = w / h; cam.updateProjectionMatrix();
+  }
+  new ResizeObserver(resize).observe(host); resize();
+  matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => { applyColors(); });
+  new MutationObserver(applyColors).observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
+
+  const v3 = new THREE.Vector3();
+  (function loop(now) {
+    if (flight) {
+      const u = Math.min(1, (now - flight.s) / 650), e = u < .5 ? 2 * u * u : 1 - Math.pow(-2 * u + 2, 2) / 2;
+      controls.target.lerpVectors(flight.from.t, flight.to.t, e); cam.position.lerpVectors(flight.from.p, flight.to.p, e);
+      if (u === 1) flight = null;
+    }
+    controls.update(); renderer.render(scene, cam);
+    const W = renderer.domElement.clientWidth, H = renderer.domElement.clientHeight, show = ui.tags.checked && ui.cable.checked;
+    WIRES.forEach((w, i) => {
+      v3.set(w.to[0], w.dupont.position.y + DUP_H + 1, w.to[1]).project(cam);
+      const on = show && v3.z < 1;
+      tags[i].style.display = on ? '' : 'none';
+      if (on) tags[i].style.transform = `translate(${(v3.x + 1) / 2 * W}px, ${(1 - v3.y) / 2 * H}px) translate(${['-110%', '-50%', '10%'][i]}, -130%)`;
+    });
+    const showSpike = ui.tags.checked && ui.spike.checked;
+    [[hubPlug.position.x, hubPlug.position.y + HUB_HDR.h + 6, hubPlug.position.z], [PORT_A.x, PORT_A.y + LPF2.h, PORT_A.z]].forEach((p, i) => {
+      v3.set(...p).project(cam);
+      const on = showSpike && v3.z < 1;
+      spikeTags[i].style.display = on ? '' : 'none';
+      if (on) spikeTags[i].style.transform = `translate(${(v3.x + 1) / 2 * W}px, ${(1 - v3.y) / 2 * H}px) translate(-50%, -130%)`;
+    });
+    requestAnimationFrame(loop);
+  })(performance.now());
+}
+// the hub's letters and the box stickers are drawn to canvases once, so wait (briefly) for Figtree
+Promise.race([document.fonts ? document.fonts.load('700 40px Figtree') : null, new Promise(r => setTimeout(r, 1500))])
+  .catch(() => {}).then(boot);
+</script>
+</body>
+</html>

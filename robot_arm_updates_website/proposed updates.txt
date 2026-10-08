@@ -1,0 +1,37 @@
+**Robotic arm instructions**
+_____________________________
+
+We will be connecting to WiFi unique to your LEGO hub to control your robotic arm. Look for the number on your hub and scan its QR code on your yellow tub using the camera app. 
+
+When you connect to the wifi, an app will automatically open with controls that you can use to test your build. 
+
+***You will get disconnected from the internet when you are connected to your robotic arm.
+****Include this detail on the page displayed from the LMS ESP32
+
+To reconnect, open the wifi settings on your iPad and reconnect to the "Discovery" network.
+****Include this detail on the page displayed from the LMS ESP32 - toast notification when you click back to HOME that tells you to change network back to discovery with an appropriate screenshot.
+
+Watch this video to learn how to open the app, and navigate to the remote controls.
+
+------------------
+
+Use the controller on your iPad to test it. Click on the joystick icon on the Mindstorms app to open the controls.
+***Port all of this to the new LMS served app.
+
+
+
+Connecting Myosensors
+_______________________________
+
+In this activity you’ll connect a muscle sensor to control your motors. You'll connect to your robot again over WiFi, then use the myosensor to control it using the web app. Use the buttons below to move through each step.
+
+
+**Code your controller** -- needs to move onto the web app
+______________________________
+
+The code for your controller can be modified to change the way
+your motors move.
+
+**Labelled diagram of the web interface with various different options for how to change the way the motors and controlled and behave 
+
+

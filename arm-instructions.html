@@ -106,6 +106,35 @@
         justify-content: center;
       }
 
+      .steps {
+        text-align: left;
+        font-size: 1.15em;
+        line-height: 1.5;
+        margin: 10px 30px;
+        padding-left: 28px;
+      }
+      .steps li { margin-bottom: 8px; }
+      .model {
+        width: 100%;
+        height: min(540px, 62vh);
+        border: 2px solid #e4dfc8;
+        border-radius: 12px;
+      }
+      .shot {
+        width: 100%;
+        max-width: 640px;
+        border-radius: 10px;
+        border: 2px solid #e4dfc8;
+        margin: 10px auto 0;
+        display: block;
+      }
+      .tip {
+        background: #fff8db;
+        border-radius: 10px;
+        padding: 10px 14px;
+        font-size: 1.05em !important;
+      }
+
     .iframe {
       width: 95%;
       height: 90vh;
@@ -220,29 +249,15 @@
       </div>
     </section>
 
-    <!-- 03/05 Open the Mindstorms App and Project -->
+    <!-- 03/05 Start the arm program -->
     <section class="card" id="c3">
       <h1>03/05</h1>
-      <h2>Open the Mindstorms app and project</h2>
+      <h2>Start the arm program on the hub</h2>
 
-      <!-- iPad-specific video (hidden by default) -->
-      <video id="ipadVideo" controls style="display: none">
-        <source src="open-app.mp4" type="video/mp4" />
-        <source src="open-app.mp4" type="video/quicktime" />
-      </video>
+      <iframe class="model" src="robot_arm_updates_website/lms-esp32/hub-buttons.html?for=arm" loading="lazy"
+        title="3D SPIKE hub: where to plug in the board and motors, and which buttons start program 0"></iframe>
 
-      <!-- Default video -->
-      <video id="defaultVideo" controls>
-        <source src="open-app.mp4" type="video/mp4" />
-        <source src="open-app.mp4" type="video/quicktime" />
-      </video>
-
-      <p>
-        We will be using the Lego Mindstorms app to control your robotic arm. We
-        have created the code for you, so all you have to do is select the right
-        code. Watch this video to learn how to open the app, and select the
-        right project.
-      </p>
+      <p>Tap the numbers under the hub to go through each step. Drag the hub to turn it.</p>
 
       <div class="nav-buttons">
         <button onclick="prevPage()">◀ Prev</button>
@@ -250,54 +265,46 @@
       </div>
     </section>
 
-    <!-- 04/05 Connecting your robotic arm -->
+    <!-- 04/05 Join the arm's Wi-Fi -->
     <section class="card" id="c4">
       <h1>04/05</h1>
-      <h2>Connecting your robotic arm</h2>
-      <!-- iPad-specific video (hidden by default) -->
-      <video id="ipadVideo" controls style="display: none">
-        <source src="connect-app.mp4" type="video/mp4" />
-        <source src="connect-app.mp4" type="video/quicktime" />
+      <h2>Connect your iPad to the arm</h2>
+
+      <video controls playsinline preload="metadata" poster="captive-portal.jpg" data-alt="The page that pops up when the iPad joins the arm's Wi-Fi, with the Open the remote button">
+        <source src="arm-join-wifi.mp4" type="video/mp4" />
       </video>
 
-      <!-- Default video -->
-      <video id="defaultVideo" controls>
-        <source src="connect-app.mp4" type="video/mp4" />
-        <source src="connect-app.mp4" type="video/quicktime" />
-      </video>
-      <p>
-        We will be connecting the robotic arm to the app so we can control it.
-        We will also need to upload the code. Once you have the Mindstorms app
-        open, watch this video to learn how to upload your code to the robotic
-        arm.
-      </p>
+      <ol class="steps">
+        <li>On the iPad, open <b>Settings → Wi-Fi</b>.</li>
+        <li>Join the network with your board's name, for example <b>GTAC 12</b>. The password is <b>robotarm</b>.</li>
+        <li>A page pops up: tap <b>Open the remote</b>. Then tap <b>Done</b> at the top (not Cancel).</li>
+        <li>No pop-up? Open <b>Safari</b> and go to <b>10.10.10.10</b>.</li>
+      </ol>
+      <p class="tip">The iPad may say there is no internet on this Wi-Fi. That is fine: stay connected. Switch back to the school Wi-Fi when you finish.</p>
+
       <div class="nav-buttons">
         <button onclick="prevPage()">◀ Prev</button>
         <button onclick="nextPage()">Next ▶</button>
       </div>
     </section>
 
-    <!-- 05/05 DONE -->
+    <!-- 05/05 Use the remote -->
     <section class="card" id="c5">
       <h1>05/05</h1>
-      <h2>Open the controls, and you are all set!</h2>
-      <img src="control.png" alt=Controller" class="img-small">
-      <!-- iPad-specific video (hidden by default) -->
-      <video id="ipadVideo" controls style="display: none">
-        <source src="open-controls.mp4" type="video/mp4" />
-        <source src="open-controls.mp4" type="video/quicktime" />
+      <h2>Drive your arm with the remote</h2>
+
+      <video controls playsinline preload="metadata" poster="remote-basic.jpg" data-alt="The remote on the Remote tab with Basic selected: D-pad 1, slider 2 and the motor positions">
+        <source src="arm-remote.mp4" type="video/mp4" />
       </video>
 
-      <!-- Default video -->
-      <video id="defaultVideo" controls>
-        <source src="open-controls.mp4" type="video/mp4" />
-        <source src="open-controls.mp4" type="video/quicktime" />
-      </video>
-      <p>
-        You’ve built and uploaded code to your robotic arm. Use the controller
-        on your iPad to test it. Click on the joystick icon on the Mindstorms
-        app to open the controls.
-      </p>
+      <ol class="steps">
+        <li>Make sure the <b>Remote</b> tab and <b>Basic</b> are selected.</li>
+        <li>Hold the <b>D-pad (1)</b> or push the <b>slider (2)</b> to move the motors. Let go to stop.</li>
+        <li>Tap <b>⌂ Home</b> to send every motor back to its home position.</li>
+        <li>Tap <b>✎ Change remote</b> to add, move or set up controls and choose which motor each one moves.</li>
+      </ol>
+      <p class="tip">Want to code your arm instead? See <a href="codecontrol.html">Change how your arm moves</a>.</p>
+
       <div class="nav-buttons">
         <button onclick="prevPage()">◀ Prev</button>
         <a class="btn" href="index.html">Home ▶</a>
@@ -349,6 +356,19 @@
       }
     }
   }
+
+  // A video that has not been recorded yet shows its picture instead (or nothing); it appears once uploaded
+  document.querySelectorAll("video").forEach((v) => {
+    const last = v.querySelector("source:last-of-type");
+    if (!last) return;
+    last.addEventListener("error", () => {
+      if (v.poster) {
+        const img = document.createElement("img");
+        img.src = v.poster; img.alt = v.dataset.alt || ""; img.className = "shot";
+        v.replaceWith(img);
+      } else v.style.display = "none";
+    });
+  });
 
   document.addEventListener("DOMContentLoaded", () => {
     setUploadBehaviour();

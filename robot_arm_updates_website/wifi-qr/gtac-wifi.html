@@ -1,0 +1,147 @@
+<title>GTAC Wi-Fi Codes</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;600;700;800&display=swap">
+<style>
+/* Layout: GTAC workshop page styling (vibe.gtac.edu.au): eggshell ground, cobalt headings with a
+   sodium-flame rule, aquamarine-edged panels, Figtree throughout. A sheet of ten network cards
+   (5 x 2, stacking on phones) with a pager for networks 1-100. Light only, like the site. */
+:root {
+  /* GTAC hero colours */
+  --eggshell: #F9F6E7; --sodium-flame: #FF6D3A; --cadmium-yellow: #FFCD1F; --chlorophyll-green: #00BC74;
+  --aquamarine: #6BE7BE; --lavender: #C0ADFF; --cobalt-blue: #4C34E5; --onyx: #272A24;
+  --muted: #5C6057; --qr-bg: #FFFFFF;
+  --font: "Figtree", system-ui, -apple-system, "Segoe UI", sans-serif;
+  color-scheme: light;
+}
+* { box-sizing: border-box }
+body { background: var(--eggshell); color: var(--onyx); font: 16px/1.5 var(--font); padding-inline: 20px; padding-block: 20px 48px }
+.wrap { max-width: 1180px; margin: 0 auto; display: grid; gap: 22px }
+
+header { display: grid; gap: 12px }
+.eyebrow { font-weight: 700; font-size: 13px; letter-spacing: .12em; text-transform: uppercase; color: var(--cobalt-blue) }
+h1 { font-weight: 800; font-size: clamp(30px, 4.6vw, 44px); line-height: 1.1; margin: 0; color: var(--cobalt-blue);
+  border-bottom: 4px solid var(--sodium-flame); padding-bottom: 10px; text-wrap: balance }
+.steps { margin: 0; padding: 0; list-style: none; display: flex; flex-wrap: wrap; gap: 8px 22px; font-size: 16px }
+.steps li { display: flex; gap: 8px; align-items: center }
+.steps b { display: inline-grid; place-items: center; width: 26px; height: 26px; border-radius: 50%; background: var(--chlorophyll-green); color: var(--onyx); font-weight: 800; font-size: 14px }
+
+.pager { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; padding: 12px; border: 1px solid var(--aquamarine); border-radius: 10px; box-shadow: 0 4px 12px rgba(0,0,0,0.05) }
+.pager button { font: 700 15px/1 var(--font); border: 2px solid var(--aquamarine); background: var(--eggshell); color: var(--onyx);
+  border-radius: 8px; padding: 9px 13px; cursor: pointer; min-height: 40px; transition: border-color .2s, background-color .2s }
+.pager button:hover:not(:disabled) { border-color: var(--sodium-flame) }
+.pager button:disabled { opacity: .4; cursor: default }
+.pager button[aria-current="page"] { background: var(--cobalt-blue); border-color: var(--cobalt-blue); color: var(--eggshell) }
+.pager button:focus-visible { outline: 3px solid var(--cobalt-blue); outline-offset: 2px }
+.pages { display: flex; flex-wrap: wrap; gap: 6px; order: 4; flex-basis: 100% }
+.pages button { min-width: 48px; padding-inline: 8px; font-variant-numeric: tabular-nums }
+.range { font-weight: 700; font-size: 14px; color: var(--muted); font-variant-numeric: tabular-nums; margin-left: auto }
+
+.sheet { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 14px }
+@media (max-width: 1020px) { .sheet { grid-template-columns: repeat(3, minmax(0, 1fr)) } }
+@media (max-width: 700px) { .sheet { grid-template-columns: repeat(2, minmax(0, 1fr)) } }
+.card { background: var(--eggshell); border: 1px solid var(--aquamarine); border-radius: 10px; padding: 14px; display: grid; gap: 10px; min-width: 0;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.05) }
+.qr { background: var(--qr-bg); border: 1px solid var(--onyx); border-radius: 3px; padding: 6px; aspect-ratio: 1; max-width: 100% }
+.qr svg { display: block; width: 100%; height: 100% }
+.qr svg rect, .qr svg path { shape-rendering: crispEdges }
+.net { display: grid; gap: 6px; min-width: 0 }
+.ssid { font-weight: 800; font-size: clamp(20px, 2.2vw, 26px); line-height: 1.1; color: var(--cobalt-blue); border-bottom: 2px dashed var(--aquamarine); padding-bottom: 5px }
+.kv { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 2px 8px; align-items: baseline; margin: 0 }
+.kv dt { color: var(--muted); text-transform: uppercase; letter-spacing: .08em; font-size: 11px; font-weight: 700 }
+.kv dd { margin: 0; font-weight: 700; font-size: 15px; overflow-wrap: anywhere }
+
+.foot { font-size: 15px; max-width: 74ch; border-left: 5px solid var(--chlorophyll-green); padding-left: 12px; margin: 0 }
+.foot code { font: 600 13px ui-monospace, Menlo, monospace; background: #FFFFFF; border: 1px solid var(--aquamarine); padding: 1px 5px; border-radius: 4px; overflow-wrap: anywhere }
+.fallback { padding: 24px; border: 1px solid var(--aquamarine); border-radius: 10px }
+@media (prefers-reduced-motion: no-preference) { .card { transition: border-color .2s } .card:hover { border-color: var(--sodium-flame) } }
+</style>
+
+<div class="wrap">
+  <header>
+    <div class="eyebrow">Robot arm lab · iPad Wi-Fi</div>
+    <h1>GTAC Wi-Fi Codes</h1>
+    <ol class="steps" aria-label="How to join">
+      <li><b>1</b>Open the iPad Camera</li>
+      <li><b>2</b>Point it at your station's code</li>
+      <li><b>3</b>Tap “Join Network”</li>
+    </ol>
+  </header>
+
+  <nav class="pager" aria-label="Pages of networks">
+    <button type="button" id="prev">← Previous</button>
+    <div class="pages" id="pages"></div>
+    <button type="button" id="next">Next →</button>
+    <span class="range" id="range" aria-live="polite"></span>
+  </nav>
+
+  <main class="sheet" id="sheet" aria-live="polite"></main>
+
+  <p class="foot">Each code holds a standard Wi-Fi join string, for example <code>WIFI:T:WPA;S:GTAC 1;P:robotarm;;</code>. Network names are <b>GTAC 1</b> to <b>GTAC 100</b>, with a space before the number. All use the password <b>robotarm</b> (WPA/WPA2). Use the arrow keys to change page.</p>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcode-generator/1.4.4/qrcode.min.js"></script>
+<script>
+const COUNT = 100, PER_PAGE = 10, PASSWORD = 'robotarm';
+const PAGES = Math.ceil(COUNT / PER_PAGE);
+const ssidOf = n => `GTAC ${n}`;
+// Wi-Fi QR format: special characters in the name and password are backslash-escaped
+const esc = s => s.replace(/([\\;,:"])/g, '\\$1');
+const payload = n => `WIFI:T:WPA;S:${esc(ssidOf(n))};P:${esc(PASSWORD)};;`;
+
+const $ = id => document.getElementById(id);
+const sheet = $('sheet'), pagesEl = $('pages');
+
+function qrSvg(text) {
+  const q = qrcode(0, 'M');
+  q.addData(text); q.make();
+  return q.createSvgTag({ cellSize: 4, margin: 2, scalable: true });
+}
+
+let page = 1;
+function readHash() { const m = /^#p(\d+)$/.exec(location.hash); return m ? Math.min(PAGES, Math.max(1, +m[1])) : 1; }
+
+function render() {
+  const first = (page - 1) * PER_PAGE + 1, last = Math.min(COUNT, first + PER_PAGE - 1);
+  if (typeof qrcode === 'undefined') {
+    sheet.innerHTML = '<p class="fallback">The QR code library could not load. Check the connection and reload the page.</p>';
+  } else {
+    sheet.innerHTML = '';
+    for (let n = first; n <= last; n++) {
+      const card = document.createElement('article');
+      card.className = 'card';
+      card.setAttribute('aria-label', `Wi-Fi code for ${ssidOf(n)}`);
+      card.innerHTML = `<div class="qr" role="img" aria-label="QR code that joins ${ssidOf(n)}">${qrSvg(payload(n))}</div>
+        <div class="net"><div class="ssid">${ssidOf(n)}</div>
+        <dl class="kv"><dt>Network</dt><dd>${ssidOf(n)}</dd><dt>Password</dt><dd>${PASSWORD}</dd></dl></div>`;
+      sheet.appendChild(card);
+    }
+  }
+  $('range').textContent = `Networks ${first}–${last} of ${COUNT}`;
+  $('prev').disabled = page === 1; $('next').disabled = page === PAGES;
+  [...pagesEl.children].forEach((b, i) => { if (i + 1 === page) b.setAttribute('aria-current', 'page'); else b.removeAttribute('aria-current'); });
+}
+function go(p) {
+  page = Math.min(PAGES, Math.max(1, p));
+  if (location.hash !== '#p' + page) history.replaceState(null, '', '#p' + page);
+  render();
+}
+
+for (let p = 1; p <= PAGES; p++) {
+  const b = document.createElement('button');
+  b.type = 'button'; b.textContent = `${(p - 1) * PER_PAGE + 1}–${Math.min(COUNT, p * PER_PAGE)}`;
+  b.setAttribute('aria-label', `Networks ${(p - 1) * PER_PAGE + 1} to ${Math.min(COUNT, p * PER_PAGE)}`);
+  b.addEventListener('click', () => go(p));
+  pagesEl.appendChild(b);
+}
+$('prev').addEventListener('click', () => go(page - 1));
+$('next').addEventListener('click', () => go(page + 1));
+document.addEventListener('keydown', e => {
+  if (e.target.closest('input, textarea')) return;
+  if (e.key === 'ArrowLeft') go(page - 1);
+  if (e.key === 'ArrowRight') go(page + 1);
+});
+window.addEventListener('hashchange', () => { const p = readHash(); if (p !== page) { page = p; render(); } });
+page = readHash();
+render();
+</script>

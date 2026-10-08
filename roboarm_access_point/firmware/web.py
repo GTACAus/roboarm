@@ -18,7 +18,7 @@ try:
     from config import WIFI_NAME   # each board's own name, set with: python tools/upload.py --name "GTAC 12"
 except ImportError:
     WIFI_NAME = "GTAC 6"           # the network name students look for
-WIFI_PASSWORD = "gtacrobot"    # at least 8 characters
+WIFI_PASSWORD = "robotarm"     # at least 8 characters; must match the printed QR codes (robot_arm_updates_website/wifi-qr)
 ADDRESS = "10.10.10.10"        # the remote's web address (private: never cached from the internet)
 WWW = "/www/"
 FILES = {"/app.js": ("app.js.gz", "application/javascript"),
