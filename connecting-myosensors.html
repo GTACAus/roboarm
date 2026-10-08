@@ -59,9 +59,9 @@
 </head>
 <body>
 
-  <!-- 01/09 INTRO -->
+  <!-- 01/08 INTRO -->
   <section class="card active" id="c1">
-    <h1>01/09</h1>
+    <h1>01/08</h1>
     <h2>Connecting the myosensors — What you'll do</h2>
     <p>
       In this activity you’ll <strong>connect a muscle sensor to control your motors</strong>,
@@ -74,9 +74,9 @@
     </div>
   </section>
 
-  <!-- 02/09 Equipment List -->
+  <!-- 02/08 Equipment List -->
   <section class="card" id="c2">
-    <h1>02/09</h1>
+    <h1>02/08</h1>
     <h2>The mysosensor - What you'll need</h2>
 
 <!-- iPad-specific video (hidden by default) -->
@@ -102,9 +102,9 @@
     </div>
   </section>
 
-  <!-- 03/09 Connect the sensor cables -->
+  <!-- 03/08 Connect the sensor cables -->
   <section class="card" id="c3">
-    <h1>03/09</h1>
+    <h1>03/08</h1>
     <h2>Connecting the sensor cables</h2>
 
     <img src="wiring-io32.jpg" alt="Board pins IO32, GND and 3V3, and the three cable colour sets">
@@ -120,15 +120,15 @@
     </div>
   </section>
 
-  <!-- 04/09 Wiring in 3D -->
+  <!-- 04/08 Wiring in 3D -->
   <section class="card" id="c4m">
-    <h1>04/09</h1>
+    <h1>04/08</h1>
     <h2>See the wiring in 3D</h2>
 
     <iframe class="model" src="robot_arm_updates_website/lms-esp32/wiring-steps.html" loading="lazy"
-      title="3D model: the black, red and blue plugs going onto GND, 3V3 and IO32 on the LMS-ESP32"></iframe>
+      title="Model: the sensor's ground, power and signal plugs going onto GND, 3V3 and IO32 on the board, in your cable colours"></iframe>
 
-    <p>Tap <b>1 GND</b>, <b>2 3V3</b> and <b>3 IO32</b> to watch each plug go on. Drag the model to turn it.</p>
+    <p>Choose <b>your cable colours</b> at the top, then tap <b>1 GND</b>, <b>2 3V3</b> and <b>3 IO32</b> to watch each plug go on. Drag the model to turn it.</p>
 
     <div class="nav-buttons">
       <button onclick="prevPage()">◀ Prev</button>
@@ -136,9 +136,9 @@
     </div>
   </section>
 
-  <!-- 05/09 Connect the sensor cables (video) -->
+  <!-- 05/08 Connect the sensor cables (video) -->
   <section class="card" id="c4">
-    <h1>05/09</h1>
+    <h1>05/08</h1>
     <h2>Connecting the sensor cables</h2>
 
     <video controls playsinline preload="metadata">
@@ -146,7 +146,6 @@
     </video>
 
     <ol class="steps">
-      <li>Find the pin header and the <b>USB-C</b> socket at one end of it.</li>
       <li>Push the <b>ground</b> cable onto <b>GND</b>: the inner pin of the pair next to the USB-C socket.</li>
       <li>Push the <b>power</b> cable onto <b>3V3</b>: the outer pin of that same pair.</li>
       <li>Push the <b>signal</b> cable onto <b>IO32</b>: the inner row, four pins further along from GND.</li>
@@ -159,27 +158,9 @@
     </div>
   </section>
 
-    <!-- 05/09 Connect the sensor cables -->
-  <section class="card" id="c3">
-    <h1>06/09</h1>
-    <h2>Connecting the sensor to your hub</h2>
-
-    <img src="connect-to-hub.png" alt="Hub connect" class="img-smaller">
-
-    <p>Connect your myosensor's black cable to the Lego Hub. <br>
-      The black cable from the myosensor box needs to connect to <b>PORT A</b>. <br><br>
-      Look at the picture above to see where to plug in your myosensor.
-    </p>
-
-    <div class="nav-buttons">
-      <button onclick="prevPage()">◀ Prev</button>
-      <button onclick="nextPage()">Next ▶</button>
-    </div>
-  </section>
-
-  <!-- 06/09 Attach the sensor -->
+  <!-- 06/08 Attach the sensor -->
   <section class="card" id="c6">
-    <h1>07/09</h1>
+    <h1>06/08</h1>
     <h2>Attach your myosensor</h2>
     <img src="mysensors.jpg" alt="Myosensor on the forearm" class="img-small">
     <img src="danger.jpg" alt="Safety warning" class="img-small">
@@ -190,9 +171,9 @@
     </div>
   </section>
 
-  <!-- 07/09 Start the arm program -->
+  <!-- 07/08 Start the arm program -->
   <section class="card" id="c7">
-    <h1>08/09</h1>
+    <h1>07/08</h1>
     <h2>Start the arm program on the hub</h2>
 
     <iframe class="model" src="robot_arm_updates_website/lms-esp32/hub-buttons.html?for=myo" loading="lazy"
@@ -206,9 +187,9 @@
     </div>
   </section>
 
-  <!-- 08/09 Use the muscle sensor -->
+  <!-- 08/08 Use the muscle sensor -->
   <section class="card" id="c8">
-    <h1>09/09</h1>
+    <h1>08/08</h1>
     <h2>Move the arm with your muscle</h2>
 
     <video controls playsinline preload="metadata" poster="muscle-trace.jpg" data-alt="The app's Muscle sensor tab: the muscle signal over the last 30 seconds, the Amplify bar and the motor buttons B to F">
@@ -216,10 +197,9 @@
     </video>
 
     <ol class="steps">
-      <li><b>Squeeze</b> your muscle: the motor shown on the hub turns. Relax: it goes back home.</li>
-      <li>Press the hub's <b>left</b> or <b>right</b> button to choose a different motor.</li>
       <li>With an iPad: join your board's Wi-Fi (for example <b>GTAC 12</b>, password <b>robotarm</b>) and open the <b>Muscle sensor</b> tab.
         You will see your muscle signal as a graph, choose the motor, and use <b>Amplify</b> if the arm barely moves.</li>
+      <li><b>Squeeze</b> your muscle: the motor shown on the hub turns. Relax: it goes back home.</li>
     </ol>
 
     <div class="nav-buttons">

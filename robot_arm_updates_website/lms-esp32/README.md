@@ -35,6 +35,21 @@ Needs KiCad 10 in `/Applications/KiCad` and the growcube PCB repo next to this o
 SPIKE cable: the LMS-ESP32's 2 × 3 HUB header (IO8/IO7 serial, 3V3, GND, M+/M−) to hub port A,
 through the lid's cutout over the header.
 
+## Step players on the instruction pages
+
+The instruction cards embed `wiring-steps.html` and `hub-buttons.html?for=arm|myo`. These show pre-rendered
+frames (`frames/wiring/`, `frames/hub/`: 19 angles across ±45° per step, plus the moves between steps)
+through `frames-player.js`, rather than a live 3D model, so they stay light on iPads and slow networks.
+Students drag sideways (or use the arrow keys) to turn the model.
+
+The frames are drawn from the live 3D versions, `wiring-steps-3d.html` and `hub-buttons-3d.html`. After
+changing a model or a step there, render again (needs Chrome or Edge, and the internet for three.js):
+
+    python make_embeds.py      # only if a model in out/ changed: repackages it for the 3D pages
+    python render_frames.py    # -> frames/wiring/ and frames/hub/
+
+If you change a step's text or tags, change them in both the 3D page and its player page.
+
 ## Sources and guesses
 
 - LMS-ESP32 header, HUB, RGB/IO25, RST, PWR, DISPLAY and Grove labels: read off Anton's photos.

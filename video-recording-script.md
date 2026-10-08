@@ -16,11 +16,11 @@ website folder (next to the `.html` files). Until then the card simply shows its
 
 | # | File name (exact) | Page and card | Length |
 |---|---|---|---|
-| 1 | `arm-start-hub.mp4` (optional: a 3D hub model now shows these steps on the cards) | arm-instructions 03/05 and connecting-myosensors 08/09 | 30–45 s |
+| 1 | `arm-start-hub.mp4` (optional: a 3D hub model now shows these steps on the cards) | arm-instructions 03/05 and connecting-myosensors 07/08 | 30–45 s |
 | 2 | `arm-join-wifi.mp4` | arm-instructions 04/05 | 45–60 s |
 | 3 | `arm-remote.mp4` | arm-instructions 05/05 | about 60 s |
-| 4 | `myo-wiring-io32.mp4` | connecting-myosensors 05/09 | about 45 s |
-| 5 | `myo-use.mp4` | connecting-myosensors 09/09 | about 60 s |
+| 4 | `myo-wiring-io32.mp4` | connecting-myosensors 05/08 | about 45 s |
+| 5 | `myo-use.mp4` | connecting-myosensors 08/08 | about 60 s |
 | 6 | `code-canvas.mp4` | codecontrol 02/03 | about 45 s |
 | 7 | `code-change.mp4` | codecontrol 03/03 | 60–75 s |
 
@@ -50,7 +50,7 @@ website folder (next to the `.html` files). Until then the card simply shows its
 
 | Shot | What to show | Line |
 |---|---|---|
-| 1 | Close-up of the board's cable in **port A**, motors in B, C and E | *"The board goes in port A, and the motors in ports B to F."* |
+| 1 | Close-up of the blue GTAC board's cable in **port A**, motors in B, C and E | *"Plug the blue GTAC board into port A, and check the motors are in ports B, C and E."* |
 | 2 | Press the hub's centre button; the hub lights up | *"Press the centre button to turn the hub on."* |
 | 3 | Press right until the display shows **0** | *"Press left or right until you see program zero."* |
 | 4 | Press the centre button | *"Press the centre button to start it."* |
@@ -64,7 +64,7 @@ website folder (next to the `.html` files). Until then the card simply shows its
 | 2 | Tap it, type **robotarm**, tap Join | *"The password is robotarm."* |
 | 3 | The pop-up page appears; tap **Open the remote** | *"A page pops up. Tap Open the remote."* |
 | 4 | The remote loads; tap **Done** at the top right | *"Tap Done, not Cancel, so the iPad stays on this Wi-Fi."* |
-| 5 | Open Safari, type **10.10.10.10**, the remote loads | *"If no page pops up, open Safari and go to ten dot ten dot ten dot ten."* |
+| 5 | Home screen: tap the **Robot arm** app; the remote loads | *"If no page pops up, open the Robot arm app on the home screen."* |
 
 ## 3. `arm-remote.mp4` — Drive the arm with the remote (screen recording plus a camera shot of the arm)
 
@@ -73,11 +73,10 @@ Record the iPad screen and film the arm at the same time; edit them side by side
 | Shot | What to show | Line |
 |---|---|---|
 | 1 | The remote on **Remote** and **Basic** | *"This is your remote. Each control has a yellow number."* |
-| 2 | Hold the D-pad up, then right; cut to the arm moving | *"Hold the D-pad to move the motors. Let go and they stop."* |
+| 2 | Hold the D-pad up, then right; cut to the arm moving | *"Hold the D-pad to move the motors."* |
 | 3 | Push the slider up and down; the arm moves | *"Push the slider further to go faster."* |
 | 4 | Watch the motor tiles at the bottom change | *"The tiles at the bottom show where each motor is."* |
-| 5 | Tap **⌂ Home**; every motor returns | *"Home sends every motor back to where it started."* |
-| 6 | Tap **✎ Change remote**, add a button, tap ⚙ and choose Motor C, tap ✎ to finish | *"Change remote lets you add controls and choose which motor each one moves."* |
+| 5 | Tap **✎ Change remote**, add a button, tap ⚙ and choose Motor C, tap ✎ to finish | *"Change remote lets you add controls and choose which motor each one moves."* |
 
 ## 4. `myo-wiring-io32.mp4` — Connect the sensor cables (camera, close-up)
 

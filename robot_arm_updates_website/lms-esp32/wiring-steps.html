@@ -8,244 +8,135 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;600;700;800&display=swap">
 <style>
-/* Layout: the 3D board fills the frame; a step bar along the bottom (Start, 1 GND, 2 3V3, 3 IO32, Done)
-   with the step's instruction beside it. GTAC colours, light only, sized to sit inside an instruction card. */
+/* Layout: the board (pre-rendered frames from wiring-steps-3d.html) fills the frame; a step bar along the bottom
+   (Start, 1 GND, 2 3V3, 3 IO32, Done) with the step's instruction beside it. GTAC colours, light only. */
 :root {
   --eggshell: #F9F6E7; --onyx: #272A24; --cobalt: #4C34E5; --aqua: #6BE7BE; --flame: #FF6D3A; --yellow: #FFCD1F;
   --muted: #5C6057; --line: #DDD8C2; --card: #FFFFFF;
-  --w-sig: #3E6FD1; --w-vcc: #C93A2E; --w-gnd: #1E1F21;
   --font: "Figtree", system-ui, -apple-system, "Segoe UI", sans-serif;
   color-scheme: light;
 }
 * { box-sizing: border-box; -webkit-tap-highlight-color: transparent }
 html, body { height: 100%; margin: 0 }
 body { background: var(--eggshell); color: var(--onyx); font: 15px/1.45 var(--font); display: flex; flex-direction: column }
-#asm { position: relative; flex: 1; min-height: 260px; overflow: hidden; touch-action: none; cursor: grab }
+#asm { position: relative; flex: 1; min-height: 260px; overflow: hidden; touch-action: pan-y; cursor: grab; user-select: none; -webkit-user-select: none }
 #asm:active { cursor: grabbing }
-#asm canvas { display: block; width: 100%; height: 100% }
-.status { position: absolute; inset: auto 0 0 0; padding: 10px 14px; font-weight: 600; font-size: 13px; color: var(--muted) }
-.tag { position: absolute; left: 0; top: 0; pointer-events: none; font: 800 13px/1 var(--font); padding: 6px 8px; border-radius: 7px;
+#asm:focus-visible { outline: 3px solid var(--flame); outline-offset: -3px }
+.fp-view { position: absolute }
+.fp-view img { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; visibility: hidden }
+.tag { position: absolute; pointer-events: none; font: 800 13px/1 var(--font); padding: 6px 8px; border-radius: 7px;
   background: var(--card); border: 2px solid var(--onyx); color: var(--onyx); white-space: nowrap; transition: opacity .2s }
-.tag i { display: inline-block; width: 10px; height: 10px; border-radius: 50%; margin-right: 6px; vertical-align: -1px }
-.tag.on { background: var(--yellow) }
+.tag i { display: inline-block; width: 10px; height: 10px; border-radius: 50%; margin-right: 6px; vertical-align: -1px; border: 1px solid rgba(0, 0, 0, .35) }
+.tag.on { background: var(--yellow); animation: pulse 1.4s ease-in-out infinite }
 .tag.dim { opacity: .45 }
 .tag.usb { border-color: var(--cobalt); color: var(--cobalt); font-weight: 700 }
+@keyframes pulse { 50% { box-shadow: 0 0 0 5px rgba(255, 205, 31, .45) } }
+.pick { position: absolute; top: 8px; left: 10px; z-index: 2; display: flex; flex-wrap: wrap; align-items: center; gap: 6px;
+  padding: 6px 8px; border-radius: 12px; background: rgba(255, 255, 255, .92); border: 2px solid var(--line); cursor: default }
+.pick span { font-weight: 700; font-size: 13px; margin-right: 2px }
+.pick button { font: 800 13px/1 var(--font); min-height: 36px; padding: 0 10px; border-radius: 999px; border: 2px solid var(--onyx);
+  background: var(--card); color: var(--onyx); cursor: pointer; display: inline-flex; align-items: center; gap: 4px }
+.pick button i { width: 12px; height: 12px; border-radius: 50%; display: inline-block; border: 1px solid rgba(0, 0, 0, .35) }
+.pick button[aria-pressed="true"] { border-color: var(--cobalt); box-shadow: 0 0 0 2px var(--cobalt) }
+.pick button:focus-visible { outline: 3px solid var(--flame); outline-offset: 2px }
 .hint { position: absolute; top: 10px; right: 12px; font-size: 12px; font-weight: 600; color: var(--muted); pointer-events: none }
 .bar { display: grid; grid-template-columns: auto 1fr; gap: 10px 16px; align-items: center; padding: 12px 14px;
   border-top: 2px solid var(--line); background: var(--card) }
 .steps { display: flex; gap: 6px; flex-wrap: wrap }
 .steps button { font: 800 15px/1 var(--font); min-height: 44px; padding: 0 14px; border-radius: 999px; border: 2px solid var(--onyx);
   background: var(--card); color: var(--onyx); cursor: pointer; display: inline-flex; align-items: center; gap: 7px }
-.steps button i { width: 11px; height: 11px; border-radius: 50%; display: inline-block }
+.steps button i { width: 11px; height: 11px; border-radius: 50%; display: inline-block; border: 1px solid rgba(0, 0, 0, .35) }
 .steps button.sel { background: var(--cobalt); border-color: var(--cobalt); color: #fff }
 .steps button:focus-visible { outline: 3px solid var(--flame); outline-offset: 2px }
 .say { font-size: 16px; min-width: 0 }
 .say b { color: var(--cobalt) }
 @media (max-width: 720px) { .bar { grid-template-columns: 1fr } }
-@media (prefers-reduced-motion: reduce) { .tag { transition: none } }
-.fallback { padding: 30px 20px; color: var(--muted) }
+@media (prefers-reduced-motion: reduce) { .tag { transition: none } .tag.on { animation: none } }
 </style>
 </head>
 <body>
-<div id="asm" role="img" aria-label="3D model of the LMS-ESP32 board in its case and the EMG sensor board. Three Dupont plugs on a black, a red and a blue wire go onto the header pins GND, 3V3 and IO32.">
-  <div class="status" id="status">Loading the 3D model…</div>
-  <div class="hint">Drag to turn · pinch to zoom</div>
+<div id="asm" role="img" aria-label="The LMS-ESP32 board in its blue case and the EMG sensor board. The sensor's three plugs, ground, power and signal, go onto the header pins GND, 3V3 and IO32.">
+  <div class="pick" role="group" aria-label="Your cable colours"><span>Your cables:</span></div>
+  <div class="hint">Drag to turn</div>
 </div>
 <div class="bar">
   <div class="steps" role="group" aria-label="Wiring steps">
     <button type="button" data-step="0">Start</button>
-    <button type="button" data-step="1"><i style="background:var(--w-gnd)"></i>1 GND</button>
-    <button type="button" data-step="2"><i style="background:var(--w-vcc)"></i>2 3V3</button>
-    <button type="button" data-step="3"><i style="background:var(--w-sig)"></i>3 IO32</button>
+    <button type="button" data-step="1"><i></i>1 GND</button>
+    <button type="button" data-step="2"><i></i>2 3V3</button>
+    <button type="button" data-step="3"><i></i>3 IO32</button>
     <button type="button" data-step="4">Done</button>
   </div>
   <div class="say" id="say" aria-live="polite"></div>
 </div>
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/STLLoader.js"></script>
-<script src="out/lms-esp32.js"></script>
-<script src="out/emg.js"></script>
-<script src="out/case-base.js"></script>
+<script src="frames/wiring/manifest.js"></script>
+<script src="frames-player.js"></script>
 <script>
-// Models: packaged in out/*.js (works from file:/// too); otherwise fetched from out/
-async function modelBuffer(name) {
-  const packed = window.MODELS && window.MODELS[name];
-  if (packed && 'DecompressionStream' in window) {
-    const bytes = Uint8Array.from(atob(packed), c => c.charCodeAt(0));
-    return new Response(new Blob([bytes]).stream().pipeThrough(new DecompressionStream('gzip'))).arrayBuffer();
-  }
-  const r = await fetch('out/' + name);
-  if (!r.ok) throw new Error(name);
-  return r.arrayBuffer();
-}
-// Same world frame and part positions as viewer.html (mm): X = the LMS-ESP32's board x,
-// Y = up from its underside, Z = its board y. The USB-C socket is at the board's top edge (z = 3.6).
-const TABLE = -1.45;
-const pin = (col, row) => [col === 'inner' ? 34.86 : 37.40, 11.5 + row * 2.54];
-const HEADER_TOP = 1.6 + 2.54, DUP_H = 14, HOVER = 22;
-const EX0 = 96.65, EZ0 = 36, EY0 = TABLE + 1.81;
-const emgToWorld = (x, up, y) => new THREE.Vector3(EX0 - x, EY0 + up, EZ0 - y);
-const PH_FACE = 34.65, PH_AXIS = 4.0, PH_BACK = PH_FACE + 4.6;
-const USB = [24.35, 3.6];
-
+// The sensor's cables come in three colour sets (see wiring-io32.jpg): [colour name, hex] for ground, power and signal,
+// and the order the picture shows them in. Keep in step with SETS in wiring-steps-3d.html.
+const SETS = [
+  { gnd: ['black', '#1E1F21'], vcc: ['red', '#C93A2E'],    sig: ['blue', '#3E6FD1'],  shown: ['gnd', 'vcc', 'sig'] },
+  { gnd: ['black', '#1E1F21'], vcc: ['red', '#C93A2E'],    sig: ['brown', '#7A4A2A'], shown: ['gnd', 'sig', 'vcc'] },
+  { gnd: ['grey', '#8A8F94'],  vcc: ['purple', '#7B3FA6'], sig: ['white', '#E2E2DC'], shown: ['vcc', 'gnd', 'sig'] },
+];
 // The order students plug them in: ground first, then power, then the signal.
 const WIRES = [
-  { name: 'GND',  color: '--w-gnd', mat: 'gnd', to: pin('inner', 0), y: 8.2,
-    say: '<b>Step 1.</b> Push the <b>black</b> (ground) plug onto <b>GND</b>: the inner pin of the pair right next to the USB-C socket.' },
-  { name: '3V3',  color: '--w-vcc', mat: 'vcc', to: pin('outer', 0), y: 10.2,
-    say: '<b>Step 2.</b> Push the <b>red</b> (power) plug onto <b>3V3</b>: the outer pin of that same first pair, beside GND.' },
-  { name: 'IO32', color: '--w-sig', mat: 'sig', to: pin('inner', 4), y: 12.2,
-    say: '<b>Step 3.</b> Push the <b>blue</b> (signal) plug onto <b>IO32</b>: on the inner row, four pins further along from GND.' },
+  { name: 'GND',  key: 'gnd', tf: 'translate(-125%, -50%)',
+    say: c => `<b>Step 1.</b> Push the <b>${c}</b> (ground) plug onto <b>GND</b>: the inner pin of the pair right next to the USB-C socket.` },
+  { name: '3V3',  key: 'vcc', tf: 'translate(25%, -50%)',
+    say: c => `<b>Step 2.</b> Push the <b>${c}</b> (power) plug onto <b>3V3</b>: the outer pin of that same first pair, beside GND.` },
+  { name: 'IO32', key: 'sig', tf: 'translate(-125%, -50%)',
+    say: c => `<b>Step 3.</b> Push the <b>${c}</b> (signal) plug onto <b>IO32</b>: on the inner row, four pins further along from GND.` },
 ];
+const cap = w => w[0].toUpperCase() + w.slice(1);
 const SAY = [
-  'The sensor\'s three plugs go on the pin header beside the <b>USB-C</b> socket. Tap <b>1 GND</b> to start, or drag to look around.',
-  ...WIRES.map(w => w.say),
-  '<b>Done.</b> Black on GND, red on 3V3, blue on IO32. Check each plug is pushed all the way down. Other cable colours? Match yours to the picture on the card.',
+  () => 'Choose <b>your cable colours</b> at the top. The three plugs go on the pin header beside the <b>USB-C</b> socket. Tap <b>1 GND</b> to start, or drag to look around.',
+  ...WIRES.map(w => set => w.say(set[w.key][0])),
+  set => `<b>Done.</b> ${WIRES.map(w => `${cap(set[w.key][0])} on ${w.name}`).join(', ')}. Check each plug is pushed all the way down.`,
 ];
+// Tags, in the order render_frames.py stored their positions: the three pins, then the USB-C socket
+const TAGS = [...WIRES.map(w => ({ html: `<i></i>${w.name}`, tf: w.tf })), { html: 'USB-C end', cls: 'usb', tf: 'translate(-50%, -50%)' }];
+const tagClass = (i, s) => i > 2 ? '' : (s === i + 1 ? 'on' : (s > 0 && s < 4 ? 'dim' : ''));
 
-function boot() {
-  const host = document.getElementById('asm'), status = document.getElementById('status');
-  if (!window.THREE || !THREE.OrbitControls || !THREE.GLTFLoader) { status.textContent = 'The 3D model could not load. Check the internet connection.'; return; }
-  let renderer;
-  try { renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true }); }
-  catch (e) { host.innerHTML = '<p class="fallback">This 3D model needs WebGL, which this browser has turned off. Use the photo on the card.</p>'; return; }
-  renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
-  host.prepend(renderer.domElement);
+let set = 0, step = 0;
+try { set = Math.min(SETS.length - 1, Math.max(0, +localStorage.getItem('gtac-cable-set') || 0)); } catch (e) {}
+const host = document.getElementById('asm');
+const player = FramesPlayer(host, window.FRAMES, `frames/wiring/${set + 1}/`, TAGS, tagClass);
+const buttons = [...document.querySelectorAll('[data-step]')], say = document.getElementById('say');
 
-  const scene = new THREE.Scene();
-  const cam = new THREE.PerspectiveCamera(35, 1, 1, 3000);
-  const controls = new THREE.OrbitControls(cam, renderer.domElement);
-  controls.enableDamping = true; controls.screenSpacePanning = true; controls.minDistance = 40; controls.maxDistance = 400;
-  scene.add(new THREE.HemisphereLight(0xffffff, 0x8a918d, 0.85));
-  const sun = new THREE.DirectionalLight(0xffffff, 0.6); sun.position.set(60, 200, 120); scene.add(sun);
-  const fill = new THREE.DirectionalLight(0xffffff, 0.25); fill.position.set(-120, 80, -60); scene.add(fill);
-
-  const css = n => getComputedStyle(document.documentElement).getPropertyValue(n).trim();
-  const lam = (c, extra) => new THREE.MeshLambertMaterial(Object.assign({ color: c, side: THREE.DoubleSide }, extra || {}));
-  const M = { case: lam(0xe9e6dc), table: lam(0xe6e1cc), dupont: lam(0x141516), crimp: lam(0xc9cbd0), phPlug: lam(0xf1ede2),
-    sig: lam(css('--w-sig')), vcc: lam(css('--w-vcc')), gnd: lam(css('--w-gnd')) };
-  const edgeMat = new THREE.LineBasicMaterial({ color: 0x1d2627, transparent: true, opacity: 0.35 });
-
-  const table = new THREE.Mesh(new THREE.PlaneGeometry(400, 300), M.table);
-  table.rotation.x = -Math.PI / 2; table.position.set(50, TABLE - 0.05, 30); scene.add(table);
-
-  const lms = new THREE.Group(), base = new THREE.Group(), emg = new THREE.Group(), cable = new THREE.Group();
-  [lms, base, emg, cable].forEach(g => scene.add(g));
-  let pending = 3;
-  const done = () => { if (--pending === 0) status.remove(); };
-  const fail = what => () => { status.textContent = `Couldn't load ${what}.`; };
-  function kicad(name, parent) {
-    modelBuffer(name).then(buf => new THREE.GLTFLoader().parse(buf, '', gltf => {
-      gltf.scene.traverse(o => { if (o.isMesh) o.material = lam(o.material.color.clone().convertLinearToSRGB()); });
-      gltf.scene.scale.setScalar(1000); parent.add(gltf.scene); done();
-    }, fail(name))).catch(fail(name));
-  }
-  kicad('lms-esp32.glb', lms);
-  kicad('emg.glb', emg);
-  emg.rotation.y = Math.PI; emg.position.set(EX0, EY0, EZ0);
-  modelBuffer('case-base.stl').then(buf => {
-    const g = new THREE.STLLoader().parse(buf);
-    g.computeVertexNormals();
-    base.add(new THREE.Mesh(g, M.case), new THREE.LineSegments(new THREE.EdgesGeometry(g, 30), edgeMat)); done();
-  }).catch(fail('the case'));
-
-  // The Gravity plug in the sensor's socket (sensor board frame), as in viewer.html
-  const box = (w, h, d, mat) => new THREE.Mesh(new THREE.BoxGeometry(w, h, d), mat);
-  const phLocal = new THREE.Group(); scene.add(phLocal);
-  phLocal.rotation.y = Math.PI; phLocal.position.set(EX0, EY0, EZ0);
-  const ph = box(5.4, 3.6, 7.2, M.phPlug); ph.position.set(PH_FACE + 1.9, PH_AXIS, 10.2); phLocal.add(ph);
-
-  // A glowing ring around each target pin, and one Dupont plug per wire
-  WIRES.forEach(w => {
-    const ring = new THREE.Mesh(new THREE.RingGeometry(1.5, 2.3, 32), new THREE.MeshBasicMaterial({ color: 0xFFCD1F, transparent: true, opacity: 0, side: THREE.DoubleSide, depthWrite: false }));
-    ring.rotation.x = -Math.PI / 2; ring.position.set(w.to[0], HEADER_TOP + 0.05, w.to[1]); scene.add(ring); w.ring = ring;
-    const d = new THREE.Group();
-    const body = box(2.5, DUP_H, 2.5, M.dupont); body.position.y = DUP_H / 2; d.add(body);
-    const band = box(2.6, 2.2, 2.6, M[w.mat]); band.position.y = DUP_H - 1.6; d.add(band);     // wire colour on the plug
-    scene.add(d); w.plug = d; w.lift = 1; w.target = 1;
+// Cable colour picker: one button per set, showing its colours in the picture's order
+const pick = host.querySelector('.pick');
+pick.addEventListener('pointerdown', e => e.stopPropagation());
+pick.addEventListener('keydown', e => e.stopPropagation());
+const picks = SETS.map((c, n) => {
+  const b = document.createElement('button'); b.type = 'button';
+  b.innerHTML = `${n + 1} ` + c.shown.map(k => `<i style="background:${c[k][1]}"></i>`).join('');
+  b.setAttribute('aria-label', `Set ${n + 1}: ${c.shown.map(k => c[k][0]).join(', ')}`);
+  b.addEventListener('click', () => chooseSet(n));
+  pick.appendChild(b); return b;
+});
+function paint() {
+  const c = SETS[set];
+  picks.forEach((b, n) => b.setAttribute('aria-pressed', n === set));
+  WIRES.forEach((w, i) => {
+    buttons[i + 1].querySelector('i').style.background = c[w.key][1];
+    host.querySelectorAll('.tag i')[i].style.background = c[w.key][1];
   });
-
-  function wireTube(w, i) {
-    const top = new THREE.Vector3(w.plug.position.x, w.plug.position.y + DUP_H, w.plug.position.z);
-    const end = emgToWorld(PH_BACK, PH_AXIS, w.y);
-    const mid = (top.z + end.z) / 2;
-    const pts = [top, new THREE.Vector3(top.x, top.y + 6, top.z),
-      new THREE.Vector3(top.x + 9, top.y + 9 - i * 0.6, mid + (top.z - mid) * 0.5),
-      new THREE.Vector3(end.x - 8, end.y + 7, end.z), new THREE.Vector3(end.x - 2.5, end.y, end.z), end];
-    if (w.tube) { cable.remove(w.tube); w.tube.geometry.dispose(); }
-    w.tube = new THREE.Mesh(new THREE.TubeGeometry(new THREE.CatmullRomCurve3(pts, false, 'centripetal'), 60, 0.55, 8), M[w.mat]);
-    cable.add(w.tube);
-  }
-  function place(w, i) {
-    // lifted plugs hover above and outside the header, each a little apart so all three are visible
-    const k = w.lift;
-    w.plug.position.set(w.to[0] + k * (6 + i * 4), HEADER_TOP + k * (HOVER - i * 5), w.to[1] + k * (2 - i * 3));
-    wireTube(w, i);
-  }
-  WIRES.forEach(place);
-
-  // Pin and USB-C tags (HTML, follow the model)
-  const tag = (cls, html) => { const el = document.createElement('div'); el.className = 'tag ' + cls; el.innerHTML = html; host.appendChild(el); return el; };
-  WIRES.forEach(w => { w.tag = tag('', `<i style="background:var(${w.color})"></i>${w.name}`); });
-  const usbTag = tag('usb', 'USB-C end');
-
-  // Steps
-  let step = 0;
-  const buttons = [...document.querySelectorAll('[data-step]')], say = document.getElementById('say');
-  const VIEW = { t: [46, 10, 22], p: [96, 112, 112] };
-  function setStep(s) {
-    step = s;
-    WIRES.forEach((w, i) => { w.target = s === 0 ? 1 : (i < s ? 0 : 1); });
-    buttons.forEach(b => b.classList.toggle('sel', +b.dataset.step === s));
-    say.innerHTML = SAY[s];
-  }
-  buttons.forEach(b => b.addEventListener('click', () => setStep(+b.dataset.step)));
-  setStep(0);
-  controls.target.set(...VIEW.t); cam.position.set(...VIEW.p); controls.update();
-
-  function resize() {
-    const w = host.clientWidth, h = host.clientHeight;
-    if (!w || !h) return;
-    renderer.setSize(w, h, false); cam.aspect = w / h; cam.updateProjectionMatrix();
-  }
-  new ResizeObserver(resize).observe(host); resize();
-
-  const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
-  const v3 = new THREE.Vector3();
-  let last = performance.now();
-  (function loop(now) {
-    const dt = Math.min(0.05, (now - last) / 1000); last = now;
-    WIRES.forEach((w, i) => {
-      if (Math.abs(w.lift - w.target) > 0.001) {
-        w.lift = reduce ? w.target : w.lift + Math.sign(w.target - w.lift) * Math.min(Math.abs(w.target - w.lift), dt * 1.6);
-        place(w, i);
-      }
-      const active = step === i + 1, pulse = 0.55 + 0.45 * Math.sin(now / 220);
-      w.ring.material.opacity = active ? (reduce ? 0.9 : pulse) : (step === 4 ? 0.5 : 0);
-      w.ring.scale.setScalar(active && !reduce ? 1 + 0.25 * pulse : 1);
-    });
-    controls.update(); renderer.render(scene, cam);
-    const W = renderer.domElement.clientWidth, H = renderer.domElement.clientHeight;
-    const put = (el, p, dx) => {
-      v3.set(...p).project(cam);
-      const on = v3.z < 1; el.style.display = on ? '' : 'none';
-      if (on) el.style.transform = `translate(${(v3.x + 1) / 2 * W}px, ${(1 - v3.y) / 2 * H}px) translate(${dx}, -50%)`;
-    };
-    WIRES.forEach((w, i) => {
-      // the tag sits on the pin; it moves up with the plug once the plug is home
-      put(w.tag, [w.to[0], HEADER_TOP + 1 + (1 - w.lift) * (DUP_H + 2), w.to[1]], ['-125%', '25%', '-125%'][i]);
-      w.tag.classList.toggle('on', step === i + 1);
-      w.tag.classList.toggle('dim', step > 0 && step < 4 && step !== i + 1);
-    });
-    put(usbTag, [USB[0], 4, USB[1] - 4], '-50%');
-    requestAnimationFrame(loop);
-  })(performance.now());
+  say.innerHTML = SAY[step](c);
 }
-Promise.race([document.fonts ? document.fonts.load('700 14px Figtree') : null, new Promise(r => setTimeout(r, 1200))])
-  .catch(() => {}).then(boot);
+function chooseSet(n) {
+  set = n;
+  try { localStorage.setItem('gtac-cable-set', n); } catch (e) {}
+  player.setBase(`frames/wiring/${n + 1}/`); paint();
+}
+function setStep(s) {
+  step = s;
+  buttons.forEach(b => b.classList.toggle('sel', +b.dataset.step === s));
+  paint(); player.setStep(s);
+}
+buttons.forEach(b => b.addEventListener('click', () => setStep(+b.dataset.step)));
+setStep(0);
 </script>
 </body>
 </html>

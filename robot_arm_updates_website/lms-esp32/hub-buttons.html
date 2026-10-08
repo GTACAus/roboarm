@@ -8,8 +8,8 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;600;700;800&display=swap">
 <style>
-/* Layout: the SPIKE hub seen from above fills the frame; a step bar along the bottom with the
-   instruction beside it. The button to press glows; the 5 x 5 display shows what students will see. */
+/* Layout: the SPIKE hub (pre-rendered frames from hub-buttons-3d.html) fills the frame; a step bar along the bottom
+   with the instruction beside it. The button to press glows; the 5 x 5 display shows what students will see. */
 :root {
   --eggshell: #F9F6E7; --onyx: #272A24; --cobalt: #4C34E5; --flame: #FF6D3A; --yellow: #FFCD1F;
   --muted: #5C6057; --line: #DDD8C2; --card: #FFFFFF;
@@ -19,12 +19,20 @@
 * { box-sizing: border-box; -webkit-tap-highlight-color: transparent }
 html, body { height: 100%; margin: 0 }
 body { background: var(--eggshell); color: var(--onyx); font: 15px/1.45 var(--font); display: flex; flex-direction: column }
-#asm { position: relative; flex: 1; min-height: 260px; overflow: hidden; touch-action: none; cursor: grab }
+#asm { position: relative; flex: 1; min-height: 260px; overflow: hidden; touch-action: pan-y; cursor: grab; user-select: none; -webkit-user-select: none }
 #asm:active { cursor: grabbing }
-#asm canvas { display: block; width: 100%; height: 100% }
-.status { position: absolute; inset: auto 0 0 0; padding: 10px 14px; font-weight: 600; font-size: 13px; color: var(--muted) }
-.tag { position: absolute; left: 0; top: 0; pointer-events: none; font: 800 14px/1 var(--font); padding: 7px 9px; border-radius: 8px;
+#asm:focus-visible { outline: 3px solid var(--flame); outline-offset: -3px }
+.fp-view { position: absolute }
+.fp-view img { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; visibility: hidden }
+.tag { position: absolute; pointer-events: none; font: 800 14px/1 var(--font); padding: 7px 9px; border-radius: 8px;
   background: var(--yellow); border: 2px solid var(--onyx); color: var(--onyx); white-space: nowrap }
+.tag.press { animation: pulse 1.4s ease-in-out infinite }
+@keyframes pulse { 50% { box-shadow: 0 0 0 5px rgba(255, 109, 58, .4) } }
+.board { position: absolute; left: 10px; top: 10px; z-index: 2; margin: 0; width: min(28%, 180px); padding: 5px 5px 4px;
+  background: var(--card); border: 2px solid var(--onyx); border-radius: 10px; pointer-events: none; text-align: center; font-size: 13px }
+.board img { display: block; width: 100%; border-radius: 6px }
+.board figcaption { margin-top: 3px }
+.board[hidden] { display: none }
 .hint { position: absolute; top: 10px; right: 12px; font-size: 12px; font-weight: 600; color: var(--muted); pointer-events: none }
 .bar { display: grid; grid-template-columns: auto 1fr; gap: 10px 16px; align-items: center; padding: 12px 14px;
   border-top: 2px solid var(--line); background: var(--card) }
@@ -36,13 +44,13 @@ body { background: var(--eggshell); color: var(--onyx); font: 15px/1.45 var(--fo
 .say { font-size: 16px; min-width: 0 }
 .say b { color: var(--cobalt) }
 @media (max-width: 720px) { .bar { grid-template-columns: 1fr } }
-.fallback { padding: 30px 20px; color: var(--muted) }
+@media (prefers-reduced-motion: reduce) { .tag.press { animation: none } }
 </style>
 </head>
 <body>
-<div id="asm" role="img" aria-label="3D model of a SPIKE Prime hub seen from above: the centre button and the left and right buttons below its 5 by 5 light display, with the button to press in each step highlighted.">
-  <div class="status" id="status">Loading the 3D model…</div>
-  <div class="hint">Drag to turn · pinch to zoom</div>
+<div id="asm" role="img" aria-label="A SPIKE Prime hub: the GTAC board goes in port A and the motors in B, C and E; then the centre button and the left and right buttons below its 5 by 5 light display, with the button to press in each step highlighted.">
+  <figure class="board" id="board"><img src="board-photo.jpg" alt="The GTAC board: a blue case with a white gtac lid and a black cable"><figcaption>The <b>GTAC board</b></figcaption></figure>
+  <div class="hint">Drag to turn</div>
 </div>
 <div class="bar">
   <div class="steps" role="group" aria-label="Steps">
@@ -50,186 +58,38 @@ body { background: var(--eggshell); color: var(--onyx); font: 15px/1.45 var(--fo
     <button type="button" data-step="1">2</button>
     <button type="button" data-step="2">3</button>
     <button type="button" data-step="3">4</button>
-    <button type="button" data-step="4">5</button>
-    <button type="button" data-step="5">6</button>
   </div>
   <div class="say" id="say" aria-live="polite"></div>
 </div>
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.js"></script>
-<script src="out/spike-hub.js"></script>
+<script src="frames/hub/manifest.js"></script>
+<script src="frames-player.js"></script>
 <script>
-// Models: packaged in out/*.js (works from file:/// too); otherwise fetched from out/
-async function modelBuffer(name) {
-  const packed = window.MODELS && window.MODELS[name];
-  if (packed && 'DecompressionStream' in window) {
-    const bytes = Uint8Array.from(atob(packed), c => c.charCodeAt(0));
-    return new Response(new Blob([bytes]).stream().pipeThrough(new DecompressionStream('gzip'))).arrayBuffer();
-  }
-  const r = await fetch('out/' + name);
-  if (!r.ok) throw new Error(name);
-  return r.arrayBuffer();
-}
-// Hub frame (from viewer.html): x across, y up, z along; the top is at y 31.66. The 5 x 5 display
-// is centred near z -5, the centre button at z 32 with the left and right buttons either side.
-const TOP = 31.66;
-const BUTTONS = { centre: { x: 0, z: 32, r: 6.2 }, left: { x: -14.5, z: 32, r: 3.6 }, right: { x: 14.5, z: 32, r: 3.6 } };
-// 5 x 5 pictures for the display ('#' = lit)
-const PICS = {
-  off:   ['.....', '.....', '.....', '.....', '.....'],
-  heart: ['.#.#.', '#####', '#####', '.###.', '..#..'],
-  zero:  ['.###.', '#...#', '#...#', '#...#', '.###.'],
-  ask:   ['.###.', '#...#', '..##.', '.....', '..#..'],
-  B:     ['####.', '#...#', '####.', '#...#', '####.'],
-};
-// ?for=arm (robotic arm page) or ?for=myo (myosensor page, the default)
-const FOR = new URLSearchParams(location.search).get('for') === 'arm' ? 'arm' : 'myo';
-const STEPS = [
-  { press: [], ports: true, pic: 'off', view: 'ports',
-    say: 'Plug the <b>board</b> into <b>port A</b> and the <b>motors</b> into ports <b>B to F</b>. Ports click when they are in.' },
-  { press: ['centre'], pic: 'heart', say: '<b>Turn the hub on.</b> Press the big <b>centre</b> button.' },
-  { press: ['left', 'right'], pic: 'zero', say: 'Press <b>left</b> or <b>right</b> until the display shows program <b>0</b>.' },
-  { press: ['centre'], pic: 'zero', say: 'Press the <b>centre</b> button to <b>start</b> program 0.' },
-  { press: [], pic: 'ask', say: FOR === 'myo'
-      ? 'The hub shows <b>?</b> for a few seconds while it finds the board. <b>Keep your arm relaxed</b> and still.'
-      : 'The hub shows <b>?</b> for a few seconds while it finds the board.' },
-  { press: [], pic: 'B', say: FOR === 'myo'
-      ? 'A <b>motor letter</b> means it is ready. Squeeze your muscle to move that motor; press <b>left</b> or <b>right</b> to choose another one.'
-      : 'A <b>motor letter</b> means it is ready. Now connect your iPad to the arm (next step).' },
+const SAY = [
+  'Plug the blue <b>GTAC board</b> into <b>port A</b> and check the <b>motors</b> are plugged into ports <b>B</b>, <b>C</b> and <b>E</b>.',
+  '<b>Turn the hub on.</b> Press the big <b>centre</b> button.',
+  'Press <b>left</b> or <b>right</b> until the display shows program <b>0</b>.',
+  'Press the <b>centre</b> button to <b>start</b> program 0.',
 ];
-// Ports on the hub's long sides: openings 27.2 mm up, at z -16, 0 and 16
-const PORTS = [['A', -1, -16], ['B', 1, -16], ['C', -1, 0], ['D', 1, 0], ['E', -1, 16], ['F', 1, 16]];
+// Tags, in the order render_frames.py stored their positions: the three port tags, then the centre, left and right buttons
+const TAGS = [
+  { html: 'Board → A', tf: 'translate(-50%, -50%)' }, { html: 'Motors → C, E', tf: 'translate(-50%, -50%)' },
+  { html: 'Motor → B', tf: 'translate(-50%, -50%)' },
+  { html: 'Press', cls: 'press', tf: 'translate(-50%, 0)' }, { html: '◀ Left', cls: 'press', tf: 'translate(-50%, 0)' },
+  { html: 'Right ▶', cls: 'press', tf: 'translate(-50%, 0)' },
+];
 
-function boot() {
-  const host = document.getElementById('asm'), status = document.getElementById('status');
-  if (!window.THREE || !THREE.OrbitControls || !THREE.GLTFLoader) { status.textContent = 'The 3D model could not load. Check the internet connection.'; return; }
-  let renderer;
-  try { renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true }); }
-  catch (e) { host.innerHTML = '<p class="fallback">This 3D model needs WebGL, which this browser has turned off. Follow the steps below the model.</p>'; return; }
-  renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
-  host.prepend(renderer.domElement);
-
-  const scene = new THREE.Scene();
-  const cam = new THREE.PerspectiveCamera(35, 1, 1, 2000);
-  const controls = new THREE.OrbitControls(cam, renderer.domElement);
-  controls.enableDamping = true; controls.screenSpacePanning = true; controls.minDistance = 60; controls.maxDistance = 400;
-  scene.add(new THREE.HemisphereLight(0xffffff, 0x8a918d, 0.85));
-  const sun = new THREE.DirectionalLight(0xffffff, 0.6); sun.position.set(60, 200, 120); scene.add(sun);
-  const fill = new THREE.DirectionalLight(0xffffff, 0.25); fill.position.set(-120, 80, -60); scene.add(fill);
-  const lam = (c, extra) => new THREE.MeshLambertMaterial(Object.assign({ color: c, side: THREE.DoubleSide }, extra || {}));
-
-  const table = new THREE.Mesh(new THREE.PlaneGeometry(400, 400), lam(0xe6e1cc));
-  table.rotation.x = -Math.PI / 2; table.position.y = -0.05; scene.add(table);
-
-  const hub = new THREE.Group(); scene.add(hub);
-  const hubFail = () => { status.textContent = 'Couldn\'t load the hub model.'; };
-  modelBuffer('spike-hub.glb').then(buf => new THREE.GLTFLoader().parse(buf, '', gltf => {
-    gltf.scene.traverse(o => {
-      if (!o.isMesh) return;
-      const c = o.material.color.clone().convertLinearToSRGB(), a = o.material.opacity;
-      o.material = a < 1 ? lam(c, { transparent: true, opacity: Math.max(a, 0.45), depthWrite: false }) : lam(c);
-    });
-    gltf.scene.scale.setScalar(1000); hub.add(gltf.scene); status.remove();
-  }, hubFail)).catch(hubFail);
-
-  // The hub's printed top (the LDraw part has none): port letters, button arrows and the display
-  const deck = document.createElement('canvas'); deck.width = 560; deck.height = 880;     // 10 px per mm
-  const deckTex = new THREE.CanvasTexture(deck); deckTex.anisotropy = 4;
-  const plane = new THREE.Mesh(new THREE.PlaneGeometry(56, 88), new THREE.MeshBasicMaterial({ map: deckTex, transparent: true, depthWrite: false }));
-  plane.rotation.x = -Math.PI / 2; plane.position.y = TOP; plane.renderOrder = 2; hub.add(plane);
-  function drawDeck(pic) {
-    const g = deck.getContext('2d'), mm = v => v * 10, X = x => mm(x + 28), Z = z => mm(z + 44);
-    g.clearRect(0, 0, deck.width, deck.height);
-    g.fillStyle = '#5b6064'; g.font = '600 34px "Figtree", Arial, sans-serif'; g.textAlign = 'center'; g.textBaseline = 'middle';
-    [['A', -1, -16], ['C', -1, 0], ['E', -1, 16], ['B', 1, -16], ['D', 1, 0], ['F', 1, 16]].forEach(([l, sx, z]) => g.fillText(l, X(sx * 21.5), Z(z)));
-    const rows = PICS[pic];
-    for (let r = 0; r < 5; r++) for (let q = 0; q < 5; q++) {
-      g.fillStyle = rows[r][q] === '#' ? '#fff3c4' : '#2c3033';
-      g.fillRect(X(-11.5 + q * 4.6 - 1.7), Z(-14.5 + r * 4.6 - 1.7), mm(3.4), mm(3.4));
-    }
-    g.strokeStyle = '#c9ccce'; g.lineWidth = 4; g.strokeRect(X(-12.6), Z(-15.6), mm(25.2), mm(25.2));
-    g.fillStyle = '#5b6064';
-    [[-1, -14.5], [1, 14.5]].forEach(([d, x]) => { g.beginPath(); g.moveTo(X(x + d * 1.6), Z(32)); g.lineTo(X(x - d * 1.4), Z(30.3)); g.lineTo(X(x - d * 1.4), Z(33.7)); g.fill(); });   // arrows point outward, as printed
-    deckTex.needsUpdate = true;
-  }
-
-  // A pulsing ring and a "Press" tag on each button to press
-  const rings = {}, tags = {};
-  Object.entries(BUTTONS).forEach(([k, b]) => {
-    const ring = new THREE.Mesh(new THREE.RingGeometry(b.r, b.r + 1.6, 48), new THREE.MeshBasicMaterial({ color: 0xFF6D3A, transparent: true, opacity: 0, side: THREE.DoubleSide, depthWrite: false }));
-    ring.rotation.x = -Math.PI / 2; ring.position.set(b.x, TOP + 0.6, b.z); ring.renderOrder = 3; hub.add(ring); rings[k] = ring;
-    const el = document.createElement('div'); el.className = 'tag'; el.textContent = k === 'centre' ? 'Press' : (k === 'left' ? '◀ Left' : 'Right ▶');
-    host.appendChild(el); tags[k] = el;
-  });
-
-  // Port glows: orange for the board's port A, blue for the motor ports
-  const portGlow = PORTS.map(([l, side, z]) => {
-    const m = new THREE.Mesh(new THREE.BoxGeometry(1.2, 9, 15), new THREE.MeshBasicMaterial({ color: l === 'A' ? 0xFF6D3A : 0x4C34E5, transparent: true, opacity: 0, depthWrite: false }));
-    m.position.set(side * 28.6, 27.2, z); hub.add(m); return m;
-  });
-  const portTags = [['Board → A', -1, -16], ['Motors → B to F', 1, 0]].map(([t, side, z]) => {
-    const el = document.createElement('div'); el.className = 'tag'; el.textContent = t; host.appendChild(el); return { el, p: [side * 40, 27.2, z] };
-  });
-
-  let step = 0;
-  const buttons = [...document.querySelectorAll('[data-step]')], say = document.getElementById('say');
-  function setStep(s) {
-    step = s;
-    buttons.forEach(b => b.classList.toggle('sel', +b.dataset.step === s));
-    say.innerHTML = '<b>' + (s + 1) + '.</b> ' + STEPS[s].say;
-    drawDeck(STEPS[s].pic);
-    fly(STEPS[s].view === 'ports' ? PORTS_VIEW : TOP_VIEW);
-  }
-  let flight = null;
-  function fly(v) { flight = { from: { t: controls.target.clone(), p: cam.position.clone() }, to: { t: new THREE.Vector3(...v.t), p: new THREE.Vector3(...v.p) }, s: performance.now() }; }
-  const TOP_VIEW = { t: [0, TOP, 8], p: [0, 130, 92] }, PORTS_VIEW = { t: [0, 20, 2], p: [-62, 100, 118] };
-  buttons.forEach(b => b.addEventListener('click', () => setStep(+b.dataset.step)));
-  controls.target.set(...PORTS_VIEW.t); cam.position.set(...PORTS_VIEW.p); controls.update();
-  setStep(0); flight = null;
-
-  function resize() {
-    const w = host.clientWidth, h = host.clientHeight;
-    if (!w || !h) return;
-    renderer.setSize(w, h, false); cam.aspect = w / h; cam.updateProjectionMatrix();
-  }
-  new ResizeObserver(resize).observe(host); resize();
-
-  const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
-  const v3 = new THREE.Vector3();
-  (function loop(now) {
-    const pulse = 0.55 + 0.45 * Math.sin(now / 220);
-    Object.keys(BUTTONS).forEach(k => {
-      const on = STEPS[step].press.includes(k);
-      rings[k].material.opacity = on ? (reduce ? 1 : pulse) : 0;
-      rings[k].scale.setScalar(on && !reduce ? 1 + 0.18 * pulse : 1);
-    });
-    if (flight) {
-      const u = reduce ? 1 : Math.min(1, (now - flight.s) / 650), e = u < .5 ? 2 * u * u : 1 - Math.pow(-2 * u + 2, 2) / 2;
-      controls.target.lerpVectors(flight.from.t, flight.to.t, e); cam.position.lerpVectors(flight.from.p, flight.to.p, e);
-      if (u === 1) flight = null;
-    }
-    const portsOn = !!STEPS[step].ports;
-    portGlow.forEach(m => { m.material.opacity = portsOn ? (reduce ? 0.8 : pulse * 0.85) : 0; });
-    controls.update(); renderer.render(scene, cam);
-    const W = renderer.domElement.clientWidth, H = renderer.domElement.clientHeight;
-    portTags.forEach(t => {
-      v3.set(...t.p).project(cam);
-      t.el.style.display = portsOn && v3.z < 1 ? '' : 'none';
-      t.el.style.transform = `translate(${(v3.x + 1) / 2 * W}px, ${(1 - v3.y) / 2 * H}px) translate(-50%, -50%)`;
-    });
-    Object.entries(BUTTONS).forEach(([k, b]) => {
-      const on = STEPS[step].press.includes(k);
-      v3.set(b.x, TOP + 2, b.z + b.r + 4).project(cam);
-      tags[k].style.display = on && v3.z < 1 ? '' : 'none';
-      tags[k].style.transform = `translate(${(v3.x + 1) / 2 * W}px, ${(1 - v3.y) / 2 * H}px) translate(-50%, 0)`;
-    });
-    requestAnimationFrame(loop);
-  })(performance.now());
+const player = FramesPlayer(document.getElementById('asm'), window.FRAMES, 'frames/hub/', TAGS);
+const buttons = [...document.querySelectorAll('[data-step]')], say = document.getElementById('say');
+const board = document.getElementById('board');
+function setStep(s) {
+  board.hidden = s !== 0;
+  buttons.forEach(b => b.classList.toggle('sel', +b.dataset.step === s));
+  say.innerHTML = '<b>' + (s + 1) + '.</b> ' + SAY[s];
+  player.setStep(s);
 }
-Promise.race([document.fonts ? document.fonts.load('600 34px Figtree') : null, new Promise(r => setTimeout(r, 1200))])
-  .catch(() => {}).then(boot);
+buttons.forEach(b => b.addEventListener('click', () => setStep(+b.dataset.step)));
+setStep(0);
 </script>
 </body>
 </html>
