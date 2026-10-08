@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<title>GTAC Robot Arm</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header class="top">
+  <div class="brand"><img class="logo" src="logo.png" alt="GTAC"><span class="sub">Design thinking for prosthesis</span></div>
+  <nav class="tabs" role="tablist">
+    <button id="tMuscle" role="tab">Muscle sensor</button>
+    <button id="tRemote" role="tab">Remote</button>
+  </nav>
+  <div class="right">
+    <span id="link" class="pill off">Not connected</span>
+    <button id="helpBtn" class="round" aria-label="Help">?</button>
+  </div>
+</header>
+
+<main>
+  <!-- ============ MUSCLE SENSOR ============ -->
+  <section id="muscle" class="view">
+    <div class="card graphcard">
+      <div class="graphhead">
+        <div><div class="label">Muscle signal</div><div class="big" id="pct">0%</div></div>
+        <div class="hint">Last 30 seconds</div>
+      </div>
+      <div class="graphrow">
+        <canvas id="graph"></canvas>
+        <div class="amp">
+          <div class="label">Amplify</div>
+          <input type="range" id="gain" min="1" max="50" step="1" value="10" aria-label="Amplify the muscle signal">
+          <div class="ampval" id="gainVal">×1.0</div>
+        </div>
+      </div>
+    </div>
+    <div class="card choose">
+      <h2>Which motor does your muscle move?</h2>
+      <div class="motorpick" id="musclePick"></div>
+      <p class="explain" id="muscleExplain">Relax: the motor goes to its home position. Squeeze: it turns further the harder you squeeze.</p>
+    </div>
+  </section>
+
+  <!-- ============ REMOTE ============ -->
+  <section id="remote" class="view">
+    <div class="bar">
+      <div class="seg" role="tablist">
+        <button id="sBasic">Basic</button>
+        <button id="sAdvanced">Advanced (code)</button>
+      </div>
+      <div class="actions">
+        <button id="homeBtn" class="act">⌂ Home</button>
+        <button id="editBtn" class="act">✎ Change remote</button>
+        <button id="codeBtn" class="act">&lt;/&gt; Code</button>
+        <button id="runBtn" class="act go">▶ Run</button>
+      </div>
+    </div>
+    <div class="card boardcard">
+      <div id="boardHome"><div id="board"></div></div>
+      <div id="editbar">
+        <button data-add="dpad">+ D-pad</button><button data-add="slider">+ Slider</button>
+        <button data-add="joy">+ Joystick</button><button data-add="button">+ Button</button>
+        <button id="reset" class="warn">Start again</button>
+      </div>
+      <p class="modehint" id="modeHint"></p>
+    </div>
+    <div class="motors" id="motorStrip"></div>
+  </section>
+</main>
+
+<div id="status" class="status"></div>
+
+<!-- ============ CODE CANVAS ============ -->
+<div id="code" class="sheet">
+  <div class="sheethead">
+    <h2>Code canvas</h2>
+    <div class="actions">
+      <button id="runBtn2" class="act go">▶ Run</button>
+      <button id="closeCode" class="act">Done</button>
+    </div>
+  </div>
+  <div class="codebody">
+    <div id="blockly"><div class="loading" id="blocklyLoading">Loading the blocks…</div></div>
+    <aside class="preview">
+      <div class="label">Live remote (numbers match the blocks)</div>
+      <div id="previewBoard"></div>
+      <div class="label">Motors</div>
+      <div class="motors mini" id="motorStrip2"></div>
+    </aside>
+  </div>
+</div>
+
+<!-- ============ SETTINGS FOR ONE CONTROL ============ -->
+<div id="dlg" class="modal"><div class="box" id="dlgbox"></div></div>
+
+<!-- ============ HELP ============ -->
+<div id="help" class="modal">
+  <div class="box">
+    <h2>It's not moving?</h2>
+    <svg class="hubpic" viewBox="0 0 220 120" aria-hidden="true">
+      <rect x="10" y="10" width="200" height="100" rx="16" fill="#F9F6E7" stroke="#272A24" stroke-width="3"/>
+      <circle cx="70" cy="60" r="12" fill="#C0ADFF" stroke="#272A24" stroke-width="3"/>
+      <circle cx="110" cy="60" r="18" fill="#FFCD1F" stroke="#272A24" stroke-width="3"/>
+      <circle cx="150" cy="60" r="12" fill="#C0ADFF" stroke="#272A24" stroke-width="3"/>
+      <text x="70" y="95" text-anchor="middle" font-size="12" fill="#272A24">left</text>
+      <text x="110" y="100" text-anchor="middle" font-size="12" fill="#272A24">centre</text>
+      <text x="150" y="95" text-anchor="middle" font-size="12" fill="#272A24">right</text>
+    </svg>
+    <ol class="steps">
+      <li>Press the <b>centre</b> button to wake the hub.</li>
+      <li>Press <b>left</b> or <b>right</b> until the hub shows program <b>0</b>.</li>
+      <li>Press the <b>centre</b> button again to start it. The hub shows a motor letter or <b>R</b>.</li>
+      <li>Wi-Fi off? Hold <b>left and right together</b> for one second.</li>
+      <li>Still stuck? Check the board's cable is in <b>port A</b> and the motors are in ports <b>B to F</b>.</li>
+    </ol>
+    <button class="done" id="closeHelp">Got it</button>
+  </div>
+</div>
+
+<script src="app.js"></script>
+</body>
+</html>
