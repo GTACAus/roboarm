@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Gtac Status Checker</title>
+    <style>
+        #action-btn {
+            display: none;
+            margin-top: 20px;
+            padding: 10px 20px;
+            font-size: 16px;
+        }
+    </style>
+</head>
+<body>
+
+    <p id="status">Checking connection to gtac.local...</p>
+    <button id="action-btn">Proceed</button>
+
+    <script>
+        async function checkGtac() {
+            const statusEl = document.getElementById('status');
+            const btnEl = document.getElementById('action-btn');
+
+            try {
+                // Standard fetch without 'no-cors' so we can read the true status code
+                const response = await fetch('http://gtac.local', { 
+                    method: 'GET'
+                });
+
+                // response.ok is true only if status is in the range 200-299
+                if (response.ok) {
+                    statusEl.textContent = 'gtac.local is reachable and responding successfully (200 OK)!';
+                    btnEl.style.display = 'block';
+                } else {
+                    statusEl.textContent = `gtac.local reached, but returned status: ${response.status} ${response.statusText}`;
+                    btnEl.style.display = 'none';
+                }
+            } catch (error) {
+                // This catches network failures, DNS errors, or CORS blocks
+                statusEl.textContent = 'Unable to reach gtac.local (Network error or CORS restriction).';
+                btnEl.style.display = 'none';
+            }
+        }
+
+        checkGtac();
+    </script>
+
+</body>
+</html>
