@@ -1,0 +1,27 @@
+# Throughput tuning, shared by both boards. The MicroPython defaults are sized
+# for low RAM, not speed; these lift bulk transfer (e.g. video) while keeping a
+# safe RAM margin on this chip (no PSRAM). Latency for arm control is
+# unaffected: the arm page freezes the uplink while it is open.
+
+# Bigger aggregation (BA) windows: the default BA_WIN of 6 throttles 802.11n
+# aggregation hard. These (16) are cheap in RAM and give most of the gain.
+CONFIG_ESP_WIFI_AMPDU_TX_ENABLED=y
+CONFIG_ESP_WIFI_AMPDU_RX_ENABLED=y
+CONFIG_ESP_WIFI_TX_BA_WIN=16
+CONFIG_ESP_WIFI_RX_BA_WIN=16
+
+# A moderate lift in Wi-Fi buffers. NOT the aggressive 64/64 + 64 KB windows
+# tried first: on this chip with no PSRAM those drove free RAM down to ~11 KB
+# under load, so Wi-Fi and the web server began failing to allocate (stalled
+# video, the page dropping out). These keep headroom while staying well above
+# the MicroPython defaults.
+CONFIG_ESP_WIFI_STATIC_RX_BUFFER_NUM=10
+CONFIG_ESP_WIFI_DYNAMIC_RX_BUFFER_NUM=32
+CONFIG_ESP_WIFI_DYNAMIC_TX_BUFFER_NUM=32
+
+# TCP window ~ the link's bandwidth-delay product (default 5760 bytes is ~4
+# packets and caps a single stream hard). 32 KB covers a ~10-13 Mbps link at
+# classroom RTTs without the per-socket memory of a 64 KB window.
+CONFIG_LWIP_TCP_WND_DEFAULT=32768
+CONFIG_LWIP_TCP_SND_BUF_DEFAULT=32768
+CONFIG_LWIP_TCP_RECVMBOX_SIZE=12

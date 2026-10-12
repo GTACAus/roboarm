@@ -1,0 +1,32 @@
+# Speed: full CPU clock (MicroPython's default is 160 MHz) and 80 MHz flash,
+# since Python and its VM run from flash through the cache.
+#
+# Flash stays in dual (DIO) mode, NOT quad (QIO). LMS-ESP32 v2 boards use the
+# ESP32-PICO-V3-02, whose in-package flash has GPIO18 as one of its quad data
+# lines; GPIO18 is also the LEGO port's RX, so in QIO mode lump.py setting it
+# up cuts the chip off from its own flash (interrupt-watchdog reset loop).
+CONFIG_ESP_DEFAULT_CPU_FREQ_MHZ_240=y
+CONFIG_ESPTOOLPY_FLASHMODE_DIO=y
+CONFIG_ESPTOOLPY_FLASHFREQ_80M=y
+CONFIG_FREERTOS_HZ=1000
+
+# No Bluetooth (see mpconfigboard.h)
+CONFIG_BT_ENABLED=n
+
+# Routing between the hotspot and the uplink
+CONFIG_LWIP_IP_FORWARD=y
+CONFIG_LWIP_IPV4_NAPT=y
+CONFIG_LWIP_IPV4_NAPT_PORTMAP=n
+
+# Keep the packet forwarding path in IRAM (sdkconfig.base turns the Wi-Fi
+# ones off to make room; dropping Bluetooth and PSRAM gives that room back).
+CONFIG_LWIP_IRAM_OPTIMIZATION=y
+CONFIG_ESP_WIFI_IRAM_OPT=y
+CONFIG_ESP_WIFI_RX_IRAM_OPT=y
+
+# Stack input queue as deep as the Wi-Fi RX buffers, so bursts aren't dropped
+CONFIG_LWIP_TCPIP_RECVMBOX_SIZE=32
+CONFIG_ESP_WIFI_DYNAMIC_RX_BUFFER_NUM=32
+
+# IPv4 only: nothing here routes or serves IPv6
+CONFIG_LWIP_IPV6=n

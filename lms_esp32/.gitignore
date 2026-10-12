@@ -1,0 +1,8 @@
+firmware/build/
+firmware-build*.log
+app/www_data.py
+__pycache__/
+.DS_Store
+tools/site.json
+tools/boards.csv
+tools/authorization-request.txt
