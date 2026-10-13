@@ -55,6 +55,95 @@
       text-decoration:none; display:inline-block;
     }
     .nav-buttons button:hover, .nav-buttons a.btn:hover{ background:#0056b3; }
+
+  /* Cable selector */
+
+  .cable-options {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    margin: 25px auto;
+    width: 95%;
+  }
+
+  .cable-option {
+    flex: 1;
+    max-width: 230px;
+    background: white;
+    border: 2px solid #ddd;
+    border-radius: 12px;
+    padding: 12px;
+    cursor: pointer;
+    font-family: inherit;
+    transition: border-color 0.2s, background 0.2s;
+  }
+
+  #c4m .cable-option img {
+    width: 100%;
+    height: 100px;
+    object-fit: contain;
+    margin: 0;
+  }
+
+  .cable-option span {
+    display: block;
+    margin-top: 10px;
+    font-size: 14px;
+    font-weight: 600;
+  }
+
+  .cable-option:hover {
+    border-color: #007bff;
+  }
+
+  .cable-option.selected {
+    border: 3px solid #007bff;
+    background: #eef6ff;
+  }
+
+  /* Wiring diagram */
+
+  .cable-instructions {
+    width: 95%;
+    margin: 20px auto;
+    text-align: center;
+  }
+
+  .cable-instructions h3 {
+    margin-bottom: 15px;
+  }
+
+  #c4m #wiringDiagram {
+    display: block;
+    width: 100%;
+    max-width: 750px;
+    max-height: 440px;
+    height: auto;
+    object-fit: contain;
+    margin: 0 auto;
+    border-radius: 10px;
+  }
+
+  /* Smaller screens */
+
+  @media (max-width: 600px) {
+    .cable-options {
+      gap: 6px;
+    }
+
+    .cable-option {
+      padding: 6px;
+    }
+
+    #c4m .cable-option img {
+      height: 65px;
+    }
+
+    .cable-option span {
+      font-size: 11px;
+    }
+  }
+
   </style>
 </head>
 <body>
@@ -120,7 +209,7 @@
   </section>
 
   <!-- 04/08 Wiring in 3D -->
-  <section class="card" id="c4m">
+  <!-- <section class="card" id="c4m">
     <h1>04/08</h1>
     <h2>See the wiring in 3D</h2>
 
@@ -133,6 +222,67 @@
       <button onclick="prevPage()">◀ Prev</button>
       <button onclick="nextPage()">Next ▶</button>
     </div>
+  </section> -->
+
+  <section class="card" id="c4m">
+
+    <h1>04/08</h1>
+    <h2>Connect your sensor cables</h2>
+
+    <p>
+      Look at your cables. Which colours do you have?
+      Select your cable set below.
+    </p>
+
+    <!-- Cable selection buttons -->
+    <div class="cable-options">
+
+      <button class="cable-option selected"
+              onclick="selectCableSet(0)"
+              aria-pressed="true">
+        <img src="wiring/cable-set-1.png" alt="">
+        <span>Black, Red, Blue</span>
+      </button>
+
+      <button class="cable-option"
+              onclick="selectCableSet(1)"
+              aria-pressed="false">
+        <img src="wiring/cable-set-2.png" alt="">
+        <span>Black, Brown, Red</span>
+      </button>
+
+      <button class="cable-option"
+              onclick="selectCableSet(2)"
+              aria-pressed="false">
+        <img src="wiring/cable-set-3.png" alt="">
+        <span>Purple, Grey, White</span>
+      </button>
+
+    </div>
+
+    <!-- Wiring instructions -->
+    <div class="cable-instructions">
+
+      <h3>Connect your cables like this:</h3>
+
+      <img
+        id="wiringDiagram"
+        src="wiring/wiring-set-1.png"
+        alt="Wiring instructions for black, red and blue cables"
+      >
+
+    </div>
+
+    <p>
+      Match each cable to the correct pin:
+      <strong>GND, 3V3 and IO32.</strong>
+    </p>
+
+    <div class="nav-buttons">
+      <button onclick="prevPage()">◀ Prev</button>
+      <button onclick="nextPage()">Next ▶</button>
+    </div>
+
   </section>
 
   <!-- 05/08 Connect the sensor cables (video) -->
@@ -240,6 +390,36 @@
         } else v.style.display = 'none';
       });
     });
+  // Cable wiring selector
+  const wiringImages = [
+    "wiring/wiring-set-1.png",
+    "wiring/wiring-set-2.png",
+    "wiring/wiring-set-3.png"
+  ];
+
+  const wiringDescriptions = [
+    "Wiring instructions for black, red and blue cables",
+    "Wiring instructions for black, brown and red cables",
+    "Wiring instructions for purple, grey and white cables"
+  ];
+
+  function selectCableSet(index) {
+
+    // Change the wiring diagram
+    const diagram = document.getElementById("wiringDiagram");
+    diagram.src = wiringImages[index];
+    diagram.alt = wiringDescriptions[index];
+
+    // Highlight the selected button
+    const buttons = document.querySelectorAll(".cable-option");
+
+    buttons.forEach((button, i) => {
+      const isSelected = i === index;
+
+      button.classList.toggle("selected", isSelected);
+      button.setAttribute("aria-pressed", String(isSelected));
+    });
+  }
   </script>
 </body>
 </html>
