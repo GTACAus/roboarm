@@ -187,6 +187,31 @@
   color: #333;
 }
 
+/* Video slide show */
+
+#videoViewer {
+  width: 100%;
+  text-align: center;
+}
+
+#videoSlide {
+  display: block;
+  max-width: 100%;
+  max-height: 450px;
+  width: auto;
+  height: auto;
+  object-fit: contain;
+  margin: 0 auto;
+}
+
+#videoInstruction {
+  text-align: center;
+  font-size: 17px;
+  line-height: 1.5;
+  margin: 16px auto 12px;
+  max-width: 550px;
+  min-height: 52px;
+}
 
     </style>
   </head>
@@ -266,7 +291,7 @@
   </section>
 
     <!-- 03/05 Start the arm program -->
-    <section class="card" id="c4">
+    <!-- <section class="card" id="c4">
       <h1>03/05</h1>
       <h2>Start the arm program on the hub</h2>
 
@@ -275,6 +300,51 @@
 
       <p>Tap the numbers under the hub to go through each step. Drag the hub to turn it.</p>
 
+      <div class="nav-buttons">
+        <button onclick="prevPage()">◀ Prev</button>
+        <button onclick="nextPage()">Next ▶</button>
+      </div>
+    </section> -->
+
+    <section class="card" id="c3">
+
+      <h1>03/05</h1>
+      <h2>Start the arm program on the hub</h2>
+      <br>
+
+      <p>
+        Follow these instructions to learn how to
+        start the right program on the hub.
+      </p>
+
+      <!-- Video Viewer -->
+      <div id="videoViewer">
+
+        <video
+          id="videoSlide"
+          autoplay
+          muted
+          loop
+          playsinline
+        >
+          <source
+            src="arm-video-01.mp4"
+            type="video/mp4"
+          >
+        </video>
+
+        <!-- Instructions that change with each video -->
+        <p id="videoInstruction">
+          Step 1: Turn on the LEGO hub.
+        </p>
+
+        <div class="img-controls">
+          <button onclick="prevVideo()">◀</button>
+          <span id="videoCounter">1 / 3</span>
+          <button onclick="nextVideo()">▶</button>
+        </div>
+
+      </div>
       <div class="nav-buttons">
         <button onclick="prevPage()">◀ Prev</button>
         <button onclick="nextPage()">Next ▶</button>
@@ -331,16 +401,84 @@
   let current = 0;
   const cards = Array.from(document.querySelectorAll(".card"));
   function show(i) {
+
+    // Pause videos when changing pages
+    document.querySelectorAll("video").forEach((v) => v.pause());
+
+    // Hide current page
     cards[current].classList.remove("active");
+
+    // Show new page
     current = i;
     cards[current].classList.add("active");
-    document.querySelectorAll("video").forEach((v) => v.pause());
+
+    // Automatically play video when entering page 3
+    if (cards[current].id === "c3") {
+      const video = document.getElementById("videoSlide");
+
+      if (video) {
+        video.currentTime = 0;
+        video.play().catch(err => {
+          console.log("Video autoplay failed:", err);
+        });
+      }
+    }
   }
   function nextPage() {
     if (current < cards.length - 1) show(current + 1);
   }
   function prevPage() {
     if (current > 0) show(current - 1);
+  }
+
+  // Video slideshow with instructions
+  const videoSlides = [
+    {
+      video: "arm-video-01.mp4",
+      instruction: "<b>Step 1</b>: Hold the center button to turn on the LEGO hub."
+    },
+    {
+      video: "arm-video-02.mp4",
+      instruction: "<b>Step 2</b>: Use the arrow buttons to go to <b>program 0</b>."
+    },
+    {
+      video: "arm-video-03.mp4",
+      instruction: "<b>Step 3</b>: On <b>program 0</b>, press the centre button to start the program."
+    }
+  ];
+
+  let currentVideo = 0;
+
+  function showVideo() {
+    const video = document.getElementById("videoSlide");
+    const instruction = document.getElementById("videoInstruction");
+    const counter = document.getElementById("videoCounter");
+
+    // Get the current slide
+    const slide = videoSlides[currentVideo];
+
+    // Update video
+    video.src = slide.video;
+    video.load();
+    video.play().catch(() => {});
+
+    // Update instructions
+    instruction.innerHTML = slide.instruction;
+
+    // Update counter
+    counter.textContent =
+      `${currentVideo + 1} / ${videoSlides.length}`;
+  }
+
+  function nextVideo() {
+    currentVideo = (currentVideo + 1) % videoSlides.length;
+    showVideo();
+  }
+
+  function prevVideo() {
+    currentVideo =
+      (currentVideo - 1 + videoSlides.length) % videoSlides.length;
+    showVideo();
   }
 
   // ---- iPad Handling ----
