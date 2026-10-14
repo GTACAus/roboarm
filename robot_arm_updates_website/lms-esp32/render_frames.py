@@ -4,6 +4,7 @@ a live 3D model.
 
     python render_frames.py            -> frames/wiring/<1-3>/*.webp + manifest.js (from wiring-steps-3d.html, one folder per cable colour set)
                                           frames/hub/*.webp + manifest.js         (from hub-buttons-3d.html)
+                                          frames/arm/*.webp + manifest.js         (from arm-cables-3d.html; needs out/arm.glb from arm_model.py)
     python render_frames.py hub        -> just one of them
 
 Each 3D page, opened with ?render, draws every step from 19 angles (the wiring page also at 6 heights) and the moves between steps, and posts
@@ -20,7 +21,7 @@ import threading
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 PORT = 8766
-PAGES = {"wiring": "wiring-steps-3d.html", "hub": "hub-buttons-3d.html"}
+PAGES = {"wiring": "wiring-steps-3d.html", "hub": "hub-buttons-3d.html", "arm": "arm-cables-3d.html"}
 BROWSERS = [
     r"C:\Program Files\Google\Chrome\Application\chrome.exe",
     r"C:\Program Files (x86)\Microsoft\Edge\Application\msedge.exe",

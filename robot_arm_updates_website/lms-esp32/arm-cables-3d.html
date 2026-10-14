@@ -1,0 +1,233 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Arm Cables 3D</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;600;700;800&display=swap">
+<style>
+/* The robotic arm (out/arm.glb, from the Studio model by arm_model.py) with its motor cables and the GTAC board.
+   Live 3D for checking; render_frames.py opens it with ?render to make the frames arm-cables.html shows. */
+:root { --eggshell: #F9F6E7; --onyx: #272A24; --cobalt: #4C34E5; --muted: #5C6057; --line: #DDD8C2; --card: #FFFFFF;
+  --font: "Figtree", system-ui, -apple-system, "Segoe UI", sans-serif; color-scheme: light }
+* { box-sizing: border-box }
+html, body { height: 100%; margin: 0 }
+body { background: var(--eggshell); color: var(--onyx); font: 15px/1.45 var(--font); display: flex; flex-direction: column }
+#asm { position: relative; flex: 1; min-height: 260px; overflow: hidden; touch-action: none }
+#asm canvas { display: block; width: 100%; height: 100% }
+.status { position: absolute; inset: auto 0 0 0; padding: 10px 14px; font-weight: 600; font-size: 13px; color: var(--muted) }
+.tag { position: absolute; left: 0; top: 0; pointer-events: none; font: 800 14px/1 var(--font); width: 26px; height: 26px; border-radius: 50%;
+  display: grid; place-items: center; background: #F9A88E; color: var(--onyx); border: 2px solid #fff; box-shadow: 0 0 0 1.5px var(--onyx) }
+.bar { display: flex; gap: 12px; align-items: center; padding: 12px 14px; border-top: 2px solid var(--line); background: var(--card) }
+.bar button { font: 800 15px/1 var(--font); min-height: 40px; min-width: 40px; border-radius: 999px; border: 2px solid var(--onyx); background: var(--card) }
+.bar button.sel { background: var(--cobalt); border-color: var(--cobalt); color: #fff }
+</style>
+</head>
+<body>
+<div id="asm"><div class="status" id="status">Loading the 3D model…</div></div>
+<div class="bar"><button data-step="0">1</button><button data-step="1">2</button><button data-step="2">3</button><span id="say"></span></div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/STLLoader.js"></script>
+<script>
+// ?render: draw the frames the step player (arm-cables.html) shows; run by render_frames.py
+const RENDER = new URLSearchParams(location.search).has('render');
+const SAY = [
+  'The <b>LEGO hub</b> has 6 ports, from <b>A</b> to <b>F</b>.',
+  'Connect the <b>gripper motor</b> to <b>port C</b>, the <b>elbow motor</b> to <b>port E</b> and the <b>large motor</b> to <b>port B</b>.',
+  'Connect the <b>GTAC board</b> to <b>port A</b>.',
+];
+// Tags, in the order the frames store their positions: the six ports, then the three motors and the board's cable end
+const PORT_NAMES = ['A', 'B', 'C', 'D', 'E', 'F'];
+const TAG_NAMES = [...PORT_NAMES, 'C', 'E', 'B', 'A'];
+// Which tags each step shows (indexes into TAG_NAMES)
+const SHOW = [[0, 1, 2, 3, 4, 5], [1, 2, 4, 6, 7, 8], [0, 9]];
+// Cables: [role of the motor, port]; the board's cable is drawn in step 3
+const CABLES = [['gripper', 'C'], ['elbow', 'E'], ['large', 'B']];
+
+fetch('out/arm.json').then(r => r.json()).then(boot);
+
+function boot(PLACE) {
+  const host = document.getElementById('asm'), status = document.getElementById('status');
+  const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true, preserveDrawingBuffer: RENDER });
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+  host.prepend(renderer.domElement);
+  const scene = new THREE.Scene();
+  const cam = new THREE.PerspectiveCamera(35, 1, 1, 6000);
+  const controls = new THREE.OrbitControls(cam, renderer.domElement);
+  scene.add(new THREE.HemisphereLight(0xffffff, 0x8a918d, 0.85));
+  const sun = new THREE.DirectionalLight(0xffffff, 0.6); sun.position.set(80, 300, 220); scene.add(sun);
+  const fill = new THREE.DirectionalLight(0xffffff, 0.25); fill.position.set(-200, 120, -100); scene.add(fill);
+  const lam = (c, extra) => new THREE.MeshLambertMaterial(Object.assign({ color: c, side: THREE.DoubleSide }, extra || {}));
+  const V = (...a) => new THREE.Vector3(...a);
+
+  // The hub's placement (arm.json) turns points from the hub's own frame (as in hub-buttons-3d.html) into the arm's
+  const hubM = new THREE.Matrix4();
+  { const r = PLACE.hub.r, t = PLACE.hub.t; hubM.set(r[0][0], r[0][1], r[0][2], t[0], r[1][0], r[1][1], r[1][2], t[1], r[2][0], r[2][1], r[2][2], t[2], 0, 0, 0, 1); }
+  const hubPt = (x, y, z) => V(x, y, z).applyMatrix4(hubM);
+  const hubDir = (x, y, z) => V(x, y, z).transformDirection(hubM);
+  // Ports on the hub's long sides: openings 27.2 mm up, at z -16, 0 and 16 (A, C, E on the -x side)
+  const PORTS = { A: [-1, -16], B: [1, -16], C: [-1, 0], D: [1, 0], E: [-1, 16], F: [1, 16] };
+  const portAt = (l, out = 0) => hubPt(PORTS[l][0] * (28.6 + out), 27.2, PORTS[l][1]);
+  const portOut = l => hubDir(PORTS[l][0], 0, 0);
+
+  const arm = new THREE.Group(), roles = {};
+  scene.add(arm);
+  let table, plate = new THREE.Box3();
+  let pending = 4;
+  const done = () => { if (--pending === 0) { status.remove(); build(); } };
+
+  new THREE.GLTFLoader().load('out/arm.glb', gltf => {
+    gltf.scene.traverse(o => {
+      if (!o.isMesh) return;
+      const role = (o.material.name || 'arm').split(':')[0];
+      o.material = lam(o.material.color.clone().convertLinearToSRGB());
+      (roles[role] = roles[role] || []).push(o);
+    });
+    gltf.scene.scale.setScalar(1000); arm.add(gltf.scene); arm.updateMatrixWorld(true); done();
+  }, undefined, () => { status.textContent = 'Couldn\'t load out/arm.glb (run arm_model.py).'; });
+
+  // The GTAC board: the case (blue base, white lid) with the board inside, as in the wiring model
+  const board = new THREE.Group(), stlLoad = (f, mat) => new THREE.STLLoader().load(f, g => { g.computeVertexNormals(); board.add(new THREE.Mesh(g, mat)); done(); });
+  stlLoad('out/case-base.stl', lam(0x2448c8));
+  stlLoad('out/case-lid.stl', lam(0xeef1f6));
+  new THREE.GLTFLoader().load('out/lms-esp32.glb', gltf => {
+    gltf.scene.traverse(o => { if (o.isMesh) o.material = lam(o.material.color.clone().convertLinearToSRGB()); });
+    gltf.scene.scale.setScalar(1000); board.add(gltf.scene); done();
+  });
+
+  const roleBox = r => { const b = new THREE.Box3(); (roles[r] || []).forEach(m => b.expandByObject(m)); return b; };
+  const cableMat = lam(0xd4d1c7), blackMat = lam(0x1d1f22);
+  function cable(pts, mat, r = 1.6) {
+    const m = new THREE.Mesh(new THREE.TubeGeometry(new THREE.CatmullRomCurve3(pts, false, 'centripetal'), 80, r, 10), mat);
+    scene.add(m); return m;
+  }
+  const plug = (at, dir, mat) => {     // the LPF2 plug at a port: a short block along the port's outward direction
+    const m = new THREE.Mesh(new THREE.BoxGeometry(13.7, 7.5, 13.9), mat);
+    m.position.copy(at).addScaledVector(dir, 13.7 / 2); m.quaternion.setFromUnitVectors(V(1, 0, 0), dir); scene.add(m); return m;
+  };
+
+  let tagPts = [], groups = [];
+  function build() {
+    const all = roleBox('arm');
+    const PLATE_TOP = all.min.y + 8;
+    table = new THREE.Mesh(new THREE.PlaneGeometry(RENDER ? 6000 : 800, RENDER ? 6000 : 800), lam(0xe6e1cc));
+    table.rotation.x = -Math.PI / 2; table.position.set(all.getCenter(V()).x, all.min.y - 0.05, all.getCenter(V()).z); scene.add(table);
+
+    // Motor cables: from the motor's side nearest its port, out and down, into the port
+    const motorCables = CABLES.map(([role, l]) => {
+      const b = roleBox(role), port = portAt(l), out = portOut(l);
+      const start = b.clampPoint(port, V()), c = b.getCenter(V());
+      const away = start.clone().sub(c).setY(0).normalize();
+      const end = port.clone().addScaledVector(out, 13.7);
+      const pts = [start, start.clone().addScaledVector(away, 14).add(V(0, -6, 0)),
+        start.clone().lerp(end, 0.5).addScaledVector(out, 30).add(V(0, -18, 0)), end.clone().addScaledVector(out, 16), end];
+      const g = new THREE.Group(); g.add(cable(pts, cableMat), plug(port, out, cableMat)); scene.add(g);
+      return { role, l, start, g };
+    });
+
+    // The board: on the plate, in front of the hub on port A's side; its cable from the HUB header to port A
+    const bb = new THREE.Box3().setFromObject(board), hb = roleBox('hub');
+    const pA = portAt('A'), outA = portOut('A');
+    board.position.set((all.min.x + hb.min.x) / 2 + 6 - (bb.min.x + bb.max.x) / 2, PLATE_TOP - bb.min.y,
+      all.max.z - 6 - bb.max.z);
+    scene.add(board); board.updateMatrixWorld(true);
+    const hdr = V(4.97, 3.6 + 14, 40.24).applyMatrix4(board.matrixWorld);
+    const endA = pA.clone().addScaledVector(outA, 13.7);
+    const boardCable = new THREE.Group();
+    boardCable.add(cable([hdr, hdr.clone().add(V(0, 12, 0)), hdr.clone().lerp(endA, 0.5).add(V(0, 26, 0)).addScaledVector(outA, 18),
+      endA.clone().addScaledVector(outA, 14), endA], blackMat), plug(pA, outA, blackMat));
+    scene.add(boardCable);
+    groups = [motorCables.map(m => m.g), [board, boardCable]];
+
+    // motor badges: each motor's middle; the gripper and elbow motors sit side by side, so their badges move apart
+    const mid = r => roleBox(r).getCenter(V()), apart = mid('elbow').sub(mid('gripper')).normalize().multiplyScalar(12);
+    const motorTag = { gripper: mid('gripper').sub(apart), elbow: mid('elbow').add(apart), large: mid('large') };
+    tagPts = [...PORT_NAMES.map(l => portAt(l, 9)), ...motorCables.map(m => motorTag[m.role]), hdr.clone().add(V(0, 8, 0))];
+    setStep(0); place(VIEWS[0]);
+    if (RENDER) renderAll(); else loop();
+  }
+
+  // Each step's view: target and camera position (mm)
+  const hubC = () => hubPt(0, 16, 0);
+  const VIEWS = [
+    () => ({ t: hubC().add(V(0, 8, 0)), p: hubC().add(V(70, 80, 240)) }),
+    () => ({ t: hubC().add(V(0, 55, -10)), p: hubC().add(V(-230, 170, 290)) }),
+    () => ({ t: hubC().add(V(-25, -10, 20)), p: hubC().add(V(-170, 130, 250)) }),
+  ];
+  let step = 0;
+  const buttons = [...document.querySelectorAll('[data-step]')], say = document.getElementById('say');
+  function setStep(s) {
+    step = s;
+    groups[0].forEach(g => { g.visible = s >= 1; });
+    groups[1].forEach(g => { g.visible = s >= 2; });
+    buttons.forEach(b => b.classList.toggle('sel', +b.dataset.step === s));
+    say.innerHTML = SAY[s];
+  }
+  function place(v) { const q = v(); controls.target.copy(q.t); cam.position.copy(q.p); cam.lookAt(q.t); controls.update(); }
+  buttons.forEach(b => b.addEventListener('click', () => { setStep(+b.dataset.step); place(VIEWS[step]); }));
+
+  const tags = TAG_NAMES.map(n => { const el = document.createElement('div'); el.className = 'tag'; el.textContent = n; host.appendChild(el); return el; });
+  function resize() {
+    const w = host.clientWidth, h = host.clientHeight;
+    if (!w || !h) return;
+    renderer.setSize(w, h, false); cam.aspect = w / h; cam.updateProjectionMatrix();
+  }
+  const v3 = new THREE.Vector3();
+  function loop() {
+    new ResizeObserver(resize).observe(host); resize();
+    (function f() {
+      controls.update(); renderer.render(scene, cam);
+      const W = renderer.domElement.clientWidth, H = renderer.domElement.clientHeight;
+      tags.forEach((el, i) => {
+        v3.copy(tagPts[i]).project(cam);
+        el.style.display = SHOW[step].includes(i) && v3.z < 1 ? '' : 'none';
+        el.style.transform = `translate(${(v3.x + 1) / 2 * W}px, ${(1 - v3.y) / 2 * H}px) translate(-50%, -50%)`;
+      });
+      requestAnimationFrame(f);
+    })();
+  }
+
+  // Every step from N angles across +-45 degrees, then the camera's moves between steps, posted to render_frames.py
+  async function renderAll() {
+    const W = 1000, H = 640, N = 19, C = (N - 1) / 2, ARC = Math.PI / 4, T = 12, Y = V(0, 1, 0);
+    renderer.setPixelRatio(1); renderer.setSize(W, H, false); cam.aspect = W / H; cam.updateProjectionMatrix();
+    const r4 = x => Math.round(x * 1e4) / 1e4;
+    const proj = p => { v3.copy(p).project(cam); return v3.z < 1 ? [r4((v3.x + 1) / 2), r4((1 - v3.y) / 2)] : 0; };
+    const tagsNow = s => tagPts.map((p, i) => s >= 0 && SHOW[s].includes(i) ? proj(p) : 0);
+    const aim = (q, a) => { cam.position.copy(q.t).add(q.p.clone().sub(q.t).applyAxisAngle(Y, a)); cam.lookAt(q.t); };
+    const snap = async (path, s) => {
+      renderer.render(scene, cam); const t = tagsNow(s);
+      const blob = await new Promise(r => renderer.domElement.toBlob(r, 'image/webp', 0.8));
+      await fetch('/save/' + path, { method: 'POST', body: blob }); return t;
+    };
+    const ease = u => u < .5 ? 2 * u * u : 1 - Math.pow(-2 * u + 2, 2) / 2;
+    const out = { w: W, h: H, n: N, center: C, steps: [], trans: {} };
+    for (let s = 0; s < SAY.length; s++) {
+      setStep(s);
+      const q = VIEWS[s](), tags = [];
+      for (let k = 0; k < N; k++) { aim(q, (k - C) / C * ARC); tags.push(await snap(`frames/arm/s${s}-${k}.webp`, s)); }
+      out.steps.push({ tags });
+    }
+    for (let s = 0; s + 1 < SAY.length; s++) {      // the camera moving from one step's view to the next, showing the next step's parts
+      setStep(s + 1);
+      const a = VIEWS[s](), b = VIEWS[s + 1](), tags = [];
+      for (let k = 1; k < T; k++) {
+        const e = ease(k / T), t = a.t.clone().lerp(b.t, e);
+        cam.position.copy(a.p).lerp(b.p, e); cam.lookAt(t);
+        tags.push(await snap(`frames/arm/t${s}${s + 1}-${k}.webp`, -1));
+      }
+      out.trans[`${s}-${s + 1}`] = { n: T - 1, tags };
+    }
+    const px = document.createElement('canvas'); px.width = px.height = 1;
+    px.getContext('2d').drawImage(renderer.domElement, 3, 3, 1, 1, 0, 0, 1, 1);
+    const d = px.getContext('2d').getImageData(0, 0, 1, 1).data; out.bg = `rgb(${d[0]},${d[1]},${d[2]})`;
+    await fetch('/save/frames/arm/manifest.js', { method: 'POST', body: '// made by render_frames.py from arm-cables-3d.html\nwindow.FRAMES = ' + JSON.stringify(out) + ';\n' });
+    await fetch('/done', { method: 'POST' });
+  }
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Connect the Arm Cables</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;600;700;800&display=swap">
+<style>
+/* Layout: the robotic arm (pre-rendered frames from arm-cables-3d.html) fills the frame; a step bar along the bottom
+   with the instruction beside it. Orange badges mark the hub's ports and the cable ends that go in them. */
+:root {
+  --eggshell: #F9F6E7; --onyx: #272A24; --cobalt: #4C34E5; --flame: #FF6D3A; --yellow: #FFCD1F;
+  --muted: #5C6057; --line: #DDD8C2; --card: #FFFFFF;
+  --font: "Figtree", system-ui, -apple-system, "Segoe UI", sans-serif;
+  color-scheme: light;
+}
+* { box-sizing: border-box; -webkit-tap-highlight-color: transparent }
+html, body { height: 100%; margin: 0 }
+body { background: var(--eggshell); color: var(--onyx); font: 15px/1.45 var(--font); display: flex; flex-direction: column }
+#asm { position: relative; flex: 1; min-height: 260px; overflow: hidden; touch-action: pan-y; cursor: grab; user-select: none; -webkit-user-select: none }
+#asm:active { cursor: grabbing }
+#asm:focus-visible { outline: 3px solid var(--flame); outline-offset: -3px }
+.fp-view { position: absolute }
+.fp-view img { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; visibility: hidden }
+.tag-at { position: absolute; width: 0; height: 0; pointer-events: none }
+.tag { position: absolute; left: 0; top: 0; pointer-events: none; font: 800 14px/1 var(--font); width: 26px; height: 26px; border-radius: 50%;
+  display: grid; place-items: center; background: #F9A88E; color: var(--onyx); border: 2px solid #fff; box-shadow: 0 0 0 1.5px var(--onyx);
+}
+.hint { position: absolute; top: 10px; right: 12px; font-size: 12px; font-weight: 600; color: var(--muted); pointer-events: none }
+.bar { display: grid; grid-template-columns: auto 1fr; gap: 10px 16px; align-items: center; padding: 12px 14px;
+  border-top: 2px solid var(--line); background: var(--card) }
+.steps { display: flex; gap: 6px; flex-wrap: wrap }
+.steps button { font: 800 15px/1 var(--font); min-height: 44px; min-width: 44px; padding: 0 14px; border-radius: 999px; border: 2px solid var(--onyx);
+  background: var(--card); color: var(--onyx); cursor: pointer }
+.steps button.sel { background: var(--cobalt); border-color: var(--cobalt); color: #fff }
+.steps button:focus-visible { outline: 3px solid var(--flame); outline-offset: 2px }
+.say { font-size: 16px; min-width: 0 }
+.say b { color: var(--cobalt) }
+@media (max-width: 720px) { .bar { grid-template-columns: 1fr } }
+</style>
+</head>
+<body>
+<div id="asm" role="img" aria-label="The robotic arm on its yellow base with the SPIKE hub standing upright. Step 1 marks the hub's six ports, A to F; step 2 shows the gripper motor's cable going to port C, the elbow motor's to port E and the large motor's to port B; step 3 shows the blue GTAC board's black cable going to port A.">
+  <div class="hint">Drag to turn</div>
+</div>
+<div class="bar">
+  <div class="steps" role="group" aria-label="Steps">
+    <button type="button" data-step="0">1</button>
+    <button type="button" data-step="1">2</button>
+    <button type="button" data-step="2">3</button>
+  </div>
+  <div class="say" id="say" aria-live="polite"></div>
+</div>
+
+<script src="frames/arm/manifest.js"></script>
+<script src="frames-player.js"></script>
+<script>
+const SAY = [
+  'The <b>LEGO hub</b> has 6 ports, from <b>A</b> to <b>F</b>.',
+  'Connect the <b>gripper motor</b> to <b>port C</b>, the <b>elbow motor</b> to <b>port E</b> and the <b>large motor</b> to <b>port B</b>.',
+  'Connect the <b>GTAC board</b> to <b>port A</b>.',
+];
+// Tags, in the order render_frames.py stored their positions: the six ports, then the gripper, elbow and large
+// motors and the board's cable end (each frame only holds the ones its step shows)
+const TAGS = ['A', 'B', 'C', 'D', 'E', 'F', 'C', 'E', 'B', 'A'].map(l => ({ html: l, tf: 'translate(-50%, -50%)' }));
+
+const player = FramesPlayer(document.getElementById('asm'), window.FRAMES, 'frames/arm/', TAGS);
+const buttons = [...document.querySelectorAll('[data-step]')], say = document.getElementById('say');
+function setStep(s) {
+  buttons.forEach(b => b.classList.toggle('sel', +b.dataset.step === s));
+  say.innerHTML = '<b>' + (s + 1) + '.</b> ' + SAY[s];
+  player.setStep(s);
+}
+buttons.forEach(b => b.addEventListener('click', () => setStep(+b.dataset.step)));
+setStep(0);
+</script>
+</body>
+</html>
