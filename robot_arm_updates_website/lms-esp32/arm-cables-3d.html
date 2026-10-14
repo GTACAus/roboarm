@@ -128,12 +128,14 @@ function boot(PLACE) {
       return { role, l, start, g };
     });
 
-    // The board: on the plate, in front of the hub on port A's side; its cable from the HUB header to port A
-    const bb = new THREE.Box3().setFromObject(board), hb = roleBox('hub');
+    // The board: on the plate behind the hub (away from its buttons), on port A's side with its HUB header nearest
+    // the hub; clear of the hub by GAP. Its cable runs from the HUB header round to port A.
+    const GAP = 3, hb = roleBox('hub');
     const pA = portAt('A'), outA = portOut('A');
-    board.position.set((all.min.x + hb.min.x) / 2 + 6 - (bb.min.x + bb.max.x) / 2, PLATE_TOP - bb.min.y,
-      all.max.z - 6 - bb.max.z);
     scene.add(board); board.updateMatrixWorld(true);
+    const bb = new THREE.Box3().setFromObject(board);
+    board.position.set(all.min.x + 1 - bb.min.x, PLATE_TOP - bb.min.y, hb.min.z - GAP - bb.max.z);
+    board.updateMatrixWorld(true);
     const hdr = V(4.97, 3.6 + 14, 40.24).applyMatrix4(board.matrixWorld);
     const endA = pA.clone().addScaledVector(outA, 13.7);
     const boardCable = new THREE.Group();
@@ -155,7 +157,7 @@ function boot(PLACE) {
   const VIEWS = [
     () => ({ t: hubC().add(V(0, 8, 0)), p: hubC().add(V(70, 80, 240)) }),
     () => ({ t: hubC().add(V(0, 55, -10)), p: hubC().add(V(-230, 170, 290)) }),
-    () => ({ t: hubC().add(V(-25, -10, 20)), p: hubC().add(V(-170, 130, 250)) }),
+    () => ({ t: hubC().add(V(-25, -10, -25)), p: hubC().add(V(-230, 150, -200)) }),
   ];
   let step = 0;
   const buttons = [...document.querySelectorAll('[data-step]')], say = document.getElementById('say');
