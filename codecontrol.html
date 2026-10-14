@@ -36,13 +36,34 @@
       text-decoration:none; display:inline-block; font-family:inherit;
     }
     .nav-buttons button:hover, .nav-buttons a.btn:hover{ background:#0056b3; }
+
+    /* Video slideshow: a single tutorial page with three video steps. */
+    #videoViewer { width:100%; text-align:center; }
+    #videoSlide {
+      display:block; max-width:100%; max-height:450px; width:auto;
+      height:auto; object-fit:contain; margin:0 auto; border-radius:10px;
+    }
+    #videoInstruction {
+      text-align:center; font-size:17px; line-height:1.5;
+      margin:16px auto 12px; max-width:550px; min-height:52px;
+    }
+    .img-controls {
+      display:flex; justify-content:center; align-items:center;
+      gap:15px; margin-top:10px;
+    }
+    .img-controls button {
+      background:#007bff; color:white; border:0; border-radius:20px;
+      padding:8px 16px; font-size:1em; font-family:inherit; cursor:pointer;
+    }
+    .img-controls button:hover { background:#0056b3; }
+    #videoCounter { font-weight:600; color:#333; }
   </style>
 </head>
 <body>
 
-  <!-- 01/03 INTRO -->
+  <!-- 01/04 INTRO -->
   <section class="card active" id="c1">
-    <h1>01/03</h1>
+    <h1>01/04</h1>
     <h2>Change how your prosthetic moves</h2>
     <p>
       You can program your arm with blocks on the iPad. Each control on the remote has a number,
@@ -55,13 +76,13 @@
     </div>
   </section>
 
-  <!-- 02/03 Open the code canvas -->
+  <!-- 02/04 Open the code canvas -->
   <section class="card" id="c2">
-    <h1>02/03</h1>
+    <h1>02/04</h1>
     <h2>Open the code canvas</h2>
 
     <video controls playsinline preload="metadata">
-      <source src="code-canvas.mp4" type="video/mp4">
+      <source src="advanced-code.mp4" type="video/mp4">
     </video>
 
     <ol class="steps">
@@ -78,9 +99,9 @@
     </div>
   </section>
 
-  <!-- 03/03 Change the code -->
+  <!-- 03/04 Change the code -->
   <section class="card" id="c3">
-    <h1>03/03</h1>
+    <h1>03/04</h1>
     <h2>Change your code</h2>
 
     <video controls playsinline preload="metadata">
@@ -97,27 +118,113 @@
 
     <div class="nav-buttons">
       <button onclick="prevPage()">◀ Prev</button>
+      <button onclick="nextPage()">Next ▶</button>
+    </div>
+  </section>
+
+  <!-- 04/04 VIDEO SLIDESHOW -->
+  <section class="card" id="c4">
+    <h1>04/04</h1>
+    <h2>Start the arm program on the hub</h2>
+
+    <p>Follow these instructions to learn how to start the right program on the hub.</p>
+
+    <div id="videoViewer">
+      <video id="videoSlide" src="arm-video-01.mp4"
+             autoplay muted loop playsinline preload="metadata"></video>
+
+      <!-- Changes automatically with each video. -->
+      <p id="videoInstruction">Step 1: Turn on the LEGO hub.</p>
+
+      <div class="img-controls">
+        <button type="button" onclick="prevVideo()" aria-label="Previous video">◀</button>
+        <span id="videoCounter">1 / 3</span>
+        <button type="button" onclick="nextVideo()" aria-label="Next video">▶</button>
+      </div>
+    </div>
+
+    <div class="nav-buttons">
+      <button onclick="prevPage()">◀ Prev</button>
       <a class="btn" href="index.html">Home ▶</a>
     </div>
   </section>
 
   <script>
-    let current = 0;
-    const cards = Array.from(document.querySelectorAll('.card'));
-    function show(i){
-      cards[current].classList.remove('active');
-      current = i;
-      cards[current].classList.add('active');
-      document.querySelectorAll('video').forEach(v => { v.pause(); });
-    }
-    function nextPage(){ if(current < cards.length - 1) show(current + 1); }
-    function prevPage(){ if(current > 0) show(current - 1); }
+    // Page navigation. These functions are shared by all four sections.
+    const cards = Array.from(document.querySelectorAll(".card"));
+    let current = Math.max(0, cards.findIndex(card => card.classList.contains("active")));
 
-    // A video that has not been recorded yet stays hidden; it appears once the file is uploaded
-    document.querySelectorAll('video').forEach(v => {
-      const last = v.querySelector('source:last-of-type');
-      if (last) last.addEventListener('error', () => { v.style.display = 'none'; });
-    });
+    function show(index) {
+      if (index < 0 || index >= cards.length) return;
+
+      // Stop playing media on the page we are leaving.
+      document.querySelectorAll("video").forEach(video => video.pause());
+      cards[current].classList.remove("active");
+      current = index;
+      cards[current].classList.add("active");
+
+      // Automatically play the video when students enter the slideshow.
+      if (cards[current].id === "c4") showVideo();
+    }
+
+    function nextPage() { show(current + 1); }
+    function prevPage() { show(current - 1); }
+
+    // EDIT THE FILE NAMES AND INSTRUCTIONS HERE.
+    // All three videos live inside the single page c4.
+    const videoSlides = [
+      {
+        video: "arm-video-01.mp4",
+        instruction: "Step 1: Turn on the LEGO hub."
+      },
+      {
+        video: "arm-video-02.mp4",
+        instruction: "Step 2: Use the arrow buttons to find the correct program."
+      },
+      {
+        video: "arm-video-03.mp4",
+        instruction: "Step 3: Press the centre button to start the program."
+      }
+    ];
+    let currentVideo = 0;
+
+    function showVideo() {
+      const video = document.getElementById("videoSlide");
+      const instruction = document.getElementById("videoInstruction");
+      const counter = document.getElementById("videoCounter");
+      if (!video || !instruction || !counter) return;
+
+      const slide = videoSlides[currentVideo];
+      video.muted = true;
+      video.loop = true;
+      video.playsInline = true;
+      video.src = slide.video;
+      video.load();
+
+      instruction.textContent = slide.instruction;
+      counter.textContent = `${currentVideo + 1} / ${videoSlides.length}`;
+
+      // This runs AFTER page c4 becomes visible (fixes the earlier pause bug).
+      if (cards[current].id === "c4") {
+        video.play().catch(error => {
+          console.warn("Video autoplay was blocked:", error);
+          video.controls = true; // Let students start it manually if needed.
+        });
+      }
+    }
+
+    function nextVideo() {
+      currentVideo = (currentVideo + 1) % videoSlides.length;
+      showVideo();
+    }
+
+    function prevVideo() {
+      currentVideo = (currentVideo - 1 + videoSlides.length) % videoSlides.length;
+      showVideo();
+    }
+
+    // Also handle opening the file directly on slide page c4.
+    if (cards[current]?.id === "c4") showVideo();
   </script>
 </body>
 </html>
