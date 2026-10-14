@@ -2,9 +2,10 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8" />
+<link rel="preload" href="fonts/figtree.woff2" as="font" type="font/woff2" crossorigin>
+<style>@font-face { font-family: "Figtree"; src: url("fonts/figtree.woff2") format("woff2"); font-weight: 300 900; font-display: swap }</style>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <title>Mantis shrimp — Biomimicry Library</title>
-<link href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;700&display=swap" rel="stylesheet">
 <style>
   :root {
     --ink: #111;
@@ -122,7 +123,7 @@
         in its incredibly strong limbs.
       </p>
 
-      <video id="defaultVideo" controls>
+      <video id="defaultVideo" controls preload="none" poster="mantis-poster.webp">
         <source src="mantis.mp4" type="video/mp4">
         <source src="mantis.mp4" type="video/quicktime">
       </video>
@@ -136,7 +137,7 @@
     </p>
 
     <div>
-      <video id="defaultVideo2" controls>
+      <video id="defaultVideo2" controls preload="none" poster="mantis2-poster.webp">
         <source src="mantis2.mp4" type="video/mp4">
         <source src="mantis2.mp4" type="video/quicktime">
       </video>

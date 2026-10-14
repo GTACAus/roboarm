@@ -2,9 +2,10 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
+<link rel="preload" href="../../fonts/figtree.woff2" as="font" type="font/woff2" crossorigin>
+<style>@font-face { font-family: "Figtree"; src: url("../../fonts/figtree.woff2") format("woff2"); font-weight: 300 900; font-display: swap }</style>
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Arm Cables 3D</title>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;600;700;800&display=swap">
 <style>
 /* The robotic arm (out/arm.glb, from the Studio model by arm_model.py) with its motor cables and the GTAC board.
    Live 3D for checking; render_frames.py opens it with ?render to make the frames arm-cables.html shows. */
@@ -202,7 +203,7 @@ function boot(PLACE) {
     const aim = (q, a) => { cam.position.copy(q.t).add(q.p.clone().sub(q.t).applyAxisAngle(Y, a)); cam.lookAt(q.t); };
     const snap = async (path, s) => {
       renderer.render(scene, cam); const t = tagsNow(s);
-      const blob = await new Promise(r => renderer.domElement.toBlob(r, 'image/webp', 0.8));
+      const blob = await new Promise(r => renderer.domElement.toBlob(r, 'image/webp', 0.6));
       await fetch('/save/' + path, { method: 'POST', body: blob }); return t;
     };
     const ease = u => u < .5 ? 2 * u * u : 1 - Math.pow(-2 * u + 2, 2) / 2;

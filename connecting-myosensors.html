@@ -2,9 +2,10 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8"/>
+<link rel="preload" href="fonts/figtree.woff2" as="font" type="font/woff2" crossorigin>
+<style>@font-face { font-family: "Figtree"; src: url("fonts/figtree.woff2") format("woff2"); font-weight: 300 900; font-display: swap }</style>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Connecting Myosensors — Instructions</title>
-  <link href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;600;700&display=swap" rel="stylesheet">
 
   <style>
     body{
@@ -156,7 +157,7 @@
       In this activity you’ll <strong>connect a muscle sensor to control your motors</strong>,
       then <strong>test</strong> it. Use the buttons below to move through each step.
     </p>
-    <img src="EMG.png" alt="Robotic arm EMG" class="img-small">
+    <img src="EMG.webp" alt="Robotic arm EMG" class="img-small">
     <div class="nav-buttons">
       <a class="btn" href="index.html">◀ Home</a>
       <button onclick="nextPage()">Start ▶</button>
@@ -169,13 +170,13 @@
     <h2>The mysosensor - What you'll need</h2>
 
 <!-- iPad-specific video (hidden by default) -->
-    <video id="ipadVideo" controls style="display:none">
+    <video id="ipadVideo" controls style="display:none" preload="none" poster="myosensor-list-v2-poster.webp">
       <source src="myosensor-list-v2.mp4" type="video/mp4">
       <source src="myosensor-list-v2.mp4" type="video/quicktime">
     </video>
 
     <!-- Default video -->
-    <video id="defaultVideo" controls>
+    <video id="defaultVideo" controls preload="none" poster="myosensor-list-v2-poster.webp">
       <source src="myosensor-list-v2.mp4" type="video/mp4">
       <source src="myosensor-list-v2.mp4" type="video/quicktime">
     </video>
@@ -275,8 +276,8 @@
   <section class="card" id="c6">
     <h1>04/06</h1>
     <h2>Attach your myosensor</h2>
-    <img src="mysensors.jpg" alt="Myosensor on the forearm" class="img-small">
-    <img src="danger.jpg" alt="Safety warning" class="img-small">
+    <img loading="lazy" decoding="async" src="mysensors.webp" alt="Myosensor on the forearm" class="img-small">
+    <img loading="lazy" decoding="async" src="danger.webp" alt="Safety warning" class="img-small">
     <p>Attach the sensor to your forearm <b>before</b> you start the arm program. The board measures your relaxed muscle when it starts.</p>
     <div class="nav-buttons">
       <button onclick="prevPage()">◀ Prev</button>
@@ -305,7 +306,7 @@
     <h1>06/06</h1>
     <h2>Move the arm with your muscle</h2>
 
-    <video controls playsinline preload="metadata" poster="muscle-trace.jpg" data-alt="The app's Muscle sensor tab: the muscle signal over the last 30 seconds, the Amplify bar and the motor buttons B to F">
+    <video controls playsinline preload="metadata" poster="muscle-trace.webp" data-alt="The app's Muscle sensor tab: the muscle signal over the last 30 seconds, the Amplify bar and the motor buttons B to F">
       <source src="myo-use.mp4" type="video/mp4">
     </video>
 

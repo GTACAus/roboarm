@@ -2,12 +2,10 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
+<link rel="preload" href="fonts/figtree.woff2" as="font" type="font/woff2" crossorigin>
+<style>@font-face { font-family: "Figtree"; src: url("fonts/figtree.woff2") format("woff2"); font-weight: 300 900; font-display: swap }</style>
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Robotic Arm — Instructions</title>
-    <link
-      href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;600;700&display=swap"
-      rel="stylesheet"
-    />
     <style>
       body {
         font-family: "Figtree", system-ui, Arial, sans-serif;
@@ -230,7 +228,7 @@
 
   <!-- Image Viewer -->
   <div id="imageViewer">
-    <img id="slide" src="lego-instructions/arm-instructions-01.png" alt="Robotic Arm Instructions" />
+    <img id="slide" src="lego-instructions/arm-instructions-01.webp" alt="Robotic Arm Instructions" />
     <div class="img-controls">
       <button onclick="prevImage()">◀</button>
       <span id="counter">1 / 39</span>
@@ -249,13 +247,13 @@
       <h1>02/05</h1>
       <h2>Connect the motor cables</h2>
       
-      <video id="ipadVideo" controls style="display: none">
+      <video id="ipadVideo" controls style="display: none" preload="none" poster="connect-motors-poster.webp">
         <source src="connect-motors.mp4" type="video/mp4" />
         <source src="connect-motors.mp4" type="video/quicktime" />
       </video>
 
       
-      <video id="defaultVideo" controls>
+      <video id="defaultVideo" controls preload="none" poster="connect-motors-poster.webp">
         <source src="connect-motors.mp4" type="video/mp4" />
         <source src="connect-motors.mp4" type="video/quicktime" />
       </video>
@@ -323,11 +321,9 @@
 
         <video
           id="videoSlide"
-          preload="none"
           muted
           loop
-          playsinline
-        >
+          playsinline preload="none" poster="arm-video-01-poster.webp">
           <source
             src="arm-video-01.mp4"
             type="video/mp4"
@@ -357,15 +353,13 @@
       <h1>04/05</h1>
       <h2>Connect your iPad to the arm</h2>
 
-      <video controls playsinline preload="metadata" poster="captive-portal.jpg" data-alt="The page that pops up when the iPad joins the arm's Wi-Fi, with the Open the remote button">
-        <source src="arm-join-wifi.mp4" type="video/mp4" />
-      </video>
+      <img src="ipad-home-screen.webp" loading="lazy" decoding="async" width="1250" height="380"
+        alt="The iPad home screen with the Settings app marked 1 and the Robot controller app marked 3">
 
       <ol class="steps">
         <li>On the iPad, open <b>Settings → Wi-Fi</b>.</li>
         <li>Join the network with your board's name, for example <b>ROBOT 12</b>. The password is <b>gtacrobot</b>.</li>
-        <li>A page pops up: tap <b>Open the remote</b>. Then tap <b>Done</b> at the top (not Cancel).</li>
-        <li>No pop-up? Open the <b>Robot arm</b> app on your iPad's home screen.</li>
+        <li>Open the <b>Robot controller</b> app on your iPad's home screen.</li>
       </ol>
       <p class="tip">The iPad may say there is no internet on this Wi-Fi. That is fine: stay connected. Switch back to the <b>Discovery</b> Wi-Fi when you finish.</p>
 
@@ -380,7 +374,7 @@
       <h1>05/05</h1>
       <h2>Drive your arm with the remote</h2>
 
-      <video controls playsinline preload="metadata" poster="remote-basic.jpg" data-alt="The remote on the Remote tab with Basic selected: D-pad 1, slider 2 and the motor positions">
+      <video controls playsinline preload="metadata" poster="remote-basic.webp" data-alt="The remote on the Remote tab with Basic selected: D-pad 1, slider 2 and the motor positions">
         <source src="arm-remote.mp4" type="video/mp4" />
       </video>
 
@@ -536,9 +530,12 @@
 
     if (!imgElement || !counter) return; // prevent errors if not found
 
+    const stepImage = n => `lego-instructions/arm-instructions-${String(n).padStart(2, '0')}.webp`;
     function showImage() {
-      imgElement.src = `lego-instructions/arm-instructions-${String(currentImage).padStart(2, '0')}.png`;
+      imgElement.src = stepImage(currentImage);
       counter.textContent = `${currentImage} / ${totalImages}`;
+      // fetch the next two steps and the one before in the background, so pressing ▶ or ◀ shows them at once
+      [1, 2, -1].forEach(d => { const n = (currentImage - 1 + d + totalImages) % totalImages + 1; new Image().src = stepImage(n); });
     }
 
     function nextImage() {

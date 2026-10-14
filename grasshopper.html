@@ -2,9 +2,10 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
+<link rel="preload" href="fonts/figtree.woff2" as="font" type="font/woff2" crossorigin>
+<style>@font-face { font-family: "Figtree"; src: url("fonts/figtree.woff2") format("woff2"); font-weight: 300 900; font-display: swap }</style>
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Grasshopper — Biomimicry Library</title>
-    <link href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;700&display=swap" rel="stylesheet">
     <style>
       :root {
         --ink: #111;
@@ -112,13 +113,13 @@
           src="https://encrypted-tbn3.gstatic.com/images?q=tbn:ANd9GcQ4RM1nw5xshZEGVgtoeCkG0NkCLs2OgHCiDB4EbXCwBkldobdmUd9g47pKZ_o7VHEnUQU8qca-1wWTqAcBa_jNEJLxqVEOGegj-0xkGlx6IQ"
           alt="grasshopper1"
         />
-        <video id="ipadVideo" controls style="display: none">
+        <video id="ipadVideo" controls style="display: none" preload="none" poster="grasshopper-poster.webp">
           <source src="grasshopper.mp4" type="video/mp4" />
           <source src="grasshopper.mp4" type="video/quicktime" />
         </video>
 
         <!-- Default video -->
-        <video id="defaultVideo" controls>
+        <video id="defaultVideo" controls preload="none" poster="grasshopper-poster.webp">
           <source src="grasshopper.mp4" type="video/mp4" />
           <source src="grasshopper.mp4" type="video/quicktime" />
         </video>

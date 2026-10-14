@@ -2,9 +2,10 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
+<link rel="preload" href="fonts/figtree.woff2" as="font" type="font/woff2" crossorigin>
+<style>@font-face { font-family: "Figtree"; src: url("fonts/figtree.woff2") format("woff2"); font-weight: 300 900; font-display: swap }</style>
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Spider — Biomimicry Library</title>
-    <link href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;700&display=swap" rel="stylesheet">
     <style>
       * {
         box-sizing: border-box;
@@ -149,11 +150,11 @@
           loses too much blood, it no longer has enough internal pressure to
           fully push its legs out.
         </p>
-        <img class="img" src="spider2.png" alt="Spider leg parts" />
+        <img class="img" src="spider2.webp" alt="Spider leg parts" />
       </div>
 
       <div class="row" style="margin-top: 12px">
-        <video id="defaultVideo" controls>
+        <video id="defaultVideo" controls preload="none" poster="necro-poster.webp">
           <source src="necro.mp4" type="video/mp4" />
           <source src="necro.mp4" type="video/quicktime" />
         </video>
@@ -177,7 +178,7 @@
       </p>
 
       <div style="margin-top: 12px">
-        <img class="img2" src="comic/26.jpg" alt="Spider" />
+        <img loading="lazy" decoding="async" class="img2" src="comic/26.webp" alt="Spider" />
       </div>
       <p class="ref">
         Source: <em>The Slingshot Spider</em> by Lindsey Leigh<br />

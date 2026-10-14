@@ -7,8 +7,8 @@ website folder (next to the `.html` files). Until then the card simply shows its
 ## What changed (why we are re-recording)
 
 - The hub runs the official **SPIKE App 3** with the arm program in **slot 0** (no Mindstorms app).
-- The LMS-ESP32 board makes its own Wi-Fi, named after the board, for example **GTAC 12** (password **gtacrobot**).
-- Joining that Wi-Fi pops up a page with **Open the remote**; the remote is at **10.10.10.10**.
+- The LMS-ESP32 board makes its own Wi-Fi, named after the board, for example **ROBOT 12** (password **gtacrobot**).
+- After joining that Wi-Fi, students open the **Robot controller** app on the iPad's home screen (the remote, at **10.10.10.10**).
 - The muscle sensor connects to **IO32**, **GND** and **3V3** (not IO33).
 - Students can code the arm with blocks in the remote's **Advanced (code)** mode.
 
@@ -28,14 +28,14 @@ website folder (next to the `.html` files). Until then the card simply shows its
 
 **Hardware**
 - One assembled arm: board in **port A**; motors in **B**, **C** and **E** (the starting remote uses these three).
-- The board has the latest firmware and its Wi-Fi name set (`python roboarm_access_point/tools/upload.py COMx --name "GTAC 12"`).
+- The board has the latest firmware and is set up with its Wi-Fi name and password (`lms_esp32/tools/provision.py`).
 - The hub has `roboarm_access_point/hub/arm-spike-app3.py` saved in **slot 0**, and is charged.
 - For videos 4 and 5: a muscle sensor with one of the three cable colour sets, and electrodes.
 
 **iPad**
 - Turn on **Do Not Disturb** and set the brightness high.
-- For the pop-up in video 2 to appear, the iPad must not have had the remote open in the last 15 seconds:
-  close Safari, wait 20 seconds, then **forget** the board's network in Settings before recording.
+- For video 2: the iPad has the **Robot controller** app on its home screen, and has **forgotten** the board's
+  network (Settings → Wi-Fi → ⓘ → Forget This Network), so joining it shows from the start.
 - For video 6 to show the starting program: Settings → Safari → Advanced → Website Data → remove **10.10.10.10**.
 - Screen recordings: Control Centre → **Screen Recording**. Use Settings → Camera → Formats → **Most Compatible**
   so videos save as H.264 `.mp4`.
@@ -60,11 +60,11 @@ website folder (next to the `.html` files). Until then the card simply shows its
 
 | Shot | What to show | Line |
 |---|---|---|
-| 1 | Settings → Wi-Fi; the list shows **GTAC 12** | *"Open Settings, then Wi-Fi, and find your board's name."* |
-| 2 | Tap it, type **gtacrobot**, tap Join | *"The password is G T A C robot."* |
-| 3 | The pop-up page appears; tap **Open the remote** | *"A page pops up. Tap Open the remote."* |
-| 4 | The remote loads; tap **Done** at the top right | *"Tap Done, not Cancel, so the iPad stays on this Wi-Fi."* |
-| 5 | Home screen: tap the **Robot arm** app; the remote loads | *"If no page pops up, open the Robot arm app on the home screen."* |
+| 1 | Home screen: tap **Settings**, then **Wi-Fi** | *"Open Settings, then Wi-Fi."* |
+| 2 | The list shows **ROBOT 12**; tap it | *"Find your board's name, for example ROBOT 12."* |
+| 3 | Type **gtacrobot**, tap Join | *"The password is G T A C robot."* |
+| 4 | The network shows *No internet connection* | *"The iPad may say there is no internet. That's fine: stay connected."* |
+| 5 | Back on the home screen, tap **Robot controller**; the remote opens | *"Now open the Robot controller app."* |
 
 ## 3. `arm-remote.mp4` — Drive the arm with the remote (screen recording plus a camera shot of the arm)
 

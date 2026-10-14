@@ -2,11 +2,10 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
+<link rel="preload" href="../../fonts/figtree.woff2" as="font" type="font/woff2" crossorigin>
+<style>@font-face { font-family: "Figtree"; src: url("../../fonts/figtree.woff2") format("woff2"); font-weight: 300 900; font-display: swap }</style>
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Sensor Wiring Steps</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;600;700;800&display=swap">
 <style>
 /* Layout: the 3D board fills the frame; a step bar along the bottom (Start, 1 GND, 2 3V3, 3 IO32, Done)
    with the step's instruction beside it. GTAC colours, light only, sized to sit inside an instruction card. */
@@ -234,7 +233,7 @@ function boot() {
     const tagsNow = () => [...WIRES.map(w => proj([w.to[0], HEADER_TOP + 1 + (1 - w.lift) * (DUP_H + 2), w.to[1]])), proj([USB[0], 4, USB[1] - 4])];
     const snap = async path => {
       renderer.render(scene, cam); const tags = tagsNow();
-      const blob = await new Promise(r => renderer.domElement.toBlob(r, 'image/webp', 0.8));
+      const blob = await new Promise(r => renderer.domElement.toBlob(r, 'image/webp', 0.6));
       await fetch('/save/' + path, { method: 'POST', body: blob }); return tags;
     };
     const ringsFor = s => WIRES.forEach((w, i) => { const on = s === i + 1; w.ring.material.opacity = on ? 0.9 : (s === 4 ? 0.5 : 0); w.ring.scale.setScalar(on ? 1.12 : 1); });

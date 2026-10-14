@@ -2,9 +2,10 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8"/>
+<link rel="preload" href="fonts/figtree.woff2" as="font" type="font/woff2" crossorigin>
+<style>@font-face { font-family: "Figtree"; src: url("fonts/figtree.woff2") format("woff2"); font-weight: 300 900; font-display: swap }</style>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <title>Bat — Biomimicry Library</title>
-<link href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;700&display=swap" rel="stylesheet">
 <style>
   :root { --ink:#111; --accent:#16a34a; }
   * { box-sizing:border-box; }
@@ -129,12 +130,12 @@
     </p>
 
     <div class="row">
-      <video id="defaultVideo" controls>
+      <video id="defaultVideo" controls preload="none" poster="bat-poster.webp">
         <source src="bat.mp4" type="video/mp4">
         <source src="bat.mp4" type="video/quicktime">
       </video>
 
-      <img class="img" src="bat2.png" alt="Bat wing labelled"/>
+      <img class="img" src="bat2.webp" alt="Bat wing labelled"/>
     </div>
 
     <p class="ref">
