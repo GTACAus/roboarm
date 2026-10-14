@@ -44,6 +44,16 @@ function FramesPlayer(host, F, base, tagDefs, tagClass) {
         box.style.display = p ? '' : 'none';
         if (p) { box.style.left = p[0] * 100 + '%'; box.style.top = p[1] * 100 + '%'; }
       });
+      // keep every label inside the picture (a short card would otherwise cut off one near the edge)
+      const H = host.getBoundingClientRect();
+      tags.forEach(({ label }) => {
+        label.style.translate = '';
+        const L = label.getBoundingClientRect();
+        if (!L.width) return;
+        const dx = Math.max(H.left + 4 - L.left, Math.min(0, H.right - 4 - L.right));
+        const dy = Math.max(H.top + 4 - L.top, Math.min(0, H.bottom - 4 - L.bottom));
+        if (dx || dy) label.style.translate = `${dx}px ${dy}px`;
+      });
     });
   }
 

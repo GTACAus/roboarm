@@ -35,10 +35,9 @@ body { background: var(--eggshell); color: var(--onyx); font: 15px/1.45 var(--fo
 .tag i { display: inline-block; width: 10px; height: 10px; border-radius: 50%; margin-right: 6px; vertical-align: -1px; border: 1px solid rgba(0, 0, 0, .35) }
 .tag.on { background: var(--yellow); animation: pulse 1.4s ease-in-out infinite }
 .tag.dim { opacity: .45 }
-.tag.usb { border-color: var(--cobalt); color: var(--cobalt); font-weight: 700 }
 @keyframes pulse { 50% { box-shadow: 0 0 0 5px rgba(255, 205, 31, .45) } }
-.pick { position: absolute; top: 8px; left: 10px; z-index: 2; display: flex; flex-wrap: wrap; align-items: center; gap: 6px;
-  padding: 6px 8px; border-radius: 12px; background: rgba(255, 255, 255, .92); border: 2px solid var(--line); cursor: default }
+.pick { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; padding: 8px 12px;
+  background: var(--card); border-bottom: 2px solid var(--line) }
 .pick span { font-weight: 700; font-size: 13px; margin-right: 2px }
 .pick button { font: 800 13px/1 var(--font); min-height: 36px; padding: 0 10px; border-radius: 999px; border: 2px solid var(--onyx);
   background: var(--card); color: var(--onyx); cursor: pointer; display: inline-flex; align-items: center; gap: 4px }
@@ -61,8 +60,8 @@ body { background: var(--eggshell); color: var(--onyx); font: 15px/1.45 var(--fo
 </style>
 </head>
 <body>
+<div class="pick" role="group" aria-label="Your cable colours"><span>Your cables:</span></div>
 <div id="asm" role="img" aria-label="The LMS-ESP32 board in its blue case and the EMG sensor board. The sensor's three plugs, ground, power and signal, go onto the header pins GND, 3V3 and IO32.">
-  <div class="pick" role="group" aria-label="Your cable colours"><span>Your cables:</span></div>
   <div class="hint">Drag to turn · drag down to look from above</div>
 </div>
 <div class="bar">
@@ -101,10 +100,9 @@ const SAY = [
   ...WIRES.map(w => set => w.say(set[w.key][0])),
   set => `<b>Done.</b> ${WIRES.map(w => `${cap(set[w.key][0])} on ${w.name}`).join(', ')}. Check each plug is pushed all the way down.`,
 ];
-// Tags, in the order render_frames.py stored their positions: the three pins, then the USB-C socket
+// Tags, in the order render_frames.py stored their positions: the three pins (the frames also hold the USB-C socket's, unused).
 // Each label sits away from its pin (lead, in px) on a line, so it doesn't hide the pins
-const TAGS = [...WIRES.map(w => ({ html: `<i></i>${w.name}`, lead: w.lead, tf: w.tf })),
-  { html: 'USB-C end', cls: 'usb', lead: [-24, -96], tf: 'translate(-50%, -100%)' }];
+const TAGS = WIRES.map(w => ({ html: `<i></i>${w.name}`, lead: w.lead, tf: w.tf }));
 const tagClass = (i, s) => i > 2 ? '' : (s === i + 1 ? 'on' : (s > 0 && s < 4 ? 'dim' : ''));
 
 let set = 0, step = 0;
@@ -114,9 +112,7 @@ const player = FramesPlayer(host, window.FRAMES, `frames/wiring/${set + 1}/`, TA
 const buttons = [...document.querySelectorAll('[data-step]')], say = document.getElementById('say');
 
 // Cable colour picker: one button per set, showing its colours in the picture's order
-const pick = host.querySelector('.pick');
-pick.addEventListener('pointerdown', e => e.stopPropagation());
-pick.addEventListener('keydown', e => e.stopPropagation());
+const pick = document.querySelector('.pick');
 const picks = SETS.map((c, n) => {
   const b = document.createElement('button'); b.type = 'button';
   b.innerHTML = `${n + 1} ` + c.shown.map(k => `<i style="background:${c[k][1]}"></i>`).join('');

@@ -190,23 +190,27 @@
     </div>
   </section>
 
-  <!-- 03/06 Wiring in 3D (the turnable model; swap with the card below to use it) -->
-  <!-- <section class="card" id="c4m">
+  <!-- 03/06 Connect the sensor cables: the turnable wiring model, in the student's cable colours -->
+  <section class="card" id="c4m">
     <h1>03/06</h1>
-    <h2>See the wiring in 3D</h2>
+    <h2>Connect your sensor cables</h2>
 
     <iframe class="model" src="robot_arm_updates_website/lms-esp32/wiring-steps.html" loading="lazy"
       title="Model: the sensor's ground, power and signal plugs going onto GND, 3V3 and IO32 on the board, in your cable colours"></iframe>
 
-    <p>Choose <b>your cable colours</b> at the top, then tap <b>1 GND</b>, <b>2 3V3</b> and <b>3 IO32</b> to watch each plug go on. Drag the model to turn it.</p>
+    <p>Choose <b>your cable colours</b> at the top, then tap <b>1 GND</b>, <b>2 3V3</b> and <b>3 IO32</b> to watch each plug go on.
+      Drag the model to turn it, or drag down to look at the pins from above.</p>
 
     <div class="nav-buttons">
       <button onclick="prevPage()">◀ Prev</button>
       <button onclick="nextPage()">Next ▶</button>
     </div>
-  </section> -->
+  </section>
 
-  <section class="card" id="c4m">
+  <!-- Not shown: the cable-picker card with wiring diagrams. To use it instead of the model above, add its images
+       (wiring/cable-set-1..3.png, wiring/wiring-set-1..3.png), change its class to "card" and remove "hidden",
+       and make the model card's class "card-off". -->
+  <section class="card-off" id="c4m-picker" hidden>
 
     <h1>03/06</h1>
     <h2>Connect your sensor cables</h2>
@@ -222,21 +226,21 @@
       <button class="cable-option selected"
               onclick="selectCableSet(0)"
               aria-pressed="true">
-        <img src="wiring/cable-set-1.png" alt="">
+        <img loading="lazy" src="wiring/cable-set-1.png" alt="">
         <span>Black, Red, Blue</span>
       </button>
 
       <button class="cable-option"
               onclick="selectCableSet(1)"
               aria-pressed="false">
-        <img src="wiring/cable-set-2.png" alt="">
+        <img loading="lazy" src="wiring/cable-set-2.png" alt="">
         <span>Black, Brown, Red</span>
       </button>
 
       <button class="cable-option"
               onclick="selectCableSet(2)"
               aria-pressed="false">
-        <img src="wiring/cable-set-3.png" alt="">
+        <img loading="lazy" src="wiring/cable-set-3.png" alt="">
         <span>Purple, Grey, White</span>
       </button>
 
@@ -247,7 +251,7 @@
 
       <h3>Connect your cables like this:</h3>
 
-      <img
+      <img loading="lazy"
         id="wiringDiagram"
         src="wiring/wiring-set-1.png"
         alt="Wiring instructions for black, red and blue cables"
