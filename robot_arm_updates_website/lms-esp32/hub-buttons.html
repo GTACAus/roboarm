@@ -24,15 +24,11 @@ body { background: var(--eggshell); color: var(--onyx); font: 15px/1.45 var(--fo
 #asm:focus-visible { outline: 3px solid var(--flame); outline-offset: -3px }
 .fp-view { position: absolute }
 .fp-view img { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; visibility: hidden }
-.tag { position: absolute; pointer-events: none; font: 800 14px/1 var(--font); padding: 7px 9px; border-radius: 8px;
+.tag-at { position: absolute; width: 0; height: 0; pointer-events: none }
+.tag { position: absolute; left: 0; top: 0; pointer-events: none; font: 800 14px/1 var(--font); padding: 7px 9px; border-radius: 8px;
   background: var(--yellow); border: 2px solid var(--onyx); color: var(--onyx); white-space: nowrap }
 .tag.press { animation: pulse 1.4s ease-in-out infinite }
 @keyframes pulse { 50% { box-shadow: 0 0 0 5px rgba(255, 109, 58, .4) } }
-.board { position: absolute; left: 10px; top: 10px; z-index: 2; margin: 0; width: min(28%, 180px); padding: 5px 5px 4px;
-  background: var(--card); border: 2px solid var(--onyx); border-radius: 10px; pointer-events: none; text-align: center; font-size: 13px }
-.board img { display: block; width: 100%; border-radius: 6px }
-.board figcaption { margin-top: 3px }
-.board[hidden] { display: none }
 .hint { position: absolute; top: 10px; right: 12px; font-size: 12px; font-weight: 600; color: var(--muted); pointer-events: none }
 .bar { display: grid; grid-template-columns: auto 1fr; gap: 10px 16px; align-items: center; padding: 12px 14px;
   border-top: 2px solid var(--line); background: var(--card) }
@@ -48,8 +44,7 @@ body { background: var(--eggshell); color: var(--onyx); font: 15px/1.45 var(--fo
 </style>
 </head>
 <body>
-<div id="asm" role="img" aria-label="A SPIKE Prime hub: the GTAC board goes in port A and the motors in B, C and E; then the centre button and the left and right buttons below its 5 by 5 light display, with the button to press in each step highlighted.">
-  <figure class="board" id="board"><img src="board-photo.jpg" alt="The GTAC board: a blue case with a white gtac lid and a black cable"><figcaption>The <b>GTAC board</b></figcaption></figure>
+<div id="asm" role="img" aria-label="A SPIKE Prime hub: the centre button and the left and right buttons below its 5 by 5 light display, with the button to press in each step highlighted. The display shows a heart, then 0, then R.">
   <div class="hint">Drag to turn</div>
 </div>
 <div class="bar">
@@ -57,7 +52,6 @@ body { background: var(--eggshell); color: var(--onyx); font: 15px/1.45 var(--fo
     <button type="button" data-step="0">1</button>
     <button type="button" data-step="1">2</button>
     <button type="button" data-step="2">3</button>
-    <button type="button" data-step="3">4</button>
   </div>
   <div class="say" id="say" aria-live="polite"></div>
 </div>
@@ -66,10 +60,9 @@ body { background: var(--eggshell); color: var(--onyx); font: 15px/1.45 var(--fo
 <script src="frames-player.js"></script>
 <script>
 const SAY = [
-  'Plug the blue <b>GTAC board</b> into <b>port A</b> and check the <b>motors</b> are plugged into ports <b>B</b>, <b>C</b> and <b>E</b>.',
   '<b>Turn the hub on.</b> Press the big <b>centre</b> button.',
   'Press <b>left</b> or <b>right</b> until the display shows program <b>0</b>.',
-  'Press the <b>centre</b> button to <b>start</b> program 0.',
+  'Press the <b>centre</b> button to <b>start</b> program 0. The hub shows <b>R</b> when the arm is ready.',
 ];
 // Tags, in the order render_frames.py stored their positions: the three port tags, then the centre, left and right buttons
 const TAGS = [
@@ -81,9 +74,7 @@ const TAGS = [
 
 const player = FramesPlayer(document.getElementById('asm'), window.FRAMES, 'frames/hub/', TAGS);
 const buttons = [...document.querySelectorAll('[data-step]')], say = document.getElementById('say');
-const board = document.getElementById('board');
 function setStep(s) {
-  board.hidden = s !== 0;
   buttons.forEach(b => b.classList.toggle('sel', +b.dataset.step === s));
   say.innerHTML = '<b>' + (s + 1) + '.</b> ' + SAY[s];
   player.setStep(s);

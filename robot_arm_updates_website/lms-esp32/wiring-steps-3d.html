@@ -215,12 +215,20 @@ function boot() {
   setStep(0);
   controls.target.set(...VIEW.t); cam.position.set(...VIEW.p); controls.update();
 
-  // Every step from N angles across +-45 degrees, then each plug going on, posted to render_frames.py
+  // Every step from a grid of views (N angles across +-45 degrees, at each height in ELEV), then each plug going on,
+  // posted to render_frames.py
   async function renderAll() {
-    const W = 1000, H = 640, N = 19, C = (N - 1) / 2, ARC = Math.PI / 4, T = 10, Y = new THREE.Vector3(0, 1, 0), v = new THREE.Vector3();
+    const W = 1000, H = 640, N = 19, C = (N - 1) / 2, ARC = Math.PI / 4, T = 10, v = new THREE.Vector3();
+    const ELEV = [15, 30, 45, 60, 75, 89], RC = 2;     // degrees above the table; RC is the starting view
     renderer.setPixelRatio(1); renderer.setSize(W, H, false); cam.aspect = W / H; cam.updateProjectionMatrix();
     const t0 = new THREE.Vector3(...VIEW.t), off0 = new THREE.Vector3(...VIEW.p).sub(t0);
-    const aim = a => { cam.position.copy(t0).add(off0.clone().applyAxisAngle(Y, a)); cam.lookAt(t0); };
+    const R0 = off0.length(), AZ0 = Math.atan2(off0.x, off0.z), PINS = new THREE.Vector3(40, 4, 18);
+    // a: turn from the starting view; r: height row. Higher views close in on the pin header.
+    const aim = (a, r) => {
+      const e = ELEV[r] * Math.PI / 180, f = Math.max(0, Math.min(1, (ELEV[r] - 45) / 44));
+      const t = t0.clone().lerp(PINS, 0.6 * f), d = R0 * (1 - 0.25 * f), az = AZ0 + a;
+      cam.position.set(t.x + d * Math.cos(e) * Math.sin(az), t.y + d * Math.sin(e), t.z + d * Math.cos(e) * Math.cos(az)); cam.lookAt(t);
+    };
     const r4 = x => Math.round(x * 1e4) / 1e4;
     const proj = p => { v.set(...p).project(cam); return v.z < 1 ? [r4((v.x + 1) / 2), r4((1 - v.y) / 2)] : 0; };
     const tagsNow = () => [...WIRES.map(w => proj([w.to[0], HEADER_TOP + 1 + (1 - w.lift) * (DUP_H + 2), w.to[1]])), proj([USB[0], 4, USB[1] - 4])];
@@ -232,18 +240,22 @@ function boot() {
     const ringsFor = s => WIRES.forEach((w, i) => { const on = s === i + 1; w.ring.material.opacity = on ? 0.9 : (s === 4 ? 0.5 : 0); w.ring.scale.setScalar(on ? 1.12 : 1); });
     const liftFor = s => WIRES.forEach((w, i) => { w.lift = w.target = s === 0 ? 1 : (i < s ? 0 : 1); place(w, i); });
     const ease = u => u < .5 ? 2 * u * u : 1 - Math.pow(-2 * u + 2, 2) / 2;
-    const out = { w: W, h: H, n: N, center: C, sets: SETS.length, steps: [], trans: {} };
+    const out = { w: W, h: H, n: N, center: C, rows: ELEV.length, rowCenter: RC, elev: ELEV, sets: SETS.length, steps: [], trans: {} };
     for (let n = 0; n < SETS.length; n++) {      // frames/wiring/<set>/ for each cable colour set; the tags are the same for all
       ['gnd', 'vcc', 'sig'].forEach(m => M[m].color.set(SETS[n][m][1]));
       const dir = `frames/wiring/${n + 1}/`;
       for (let s = 0; s < SAY.length; s++) {
         setStep(s); ringsFor(s); liftFor(s);
         const tags = [];
-        for (let k = 0; k < N; k++) { aim((k - C) / C * ARC); tags.push(await snap(`${dir}s${s}-${k}.webp`)); }
+        for (let r = 0; r < ELEV.length; r++) {
+          const row = [];
+          for (let k = 0; k < N; k++) { aim((k - C) / C * ARC, r); row.push(await snap(`${dir}s${s}-${r}-${k}.webp`)); }
+          tags.push(row);
+        }
         if (!n) out.steps.push({ tags });
       }
       for (let s = 0; s < WIRES.length; s++) {     // plug s goes on: step s -> s + 1, seen from the middle angle
-        setStep(s + 1); ringsFor(s + 1); liftFor(s); aim(0);
+        setStep(s + 1); ringsFor(s + 1); liftFor(s); aim(0, RC);
         const tags = [];
         for (let k = 1; k < T; k++) { WIRES[s].lift = 1 - ease(k / T); place(WIRES[s], s); tags.push(await snap(`${dir}t${s}${s + 1}-${k}.webp`)); }
         if (!n) out.trans[`${s}-${s + 1}`] = { n: T - 1, tags };

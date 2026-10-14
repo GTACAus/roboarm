@@ -77,12 +77,12 @@ h1 { font-weight: 800; font-size: clamp(30px, 4.6vw, 44px); line-height: 1.1; ma
 
   <main class="sheet" id="sheet" aria-live="polite"></main>
 
-  <p class="foot">Each code holds a standard Wi-Fi join string, for example <code>WIFI:T:WPA;S:GTAC 1;P:robotarm;;</code>. Network names are <b>GTAC 1</b> to <b>GTAC 100</b>, with a space before the number. All use the password <b>robotarm</b> (WPA/WPA2). Use the arrow keys to change page.</p>
+  <p class="foot">Each code holds a standard Wi-Fi join string, for example <code>WIFI:T:WPA;S:GTAC 1;P:gtacrobot;;</code>. Network names are <b>GTAC 1</b> to <b>GTAC 100</b>, with a space before the number. All use the password <b>robotarm</b> (WPA/WPA2). Use the arrow keys to change page.</p>
 </div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcode-generator/1.4.4/qrcode.min.js"></script>
 <script>
-const COUNT = 100, PER_PAGE = 10, PASSWORD = 'robotarm';
+const COUNT = 100, PER_PAGE = 10, PASSWORD = 'gtacrobot';
 const PAGES = Math.ceil(COUNT / PER_PAGE);
 const ssidOf = n => `GTAC ${n}`;
 // Wi-Fi QR format: special characters in the name and password are backslash-escaped

@@ -7,7 +7,7 @@ website folder (next to the `.html` files). Until then the card simply shows its
 ## What changed (why we are re-recording)
 
 - The hub runs the official **SPIKE App 3** with the arm program in **slot 0** (no Mindstorms app).
-- The LMS-ESP32 board makes its own Wi-Fi, named after the board, for example **GTAC 12** (password **robotarm**).
+- The LMS-ESP32 board makes its own Wi-Fi, named after the board, for example **GTAC 12** (password **gtacrobot**).
 - Joining that Wi-Fi pops up a page with **Open the remote**; the remote is at **10.10.10.10**.
 - The muscle sensor connects to **IO32**, **GND** and **3V3** (not IO33).
 - Students can code the arm with blocks in the remote's **Advanced (code)** mode.
@@ -61,7 +61,7 @@ website folder (next to the `.html` files). Until then the card simply shows its
 | Shot | What to show | Line |
 |---|---|---|
 | 1 | Settings → Wi-Fi; the list shows **GTAC 12** | *"Open Settings, then Wi-Fi, and find your board's name."* |
-| 2 | Tap it, type **robotarm**, tap Join | *"The password is robotarm."* |
+| 2 | Tap it, type **gtacrobot**, tap Join | *"The password is G T A C robot."* |
 | 3 | The pop-up page appears; tap **Open the remote** | *"A page pops up. Tap Open the remote."* |
 | 4 | The remote loads; tap **Done** at the top right | *"Tap Done, not Cancel, so the iPad stays on this Wi-Fi."* |
 | 5 | Home screen: tap the **Robot arm** app; the remote loads | *"If no page pops up, open the Robot arm app on the home screen."* |

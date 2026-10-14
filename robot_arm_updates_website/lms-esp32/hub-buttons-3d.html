@@ -80,16 +80,15 @@ const BUTTONS = { centre: { x: 0, z: 32, r: 6.2 }, left: { x: -14.5, z: 32, r: 3
 const PICS = {
   off:   ['.....', '.....', '.....', '.....', '.....'],
   heart: ['.#.#.', '#####', '#####', '.###.', '..#..'],
-  zero:  ['.###.', '#...#', '#...#', '#...#', '.###.'],
+  zero:  ['.###.', '.#.#.', '.#.#.', '.#.#.', '.###.'],     // the hub's narrow digits and letters
+  R:     ['.##..', '.#.#.', '.##..', '.#.#.', '.#.#.'],
 };
 // ?render: draw the frames the step player (hub-buttons.html) shows; run by render_frames.py
 const RENDER = new URLSearchParams(location.search).has('render');
 const STEPS = [
-  { press: [], ports: true, pic: 'off', view: 'ports',
-    say: 'Plug the blue <b>GTAC board</b> into <b>port A</b> and check the <b>motors</b> are plugged into ports <b>B</b>, <b>C</b> and <b>E</b>.' },
   { press: ['centre'], pic: 'heart', say: '<b>Turn the hub on.</b> Press the big <b>centre</b> button.' },
   { press: ['left', 'right'], pic: 'zero', say: 'Press <b>left</b> or <b>right</b> until the display shows program <b>0</b>.' },
-  { press: ['centre'], pic: 'zero', say: 'Press the <b>centre</b> button to <b>start</b> program 0.' },
+  { press: ['centre'], pic: 'R', say: 'Press the <b>centre</b> button to <b>start</b> program 0. The hub shows <b>R</b> when the arm is ready.' },
 ];
 // Ports on the hub's long sides: openings 27.2 mm up, at z -16, 0 and 16. The arm uses A (board), B, C and E (motors)
 const PORTS = [['A', -1, -16], ['B', 1, -16], ['C', -1, 0], ['E', -1, 16]];
@@ -137,9 +136,14 @@ function boot() {
     g.fillStyle = '#5b6064'; g.font = '600 34px "Figtree", Arial, sans-serif'; g.textAlign = 'center'; g.textBaseline = 'middle';
     [['A', -1, -16], ['C', -1, 0], ['E', -1, 16], ['B', 1, -16], ['D', 1, 0], ['F', 1, 16]].forEach(([l, sx, z]) => g.fillText(l, X(sx * 21.5), Z(z)));
     const rows = PICS[pic];
+    g.fillStyle = '#8c8e8a'; g.fillRect(X(-12.6), Z(-15.6), mm(25.2), mm(25.2));       // the display: grey until a pixel lights
     for (let r = 0; r < 5; r++) for (let q = 0; q < 5; q++) {
-      g.fillStyle = rows[r][q] === '#' ? '#fff3c4' : '#2c3033';
-      g.fillRect(X(-11.5 + q * 4.6 - 1.7), Z(-14.5 + r * 4.6 - 1.7), mm(3.4), mm(3.4));
+      const on = rows[r][q] === '#', x = X(-11.5 + q * 4.6 - 1.7), z = Z(-14.5 + r * 4.6 - 1.7);
+      g.save();
+      if (on) { g.shadowColor = '#ffb04a'; g.shadowBlur = 18; }
+      g.fillStyle = on ? '#ffd58c' : '#858783'; g.fillRect(x, z, mm(3.4), mm(3.4));
+      if (on) { g.shadowBlur = 0; g.fillStyle = '#fff1cf'; g.fillRect(x + mm(0.7), z + mm(0.7), mm(2.0), mm(2.0)); }
+      g.restore();
     }
     g.strokeStyle = '#c9ccce'; g.lineWidth = 4; g.strokeRect(X(-12.6), Z(-15.6), mm(25.2), mm(25.2));
     g.fillStyle = '#5b6064';
@@ -178,12 +182,12 @@ function boot() {
   function fly(v) { flight = { from: { t: controls.target.clone(), p: cam.position.clone() }, to: { t: new THREE.Vector3(...v.t), p: new THREE.Vector3(...v.p) }, s: performance.now() }; }
   const TOP_VIEW = { t: [0, TOP, 8], p: [0, 130, 92] }, PORTS_VIEW = { t: [0, 20, 2], p: [-62, 100, 118] };
   buttons.forEach(b => b.addEventListener('click', () => setStep(+b.dataset.step)));
-  controls.target.set(...PORTS_VIEW.t); cam.position.set(...PORTS_VIEW.p); controls.update();
+  controls.target.set(...TOP_VIEW.t); cam.position.set(...TOP_VIEW.p); controls.update();
   setStep(0); flight = null;
 
   // Every step from N angles across +-45 degrees, then the camera's move from the ports to the top, posted to render_frames.py
   async function renderAll() {
-    const W = 1000, H = 640, N = 19, C = (N - 1) / 2, ARC = Math.PI / 4, M = 14, Y = new THREE.Vector3(0, 1, 0), v = new THREE.Vector3();
+    const W = 1000, H = 640, N = 19, C = (N - 1) / 2, ARC = Math.PI / 4, Y = new THREE.Vector3(0, 1, 0), v = new THREE.Vector3();
     renderer.setPixelRatio(1); renderer.setSize(W, H, false); cam.aspect = W / H; cam.updateProjectionMatrix();
     const views = [PORTS_VIEW, TOP_VIEW].map(q => ({ t: new THREE.Vector3(...q.t), p: new THREE.Vector3(...q.p) }));
     const aim = (q, a) => { cam.position.copy(q.t).add(q.p.clone().sub(q.t).applyAxisAngle(Y, a)); cam.lookAt(q.t); };
@@ -200,7 +204,6 @@ function boot() {
       Object.keys(BUTTONS).forEach(k => { const on = s >= 0 && STEPS[s].press.includes(k); rings[k].material.opacity = on ? 1 : 0; rings[k].scale.setScalar(on ? 1.1 : 1); });
       portGlow.forEach(m => { m.material.opacity = s >= 0 && STEPS[s].ports ? 0.8 : 0; });
     };
-    const ease = u => u < .5 ? 2 * u * u : 1 - Math.pow(-2 * u + 2, 2) / 2;
     const out = { w: W, h: H, n: N, center: C, steps: [], trans: {} };
     for (let s = 0; s < STEPS.length; s++) {
       setStep(s); show(s);
@@ -208,14 +211,6 @@ function boot() {
       for (let k = 0; k < N; k++) { aim(q, (k - C) / C * ARC); tags.push(await snap(`frames/hub/s${s}-${k}.webp`, s)); }
       out.steps.push({ tags });
     }
-    drawDeck('off'); show(-1);     // from the ports down to the top (step 1 -> 2)
-    const tags = [];
-    for (let k = 1; k < M; k++) {
-      const e = ease(k / M), t = views[0].t.clone().lerp(views[1].t, e);
-      cam.position.copy(views[0].p).lerp(views[1].p, e); cam.lookAt(t);
-      tags.push(await snap(`frames/hub/t01-${k}.webp`, -1));
-    }
-    out.trans['0-1'] = { n: M - 1, tags };
     const px = document.createElement('canvas'); px.width = px.height = 1;
     px.getContext('2d').drawImage(renderer.domElement, 3, 3, 1, 1, 0, 0, 1, 1);
     const d = px.getContext('2d').getImageData(0, 0, 1, 1).data; out.bg = `rgb(${d[0]},${d[1]},${d[2]})`;

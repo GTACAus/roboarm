@@ -6,7 +6,7 @@ a live 3D model.
                                           frames/hub/*.webp + manifest.js         (from hub-buttons-3d.html)
     python render_frames.py hub        -> just one of them
 
-Each 3D page, opened with ?render, draws every step from 19 angles (and the moves between steps) and posts
+Each 3D page, opened with ?render, draws every step from 19 angles (the wiring page also at 6 heights) and the moves between steps, and posts
 the images here. Needs Chrome or Edge, and the internet (three.js comes from a CDN). Run it again after a
 model or a step changes.
 """
@@ -72,7 +72,7 @@ def render(name):
     proc = subprocess.Popen([browser(), "--headless=new", "--use-angle=swiftshader", "--enable-unsafe-swiftshader",
                              "--user-data-dir=" + profile, "--no-first-run", "--window-size=1000,800", url],
                             stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
-    ok = finished.wait(900)
+    ok = finished.wait(3600)
     proc.terminate(); proc.wait()
     shutil.rmtree(profile, ignore_errors=True)
     if not ok:
