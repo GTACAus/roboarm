@@ -2,9 +2,10 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
+<link rel="preload" href="fonts/figtree.woff2" as="font" type="font/woff2" crossorigin>
+<style>@font-face { font-family: "Figtree"; src: url("fonts/figtree.woff2") format("woff2"); font-weight: 300 900; font-display: swap }</style>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Design Thinking for Prosthesis</title>
-  <link href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;600;700&display=swap" rel="stylesheet">
   <style>
     :root{
       --card-bg: #dbf2ff;   /* light blue like your Canva */
@@ -113,7 +114,7 @@
     <!-- 2. Robotic Arm Instructions -->
     <div class="card">
       <div class="image-box">
-        <img src="roboticarm.png" alt="Robotic arm assembly icon">
+        <img src="roboticarm.webp" alt="Robotic arm assembly icon">
       </div>
       <div class="label">Robotic Arm<br/>Instructions</div>
       <a href="arm-instructions.html">Robotic Arm Instructions</a>
@@ -123,7 +124,7 @@
     <div class="card">
       <div class="image-box">
         <!-- replace with your asset -->
-        <img src="harpy-eagle1.png" alt="Biomimicry Library icon">
+        <img loading="lazy" decoding="async" src="harpy-eagle1.webp" alt="Biomimicry Library icon">
       </div>
       <div class="label">Biomimicry Library</div>
       <a href="biomimicry-library.html">Biomimicry Library</a>
@@ -131,7 +132,7 @@
     <!-- 5. SCAMPER -->
     <div class="card">
       <div class="image-box">
-        <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQSZYP2RjabHjU1SrtOva7vmBSNbMA7rEhVBg&s" alt="The GTAC arm">
+        <img loading="lazy" decoding="async" src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQSZYP2RjabHjU1SrtOva7vmBSNbMA7rEhVBg&s" alt="The GTAC arm">
       </div>
       <div class="label">SCAMPER:<br/>Ideation</div>
       <a href="https://gtacaus.github.io/SCAMPER/">SCAMPER</a>
@@ -139,7 +140,7 @@
         <!-- 4. Robotic Arm App -->
     <div class="card">
       <div class="image-box">
-        <img src="GTACArm.jpg" alt="The GTAC arm">
+        <img loading="lazy" decoding="async" src="GTACArm.webp" alt="The GTAC arm">
       </div>
       <div class="label">Biomechanics:<br/>The human arm</div>
       <a href="https://gtacaus.github.io/arm/">GTAC arm</a>
@@ -147,7 +148,7 @@
     <!-- 3. Connecting Myosensors -->
     <div class="card">
       <div class="image-box">
-        <img src="EMG.png" alt="EMG / myosensor icon">
+        <img loading="lazy" decoding="async" src="EMG.webp" alt="EMG / myosensor icon">
       </div>
       <div class="label">Connecting<br/>Myosensors</div>
       <a href="connecting-myosensors.html">Connecting Myosensors</a>
@@ -155,7 +156,7 @@
     <!-- 3. Placeholder -->
     <div class="card">
       <div class="image-box">
-        <img src="control.png" alt="Code">
+        <img loading="lazy" decoding="async" src="control.webp" alt="Code">
       </div>
       <div class="label">Code your<br/> controller</div>
       <a href="codecontrol.html">Coding remote</a>
