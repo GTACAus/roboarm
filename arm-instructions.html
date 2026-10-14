@@ -216,7 +216,7 @@
     </style>
   </head>
   <body>
-    <!-- 01/06 BUILD -->
+    <!-- 01/05 BUILD -->
 <section class="card active" id="c1">
 
   <h1>01/05</h1>
@@ -244,7 +244,7 @@
   </div>
 </section>
 
-    <!-- 02/06 Connect the motor cables -->
+    <!-- old 02/05 Connect the motor cables (video) -->
     <!-- <section class="card" id="c2">
       <h1>02/05</h1>
       <h2>Connect the motor cables</h2>
@@ -290,13 +290,13 @@
     </div>
   </section>
 
-    <!-- 03/05 Start the arm program -->
-    <!-- <section class="card" id="c4">
+    <!-- 03/05 Start the arm program: the hub model (turn on, choose program 0, start it) -->
+    <section class="card" id="c3m">
       <h1>03/05</h1>
       <h2>Start the arm program on the hub</h2>
 
       <iframe class="model" src="robot_arm_updates_website/lms-esp32/hub-buttons.html?for=arm" loading="lazy"
-        title="3D SPIKE hub: where to plug in the board and motors, and which buttons start program 0"></iframe>
+        title="SPIKE hub model: which buttons turn the hub on, choose program 0 and start it"></iframe>
 
       <p>Tap the numbers under the hub to go through each step. Drag the hub to turn it.</p>
 
@@ -304,9 +304,11 @@
         <button onclick="prevPage()">◀ Prev</button>
         <button onclick="nextPage()">Next ▶</button>
       </div>
-    </section> -->
+    </section>
 
-    <section class="card" id="c3">
+    <!-- Not shown: the same steps as three videos. To use it instead of the hub model above, change its class to
+         "card" and remove "hidden", make the model card's class "card-off", and put autoplay back on the video. -->
+    <section class="card-off" id="c3" hidden>
 
       <h1>03/05</h1>
       <h2>Start the arm program on the hub</h2>
@@ -322,7 +324,7 @@
 
         <video
           id="videoSlide"
-          autoplay
+          preload="none"
           muted
           loop
           playsinline
@@ -353,7 +355,7 @@
 
     <!-- 04/05 Join the arm's Wi-Fi -->
     <section class="card" id="c5">
-      <h1>05/06</h1>
+      <h1>04/05</h1>
       <h2>Connect your iPad to the arm</h2>
 
       <video controls playsinline preload="metadata" poster="captive-portal.jpg" data-alt="The page that pops up when the iPad joins the arm's Wi-Fi, with the Open the remote button">
@@ -376,7 +378,7 @@
 
     <!-- 05/05 Use the remote -->
     <section class="card" id="c6">
-      <h1>06/06</h1>
+      <h1>05/05</h1>
       <h2>Drive your arm with the remote</h2>
 
       <video controls playsinline preload="metadata" poster="remote-basic.jpg" data-alt="The remote on the Remote tab with Basic selected: D-pad 1, slider 2 and the motor positions">
