@@ -19,7 +19,7 @@
       min-height: 100vh;
     }
 
-    /* Automatically fit each page's content instead of forcing an 800px height. */
+    /* Each page grows to fit its content. */
     .card {
       box-sizing: border-box;
       background: #fff;
@@ -31,14 +31,14 @@
       text-align: center;
       display: none;
       flex-direction: column;
-      justify-content: flex-start;
-      position: relative;
     }
+
     .card.active { display: flex; }
     .card h1 { font-size: 2.2em; margin: 6px 0; }
     .card h2 { font-size: 1.6em; margin: 6px 0 10px; }
     .card p { font-size: 1.15em; margin: 10px 24px; line-height: 1.45; }
     .card img { border-radius: 10px; width: 100%; height: auto; margin-top: 10px; }
+
     video {
       border-radius: 10px;
       width: 100%;
@@ -48,8 +48,22 @@
       object-fit: contain;
       margin-top: 10px;
     }
-    .img-medium { max-width: 560px; display: block; margin: 10px auto; border: 2px solid #e4dfc8; }
-    .steps { text-align: left; font-size: 1.1em; line-height: 1.5; margin: 10px 30px; padding-left: 28px; }
+
+    .img-medium {
+      max-width: 560px;
+      display: block;
+      margin: 10px auto;
+      border: 2px solid #e4dfc8;
+    }
+
+    .steps {
+      text-align: left;
+      font-size: 1.1em;
+      line-height: 1.5;
+      margin: 10px 30px;
+      padding-left: 28px;
+    }
+
     .steps li { margin-bottom: 8px; }
     .tip { background: #fff8db; border-radius: 10px; padding: 10px 14px; font-size: 1.05em !important; }
 
@@ -60,7 +74,9 @@
       padding: 0 15px;
       margin-top: 24px;
     }
-    .nav-buttons button, .nav-buttons a.btn {
+
+    .nav-buttons button,
+    .nav-buttons a.btn {
       margin: 5px;
       padding: 10px 18px;
       border: none;
@@ -73,80 +89,44 @@
       display: inline-block;
       font-family: inherit;
     }
-    .nav-buttons button:hover, .nav-buttons a.btn:hover { background: #0056b3; }
 
-    /* Video slideshow: four short videos within page 04/04. */
-    #videoViewer { width: 100%; text-align: center; }
-    #videoSlide {
-      display: block;
-      max-width: 100%;
-      max-height: 450px;
-      width: auto;
-      height: auto;
-      object-fit: contain;
-      margin: 0 auto;
-      border-radius: 10px;
-    }
-    #videoInstruction {
-      text-align: center;
-      font-size: 17px;
-      line-height: 1.5;
-      margin: 16px auto 12px;
-      max-width: 550px;
-      min-height: 52px;
-    }
-    .img-controls {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      gap: 15px;
-      margin-top: 10px;
-    }
-    .img-controls button {
-      background: #007bff;
-      color: white;
-      border: 0;
-      border-radius: 20px;
-      padding: 8px 16px;
-      font-size: 1em;
-      font-family: inherit;
-      cursor: pointer;
-    }
-    .img-controls button:hover { background: #0056b3; }
-    #videoCounter { font-weight: 600; color: #333; }
+    .nav-buttons button:hover,
+    .nav-buttons a.btn:hover { background: #0056b3; }
 
     @media (max-width: 600px) {
       .card { padding: 16px 10px; }
       .card p { margin: 10px 12px; }
       .steps { margin: 10px 12px; padding-left: 24px; }
       .nav-buttons { padding: 0 4px; }
-      #videoInstruction { min-height: 0; }
     }
   </style>
 </head>
+
 <body>
-  <!-- 01/04 INTRO -->
+  <!-- 01/03 INTRODUCTION -->
   <section class="card active" id="c1">
-    <h1>01/04</h1>
+    <h1>01/03</h1>
     <h2>Change how your prosthetic moves</h2>
     <p>
       You can program your arm with blocks on the iPad. Each control on the remote has a number,
       and your code decides what happens when you use it: how far a motor turns, how fast, and in which direction.
     </p>
     <img src="code-canvas.jpg" alt="The code canvas: blocks on the left, the live remote and motor positions on the right" class="img-medium" />
+
     <div class="nav-buttons">
       <a class="btn" href="index.html">◀ Home</a>
       <button type="button" onclick="nextPage()">Start ▶</button>
     </div>
   </section>
 
-  <!-- 02/04 OPEN THE CODE CANVAS -->
+  <!-- 02/03 OPEN THE CODE CANVAS -->
   <section class="card" id="c2">
-    <h1>02/04</h1>
+    <h1>02/03</h1>
     <h2>Open the code canvas</h2>
     <video controls playsinline preload="metadata">
       <source src="advanced-code.mp4" type="video/mp4" />
     </video>
+
     <ol class="steps">
       <li>Connect your iPad to the arm's Wi-Fi (see <a href="arm-instructions.html">the robotic arm steps</a>).</li>
       <li>On the <b>Remote</b> tab, choose <b>Advanced (code)</b>, then tap <b>&lt;/&gt; Code</b>.</li>
@@ -154,19 +134,21 @@
         The live remote on the right shows the same numbers as the blocks.</li>
       <li>Tap <b>▶ Run</b>, then use the remote on the right to test it.</li>
     </ol>
+
     <div class="nav-buttons">
       <button type="button" onclick="prevPage()">◀ Prev</button>
       <button type="button" onclick="nextPage()">Next ▶</button>
     </div>
   </section>
 
-  <!-- 03/04 CHANGE THE CODE -->
+  <!-- 03/03 CHANGE THE CODE -->
   <section class="card" id="c3">
-    <h1>03/04</h1>
+    <h1>03/03</h1>
     <h2>Change your code</h2>
     <video controls playsinline preload="metadata">
-      <source src="code-change.mp4" type="video/mp4" />
+      <source src="advanced-code-2.mp4" type="video/mp4" />
     </video>
+
     <ol class="steps">
       <li>Tap a number in a <b>turn</b> block and change it: <b>5</b> is a small step, <b>90</b> is a quarter turn.</li>
       <li>Drag <b>set Motor speed to slow / medium / fast</b> from <b>Motors</b> to change how fast it moves.</li>
@@ -174,28 +156,7 @@
       <li>Tap <b>■ Stop</b>, then <b>▶ Run</b> again to try your changes. Your code is saved on the iPad.</li>
     </ol>
     <p class="tip">Stuck? Tap the yellow <b>?</b> in the app for help.</p>
-    <div class="nav-buttons">
-      <button type="button" onclick="prevPage()">◀ Prev</button>
-      <button type="button" onclick="nextPage()">Next ▶</button>
-    </div>
-  </section>
 
-  <!-- 04/04 SPEED-SETTINGS VIDEO SLIDESHOW -->
-  <section class="card" id="c4">
-    <h1>04/04</h1>
-    <h2>Try it yourself: Adjust the speed</h2>
-    <p>Learn how to adjust the speed of the motors below</p>
-    <div id="videoViewer">
-      <video id="videoSlide" src="speed-settings-1.mp4" autoplay muted loop playsinline preload="metadata"></video>
-
-      <!-- This text updates with the video. -->
-      <p id="videoInstruction">Step 1: Click on the "Motors" tab on the left menu.</p>
-      <div class="img-controls">
-        <button type="button" onclick="prevVideo()" aria-label="Previous video">◀</button>
-        <span id="videoCounter">1 / 4</span>
-        <button type="button" onclick="nextVideo()" aria-label="Next video">▶</button>
-      </div>
-    </div>
     <div class="nav-buttons">
       <button type="button" onclick="prevPage()">◀ Prev</button>
       <a class="btn" href="index.html">Home ▶</a>
@@ -203,63 +164,20 @@
   </section>
 
   <script>
-    // Page navigation, shared by all four sections.
+    // Navigate between the three pages and pause videos on leaving a page.
     const cards = Array.from(document.querySelectorAll('.card'));
-    let current = Math.max(0, cards.findIndex(card => card.classList.contains('active')));
+    let current = 0;
 
     function show(index) {
       if (index < 0 || index >= cards.length) return;
-      document.querySelectorAll('video').forEach(video => video.pause());
+      cards[current].querySelectorAll('video').forEach(video => video.pause());
       cards[current].classList.remove('active');
       current = index;
       cards[current].classList.add('active');
-      // Start the selected slideshow video after its section becomes visible.
-      if (cards[current].id === 'c4') showVideo();
     }
+
     function nextPage() { show(current + 1); }
     function prevPage() { show(current - 1); }
-
-    // Edit the instructions for each of the four videos here.
-    const videoSlides = [
-      { video: 'speed-settings-1.mp4', instruction: 'Step 1: Click on the "Motors" tab on the left menu.' },
-      { video: 'speed-settings-2.mp4', instruction: 'Step 2: Drag the "Set motor speed" block to the canvas.' },
-      { video: 'speed-settings-3.mp4', instruction: 'Step 3: Place the speed block between the yellow block and the angle block.' },
-      { video: 'speed-settings-4.mp4', instruction: 'Step 4: Change the speed block to the right motor, and change the speed.' }
-    ];
-    let currentVideo = 0;
-
-    function showVideo() {
-      const video = document.getElementById('videoSlide');
-      const instruction = document.getElementById('videoInstruction');
-      const counter = document.getElementById('videoCounter');
-      if (!video || !instruction || !counter) return;
-
-      const slide = videoSlides[currentVideo];
-      video.muted = true;
-      video.loop = true;
-      video.playsInline = true;
-      video.src = slide.video;
-      video.load();
-      instruction.textContent = slide.instruction;
-      counter.textContent = `${currentVideo + 1} / ${videoSlides.length}`;
-
-      if (cards[current].id === 'c4') {
-        video.controls = false;
-        video.play().catch(error => {
-          console.warn('Autoplay prevented:', error);
-          video.controls = true;
-        });
-      }
-    }
-    function nextVideo() {
-      currentVideo = (currentVideo + 1) % videoSlides.length;
-      showVideo();
-    }
-    function prevVideo() {
-      currentVideo = (currentVideo - 1 + videoSlides.length) % videoSlides.length;
-      showVideo();
-    }
-    if (cards[current]?.id === 'c4') showVideo();
   </script>
 </body>
 </html>
