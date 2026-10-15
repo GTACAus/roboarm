@@ -5,14 +5,33 @@ board, and the web server sends them straight from flash.
 
     python tools/make_www.py
 """
+import gzip
+import hashlib
 import os
+import re
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 WWW = os.path.join(ROOT, "app", "www")
 OUT = os.path.join(ROOT, "app", "www_data.py")
 
 
+def stamp_blockly():
+    """iPads cache blockly.js for a day, so app.js asks for blockly.js?v=<its hash>:
+    a changed blockly.js gets a new address and is fetched fresh."""
+    app_gz = os.path.join(WWW, "app.js.gz")
+    with open(os.path.join(WWW, "blockly.js.gz"), "rb") as f:
+        version = hashlib.md5(gzip.decompress(f.read())).hexdigest()[:8]
+    with open(app_gz, "rb") as f:
+        app = gzip.decompress(f.read()).decode("utf-8")
+    stamped = re.sub(r"blockly\.js\?v=[0-9a-z]+", "blockly.js?v=" + version, app)
+    if stamped != app:
+        with open(app_gz, "wb") as f:
+            f.write(gzip.compress(stamped.encode("utf-8"), 9, mtime=0))
+        print("app.js: blockly.js?v=" + version)
+
+
 def main():
+    stamp_blockly()
     names = []
     for folder, _, files in os.walk(WWW):
         for f in files:

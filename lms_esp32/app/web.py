@@ -10,7 +10,6 @@
 # hub link never stalls.
 
 import gc
-import machine
 import network
 import socket
 import utime
@@ -33,7 +32,7 @@ WIFI_NAME = getattr(config, "WIFI_NAME", None)            # the network name stu
 WIFI_PASSWORD = getattr(config, "WIFI_PASSWORD", None)    # at least 8 characters; must match the QR codes
 UPLINK_NAME = getattr(config, "UPLINK_NAME", None)        # the network whose internet is shared (None: no internet)
 UPLINK_PASSWORD = getattr(config, "UPLINK_PASSWORD", "")
-SIMULATE = getattr(config, "SIMULATE", False)             # kept when rewriting config.py from /wifi
+SIMULATE = getattr(config, "SIMULATE", False)             # a test board with a simulated hub
 HOSTNAME = "gtac"              # the remote is also at http://gtac.local (every board, on its own hotspot)
 ADDRESS = "10.10.10.10"        # the remote's web address (private: never cached from the internet)
 FILES = {"/app.js": ("app.js.gz", "application/javascript"),
@@ -44,6 +43,8 @@ FILES = {"/app.js": ("app.js.gz", "application/javascript"),
 MAX_LIVE = 4                   # live page connections kept at once
 PAGE_TIMEOUT_MS = 3000         # the page counts as open while it has spoken within this time
 FORGET_MS = 15000              # a device whose page has been closed this long gets the sign-in pop-up again next time
+STALL_MS = 10000               # a download or live link with no progress this long is closed (its device has gone)
+MAX_SENDING = 8                # downloads at once; the oldest is dropped past this
 APPLE_OK = b"<HTML><HEAD><TITLE>Success</TITLE></HEAD><BODY>Success</BODY></HTML>"
 WS_GUID = "258EAFA5-E914-47DA-95CA-C5AB0DC85B11"
 
@@ -56,21 +57,6 @@ def parse(text):
             k, v = part.split("=", 1)
             d[k] = v
     return d
-
-
-def unquote(s):
-    """Decode a URL-encoded form value (ASCII; good enough for SSIDs/passwords)."""
-    s = s.replace("+", " ")
-    if "%" not in s:
-        return s
-    bits = s.split("%")
-    out = bits[0]
-    for b in bits[1:]:
-        try:
-            out += chr(int(b[:2], 16)) + b[2:]
-        except ValueError:
-            out += "%" + b
-    return out
 
 
 def esc(text):
@@ -101,9 +87,9 @@ def _dur(s):
     return "%dm %ds" % (m, s % 60)
 
 
-def stats_page(info, message=""):
-    """Diagnostics page for the AP, with a form to change the uplink network.
-    `info` is a plain dict (see Web._stats_info), so this is easy to test."""
+def stats_page(info):
+    """Diagnostics page for the board. `info` is a plain dict (see Web._stats_info),
+    so this is easy to test."""
     phy = {4: "802.11n", 3: "802.11g", 2: "802.11b"}.get(info.get("phy", 0), "-")
     width = "40 MHz (HT40)" if info.get("ht40") else "20 MHz"
     mb = lambda b: "%.1f MB" % (b / 1e6) if b < 1e9 else "%.2f GB" % (b / 1e9)
@@ -124,6 +110,16 @@ def stats_page(info, message=""):
                 ("Data (down / up)", "%s / %s" % (mb(info["rx"]), mb(info["tx"])))]
     else:
         rows = [("Uplink network", "none (internet sharing off)")]
+    hub = info.get("hub")
+    if hub is not None:
+        rows.append(("Hub link", "connected" if hub["connected"] else "not connected (check the cable in port A)"))
+        bat = hub["battery"]
+        if bat:
+            pct, mv, age = bat
+            rows.append(("Hub battery", "%d%% (%.2f V), %s ago%s" % (
+                pct, mv / 1000, _dur(age), " - charge soon" if pct < 20 else "")))
+        else:
+            rows.append(("Hub battery", "not reported (hub program too old, or its hub can't say)"))
     rows += [("Hotspot", esc(info["ap_ssid"]) + " on channel %s" % info["channel"]),
              ("Hotspot address", info["ap_ip"]),
              ("Clients connected", "-" if info["clients"] is None else str(info["clients"])),
@@ -137,7 +133,6 @@ def stats_page(info, message=""):
         rows.append(("Mode", "SIMULATION (no real arm)"))
     table = "".join("<tr><td>%s</td><td>%s</td></tr>" % (k, v) for k, v in rows)
     clients = "".join("<li>%s</li>" % esc(m) for m in info["macs"])
-    note = "<p class=msg>%s</p>" % esc(message) if message else ""
     return (
         "<!doctype html><html><head><meta charset=utf-8>"
         "<meta name=viewport content='width=device-width,initial-scale=1'>"
@@ -146,23 +141,14 @@ def stats_page(info, message=""):
         "h1{font-size:19px}h2{font-size:13px;text-transform:uppercase;letter-spacing:.05em;color:#71717a;margin:18px 0 6px}"
         "table{width:100%%;border-collapse:collapse}td{padding:4px 2px;border-top:1px solid #e4e4e7;vertical-align:top}"
         "td:first-child{color:#71717a;width:48%%}ul{margin:4px 0;padding-left:20px;color:#52525b}"
-        "label{display:block;margin:8px 0 2px;color:#71717a;font-size:13px}"
-        "input{width:100%%;box-sizing:border-box;padding:8px;border:1px solid #d4d4d8;border-radius:8px;font:inherit}"
         "button{margin-top:10px;padding:8px 14px;border:0;border-radius:8px;background:#18181b;color:#fff;font:inherit}"
-        ".msg{padding:8px 10px;background:#f4f4f5;border-radius:8px}a{color:#2563eb}"
+        "a{color:#2563eb}"
         "@media(prefers-color-scheme:dark){body{background:#09090b;color:#f4f4f5}"
-        "td{border-color:#27272a}input{background:#18181b;color:#f4f4f5;border-color:#3f3f46}"
-        "button{background:#f4f4f5;color:#18181b}.msg{background:#18181b}}"
+        "td{border-color:#27272a}button{background:#f4f4f5;color:#18181b}}"
         "</style></head><body>"
-        "<h1>%s</h1>%s"
+        "<h1>%s</h1>"
         "<h2>Status</h2><table>%s</table>"
         "%s"
-        "<h2>Change the internet network</h2>"
-        "<form action=/wifi method=get>"
-        "<label>Network name (SSID)</label><input name=ssid maxlength=32 value=\"%s\" autocapitalize=off>"
-        "<label>Password (leave blank for an open network)</label>"
-        "<input name=pass type=password maxlength=63 autocomplete=off>"
-        "<button>Save and reconnect</button></form>"
         "<h2>Nearby networks</h2>"
         "<button id=scanbtn onclick=doScan()>Scan for Wi-Fi</button>"
         "<p id=scannote style='color:#71717a;font-size:13px;margin:6px 0'>"
@@ -170,8 +156,7 @@ def stats_page(info, message=""):
         "<table><tbody id=scanres></tbody></table>"
         "<p><a href=/stats>Refresh</a> &middot; <a href=/>Arm page</a></p>"
         "<script>"
-        "var reloader=setInterval(function(){var a=document.activeElement||{};"
-        "if(a.tagName!='INPUT'&&a.tagName!='BUTTON')location.reload()},3000);"
+        "var reloader=setInterval(function(){location.reload()},3000);"
         "function esc(t){return t.replace(/[&<>\"]/g,function(c){"
         "return{'&':'&amp;','<':'&lt;','>':'&gt;','\"':'&quot;'}[c]})}"
         "function doScan(){clearInterval(reloader);"
@@ -186,9 +171,8 @@ def stats_page(info, message=""):
         "}).catch(function(){b.disabled=false;b.textContent='Scan failed - retry';});}"
         "</script>"
         "</body></html>"
-    ) % (esc(info["ap_ssid"]), esc(info["ap_ssid"]) + " diagnostics", note, table,
-         ("<h2>Client addresses</h2><ul>%s</ul>" % clients) if clients else "",
-         esc(info["uplink"] or ""))
+    ) % (esc(info["ap_ssid"]), esc(info["ap_ssid"]) + " diagnostics", table,
+         ("<h2>Client addresses</h2><ul>%s</ul>" % clients) if clients else "")
 
 
 def ws_frame(text):
@@ -221,11 +205,11 @@ class Web:
         self.last_message = utime.ticks_add(utime.ticks_ms(), -PAGE_TIMEOUT_MS - 1)
         self.accepted = {}         # device -> when its page last spoke; these are told "the network is fine"
         self.last_forget = utime.ticks_ms()
-        self.live = []             # [socket, unread bytes]
-        self.sending = []          # [socket, file data in flash, bytes sent]
+        self.live = []             # [socket, unread bytes, device, last heard from]
+        self.sending = []          # [socket, file data in flash, bytes sent, last progress]
+        self.hub_status = None     # set by arm.py: () -> {"connected", "battery"} for /stats
 
         self.held = False          # uplink on hold (arm page open)
-        self.reboot_at = None      # set by /wifi: reboot shortly after replying
         self.last_rx = self.last_tx = None   # for the live throughput figure on /stats
         self.last_rate_ms = utime.ticks_ms()
 
@@ -265,8 +249,6 @@ class Web:
 
     # ---------- everything below runs a little at a time from poll()
     def poll(self):
-        if self.reboot_at is not None and utime.ticks_diff(utime.ticks_ms(), self.reboot_at) >= 0:
-            machine.reset()
         try:
             q, who = self.dns.recvfrom(512)
             r = dns_reply(q, ADDRESS)
@@ -320,7 +302,7 @@ class Web:
             client.setblocking(False)
             if len(self.live) >= MAX_LIVE:
                 self._drop_live(self.live[0])
-            self.live.append([client, b"", device])
+            self.live.append([client, b"", device, utime.ticks_ms()])
             self._accept(device)
             return True
         if path.startswith("/s?"):
@@ -334,9 +316,6 @@ class Web:
         if path == "/scan":
             self._accept(device)
             return self._scan(client)
-        if path.startswith("/wifi?"):
-            self._accept(device)
-            return self._set_uplink(client, full.split("?", 1)[1])
         if path in FILES:
             name, kind = FILES[path]
             return self._send_file(client, name, kind, "no-cache" if path in ("/app.js", "/style.css") else "max-age=86400")
@@ -431,36 +410,8 @@ class Web:
                 "held": held, "sta_ip": sta_ip, "uptime_s": now // 1000, "mem_free": gc.mem_free(),
                 "sim": SIMULATE, "chan2": chan2, "ht40": ht40, "phy": phy, "rx": rx, "tx": tx,
                 "down": down, "up_mbps": up_mbps, "txpower": txpower, "temp": temp,
-                "ram_free": free, "ram_min": least}
-
-    def _set_uplink(self, client, query):
-        q = parse(query)
-        ssid = unquote(q.get("ssid", "")).strip()
-        pwd = unquote(q.get("pass", ""))
-        if not 1 <= len(ssid) <= 32:
-            return self._send_html(client, stats_page(self._stats_info(),
-                                                      "Network name must be 1-32 characters."))
-        if pwd and not 8 <= len(pwd) <= 63:
-            return self._send_html(client, stats_page(self._stats_info(),
-                                                      "Password must be 8-63 characters, or blank for open."))
-        try:
-            lines = ["# Written by the board's /wifi page.",
-                     "WIFI_NAME = %r" % WIFI_NAME, "WIFI_PASSWORD = %r" % WIFI_PASSWORD,
-                     "UPLINK_NAME = %r" % ssid, "UPLINK_PASSWORD = %r" % pwd]
-            if SIMULATE:
-                lines.append("SIMULATE = True")
-            with open("config.py", "w") as f:
-                f.write("\n".join(lines) + "\n")
-        except Exception as e:
-            return self._send_html(client, stats_page(self._stats_info(), "Could not save: %s" % e))
-        self._send_html(client, "<!doctype html><meta charset=utf-8>"
-                        "<meta name=viewport content='width=device-width,initial-scale=1'>"
-                        "<title>Saved</title><body style='font:15px system-ui;padding:16px'>"
-                        "<p>Saved. The board is restarting and will connect to <b>%s</b>.</p>"
-                        "<p>Rejoin the hotspot, then open <a href=http://%s/stats>%s/stats</a>.</p>"
-                        % (esc(ssid), HOSTNAME + ".local", HOSTNAME + ".local"))
-        self.reboot_at = utime.ticks_add(utime.ticks_ms(), 1500)   # let the reply flush first
-        return False
+                "ram_free": free, "ram_min": least,
+                "hub": self.hub_status() if self.hub_status else None}
 
     # A user-triggered all-SSID scan (debug page only), via repeater.scan() in
     # the C module - MicroPython's own WLAN.scan() returns nothing in this
@@ -494,14 +445,19 @@ class Web:
         client.write(("HTTP/1.0 200 OK\r\nContent-Type: %s\r\n%sContent-Length: %d\r\n"
                       "Cache-Control: %s\r\n\r\n" % (kind, gz, len(data), cache)).encode())
         client.setblocking(False)
-        self.sending.append([client, memoryview(data), 0])   # straight from flash, no copy
+        if len(self.sending) >= MAX_SENDING:
+            self._close(self.sending.pop(0)[0])
+        self.sending.append([client, memoryview(data), 0, utime.ticks_ms()])   # straight from flash, no copy
         return True
 
     def _pump(self):
-        """Send the next piece of every file being downloaded."""
+        """Send the next piece of every file being downloaded. A download that makes no
+        progress for STALL_MS is dropped: its device left (or slept) without closing the
+        connection, and each stuck one would otherwise hold a socket and its buffers for good."""
+        now = utime.ticks_ms()
         for item in list(self.sending):
-            sock, data, sent = item
-            if sent >= len(data):
+            sock, data, sent, last = item
+            if sent >= len(data) or utime.ticks_diff(now, last) > STALL_MS:
                 self._close(sock)
                 self.sending.remove(item)
                 continue
@@ -514,7 +470,9 @@ class Web:
                     self._close(sock)
                     self.sending.remove(item)
                     continue
-            item[2] = sent + (n or 0)
+            if n:
+                item[2] = sent + n
+                item[3] = now
 
     # ---------- live links
     def broadcast(self, text):
@@ -532,6 +490,7 @@ class Web:
             self.live.remove(item)
 
     def _read_live(self):
+        now = utime.ticks_ms()
         for item in list(self.live):
             sock = item[0]
             try:
@@ -543,6 +502,10 @@ class Web:
                     self._drop_live(item)
                     continue
                 item[1] += data
+                item[3] = now
+            elif utime.ticks_diff(now, item[3]) > STALL_MS:
+                self._drop_live(item)        # the page sends every 0.5 s: this one has gone
+                continue
             buf = item[1]
             while len(buf) >= 2:
                 op = buf[0] & 0x0F

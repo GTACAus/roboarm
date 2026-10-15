@@ -53,6 +53,7 @@ class FakeHub:
         if not self.started:
             self.started = True
             self._emit(4, self.mode, self.muscle_motor, FITTED_MASK)
+            self._emit(5, 87, 82, 0)             # battery 87 %, 8.20 V (a real hub program reports its own)
             for m in FITTED:
                 self._emit(3, m, self.base[m] // 100, self.base[m] % 100)
                 self._report(m, force=True)

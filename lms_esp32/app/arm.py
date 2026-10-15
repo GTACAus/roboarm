@@ -32,10 +32,12 @@ MOTORS = "BCDEF"
 MIN_MM, MAX_MM = 50, 1000          # muscle readings: relaxed .. full squeeze
 CMD_MM, CMD_STEP = 1100, 5          # commands: mm = 1100 + 5 x code
 STOP_ALL, HOME, REBASE, MUSCLE_MOTOR, GO_HEAD, GO_ANGLE, TURN_HEAD = 35, 36, 37, 38, 43, 88, 160
+MUSCLE_OPTS = 175                   # + 1: muscle motor turns the other way, + 2: no auto return
+                                    # (older hub programs ignore codes past TURN_HEAD + 14)
 FRAME_MS = 30                       # remote: each motor's state is repeated in turn this often
 HOLD_MS = 15                        # shortest hold of a command, so the hub reads it twice
 MUSCLE_MS = 20                      # muscle reading update rate
-REFRESH_MS = 2000                   # the page's muscle motor choice is repeated this often
+REFRESH_MS = 2000                   # the page's muscle motor choice and options are repeated this often
 IDLE_POLL_MS = 20                   # web server check interval while the arm page is closed
 STATUS_MS = 1000                    # uplink status check interval (printed when it changes)
 
@@ -51,6 +53,8 @@ class Arm:
         self.remote = False             # current mode
         self.gain = 1.0                 # amplifier bar on the page
         self.muscle_motor = None        # chosen on the page (None: the hub's buttons choose)
+        self.muscle_opts = None         # MUSCLE_OPTS flags from the page (None: not sent yet)
+        self.battery = None             # (percent, millivolts, when) from the hub, if its program reports it
         self.positions = [-1] * 5
         self.baselines = [-1] * 5
         self.hub = "h 0 B 0"
@@ -70,9 +74,20 @@ class Arm:
             angle = b * 100 + c
             (self.positions if kind == 2 else self.baselines)[a] = angle
             self.tell("%s %s %d" % ("p" if kind == 2 else "b", MOTORS[a], angle))
+        elif kind == 5:                 # battery: percent, then volts as two 2-digit halves (8.05 V = 80, 50)
+            self.battery = (a, b * 100 + c, utime.ticks_ms())
         elif kind == 4:
             self.hub = "h %d %s %d" % (a, MOTORS[b] if b < 5 else "B", c)
             self.tell(self.hub)
+
+    def hub_status(self):
+        """For the /stats page: is the hub talking, and its battery (None if never reported)."""
+        s = self.sensor
+        battery = None
+        if self.battery:
+            pct, mv, when = self.battery
+            battery = (pct, mv, utime.ticks_diff(utime.ticks_ms(), when) // 1000)
+        return {"connected": bool(s and getattr(s, "connected", True)), "battery": battery}
 
     def tell(self, line):
         if self.web:
@@ -96,6 +111,14 @@ class Arm:
             if m != self.muscle_motor:
                 self.muscle_motor = m
                 self.queue.append(MUSCLE_MOTOR + m)
+        if "o" in p:
+            try:
+                opts = int(p["o"]) & 3
+            except ValueError:
+                opts = None
+            if opts is not None and opts != self.muscle_opts:
+                self.muscle_opts = opts
+                self.queue.append(MUSCLE_OPTS + opts)
         if "m" in p and self.remote_tab and len(p["m"]) == 5:
             for i in range(5):
                 s = ord(p["m"][i]) - 48
@@ -171,6 +194,8 @@ class Arm:
             self.last_refresh = now
             if MUSCLE_MOTOR + self.muscle_motor not in self.queue:
                 self.queue.append(MUSCLE_MOTOR + self.muscle_motor)
+            if self.muscle_opts is not None and MUSCLE_OPTS + self.muscle_opts not in self.queue:
+                self.queue.append(MUSCLE_OPTS + self.muscle_opts)
 
         mm = None
         wait = MUSCLE_MS
@@ -230,6 +255,7 @@ def main():
         emg.calibrate()
     try:
         arm.web = web.Web(arm.page)
+        arm.web.hub_status = arm.hub_status
     except ValueError as e:          # not set up yet: the hub and muscle sensor still work
         print(e)
     print(memory())
